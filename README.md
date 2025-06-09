@@ -31,10 +31,10 @@ Dự án được xây dựng với trái tim nồng cháy và những công ngh
 
 ```bash
 # Clone project về máy
-git clone https://github.com/your-username/travel-booking.git
+https://github.com/runeeyes584/Software-Engineering-HK2-2025.git
 
 # Cài đặt dependencies
-cd travel-booking
+cd /your-folder-name/
 npm install
 
 # Khởi chạy dự án
