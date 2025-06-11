@@ -3,6 +3,10 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 const { Clerk } = require('@clerk/clerk-sdk-node');
+const tourRoutes = require('./routes/tour.route.js');
+const bookingRoutes = require('./routes/booking.route.js');
+const paymentRoutes = require('./routes/payment.route.js');
+const userRoutes = require('./routes/user.route.js');
 
 Clerk({ secretKey: process.env.CLERK_SECRET_KEY });
 
@@ -21,7 +25,11 @@ mongoose.connect(process.env.MONGODB_URI)
   .catch((err) => console.error('Could not connect to MongoDB:', err));
 
 // Routes
-app.use('/api/auth', authRoutes);
+// app.use('/api/auth', authRoutes);
+app.use('/api/tours', tourRoutes);
+app.use('/api/bookings', bookingRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/users', userRoutes);
 
 // Route bảo vệ bằng Clerk
 app.get('/api/protected', requireAuth, (req, res) => {
