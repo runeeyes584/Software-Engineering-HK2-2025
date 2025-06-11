@@ -9,6 +9,7 @@ const paymentRoutes = require('./routes/payment.route.js');
 const userRoutes = require('./routes/user.route.js');
 const cloudinaryRoutes = require('./routes/cloudinary.route.js');
 const saveTourRoutes = require('./routes/save-tour.route.js');
+const reviewRoutes = require('./routes/review.route.js');
 
 Clerk({ secretKey: process.env.CLERK_SECRET_KEY });
 
@@ -38,6 +39,7 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/cloudinary', cloudinaryRoutes);
 app.use('/api/saved-tours', saveTourRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 // Route bảo vệ bằng Clerk
 app.get('/api/protected', requireAuth, (req, res) => {
