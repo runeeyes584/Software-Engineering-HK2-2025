@@ -7,6 +7,8 @@ const tourRoutes = require('./routes/tour.route.js');
 const bookingRoutes = require('./routes/booking.route.js');
 const paymentRoutes = require('./routes/payment.route.js');
 const userRoutes = require('./routes/user.route.js');
+const cloudinaryRoutes = require('./routes/cloudinary.route.js');
+const saveTourRoutes = require('./routes/save-tour.route.js');
 
 Clerk({ secretKey: process.env.CLERK_SECRET_KEY });
 
@@ -17,19 +19,25 @@ const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((err) => console.error('Could not connect to MongoDB:', err));
+mongoose.connect(process.env.MONGODB_URI, {
+  dbName: 'travelbooking',
+})
+.then(() => console.log('Connected to MongoDB'))
+.catch((err) => console.error('Could not connect to MongoDB:', err));
+
+app.use('/api/users', userRoutes);
+
+app.use(express.json());
 
 // Routes
 // app.use('/api/auth', authRoutes);
 app.use('/api/tours', tourRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/payments', paymentRoutes);
-app.use('/api/users', userRoutes);
+app.use('/api/cloudinary', cloudinaryRoutes);
+app.use('/api/saved-tours', saveTourRoutes);
 
 // Route bảo vệ bằng Clerk
 app.get('/api/protected', requireAuth, (req, res) => {

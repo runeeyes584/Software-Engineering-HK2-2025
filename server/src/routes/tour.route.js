@@ -6,6 +6,8 @@ const {
   updateTour,
   deleteTour
 } = require('../controllers/tour.controller.js');
+const requireAuth = require('../middleware/clerk.js');
+const isAdmin = require('../middleware/isAdmin.js');
 
 const router = express.Router();
 
@@ -16,12 +18,12 @@ router.get('/', getAllTours);
 router.get('/:id', getTourById);
 
 // Tạo tour mới
-router.post('/', createTour);
+router.post('/', requireAuth, isAdmin, createTour);
 
 // Cập nhật tour theo ID
-router.put('/:id', updateTour);
+router.put('/:id', requireAuth, isAdmin, updateTour);
 
 // Xóa tour theo ID
-router.delete('/:id', deleteTour);
+router.delete('/:id', requireAuth, isAdmin, deleteTour);
 
 module.exports = router;

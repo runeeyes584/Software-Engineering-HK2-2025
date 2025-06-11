@@ -20,12 +20,14 @@ const handleClerkWebhook = async (req, res) => {
   let evt;
 
   try {
-    const payload = req.body;
+    const payload = req.body.toString();
     evt = wh.verify(payload, {
       "svix-id": svix_id,
       "svix-timestamp": svix_timestamp,
       "svix-signature": svix_signature,
     });
+
+    console.log("📨 Nhận webhook từ Clerk, loại:", evt.type);
   } catch (err) {
     return res.status(400).json({ success: false, message: err.message });
   }
@@ -33,6 +35,11 @@ const handleClerkWebhook = async (req, res) => {
   try {
     const { id } = evt.data;
     const eventType = evt.type;
+
+    if (eventType === "user.deleted") {
+      return res.status(200).json({ success: true, message: "User deleted event ignored" });
+    }
+
     const {
       username,
       first_name,
@@ -41,35 +48,38 @@ const handleClerkWebhook = async (req, res) => {
       email_addresses
     } = evt.data;
 
-    if (eventType === "user.created" || eventType === "user.updated") {
-      const userData = {
-        clerkId: id,
-        email: email_addresses?.[0]?.email_address?.toLowerCase(),
-        username: username || null,
-        firstname: first_name || null,
-        lastname: last_name || null,
-        avatar: image_url || null,
-      };
+    const email = email_addresses?.[0]?.email_address?.toLowerCase();
 
-      Object.keys(userData).forEach(key => userData[key] === undefined && delete userData[key]);
-
-      await User.findOneAndUpdate({ clerkId: id }, userData, { upsert: true, new: true });
-
+    if (!email) {
       return res.status(200).json({
         success: true,
-        message: "Webhook processed and DB updated successfully",
+        message: "No email provided, webhook ignored"
       });
     }
 
-    if (eventType === "user.deleted") {
-      await User.findOneAndDelete({ clerkId: id });
-      return res.status(200).json({
-        success: true,
-        message: "User deleted successfully",
-      });
-    }
+    const finalUsername = username || email.split('@')[0] || `user_${Date.now()}`;
 
-    return res.status(200).json({ success: true, message: "Webhook received (no action taken)" });
+    const userData = {
+      clerkId: id,
+      email,
+      username: finalUsername,
+      firstname: first_name || null,
+      lastname: last_name || null,
+      avatar: image_url || null,
+    };
+
+    Object.keys(userData).forEach(key => userData[key] === undefined && delete userData[key]);
+
+    await User.findOneAndUpdate(
+      { clerkId: id },
+      userData,
+      { upsert: true, new: true, runValidators: true }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "User saved successfully to database",
+    });
   } catch (err) {
     return res.status(500).send("Error processing webhook");
   }

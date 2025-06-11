@@ -5,19 +5,21 @@ const {
   createBooking,
   updateBooking
 } = require('../controllers/booking.controller.js');
+const requireAuth = require('../middleware/clerk.js');
+const isAdmin = require('../middleware/isAdmin.js');
 
 const router = express.Router();
 
 // Lấy danh sách tất cả booking
-router.get('/', getAllBookings);
+router.get('/', requireAuth, getAllBookings);
 
 // Lấy booking theo ID
-router.get('/:id', getBookingById);
+router.get('/:id', requireAuth, getBookingById);
 
 // Tạo booking mới
-router.post('/', createBooking);
+router.post('/', requireAuth, createBooking);
 
 // Cập nhật booking theo ID
-router.put('/:id', updateBooking);
+router.put('/:id', requireAuth, updateBooking);
 
 module.exports = router;

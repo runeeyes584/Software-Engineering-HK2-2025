@@ -1,4 +1,7 @@
 const Booking = require('../models/Booking.js');
+const Promotion = require('../models/Promotion.js');
+const Review = require('../models/Review.js');
+const Payment = require('../models/Payment.js');
 
 // Lấy tất cả booking
 const getAllBookings = async (req, res) => {

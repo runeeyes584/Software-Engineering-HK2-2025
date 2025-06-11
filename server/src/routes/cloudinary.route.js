@@ -31,13 +31,10 @@ const upload = multer({
   }
 });
 
-// Route upload file đơn lẻ
-router.post('/upload', upload.single('file'), uploadSingleFile);
-
 // Route upload nhiều file
 router.post('/upload-multiple', upload.array('files', 20), uploadMultipleFiles);
 
 // Route xóa file
-router.delete('/delete/:publicId', deleteFile);
+router.delete('/delete/*', deleteFile);
 
 module.exports = router;

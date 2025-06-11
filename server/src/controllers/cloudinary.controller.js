@@ -8,41 +8,6 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-const uploadSingleFile = async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: 'Vui lòng chọn file để upload' });
-    }
-
-    let result;
-    if (req.file.mimetype.startsWith('image/')) {
-      result = await cloudinary.uploader.upload(req.file.path, {
-        folder: 'images',
-        resource_type: 'image'
-      });
-    } else if (req.file.mimetype.startsWith('video/')) {
-      result = await cloudinary.uploader.upload(req.file.path, {
-        folder: 'videos',
-        resource_type: 'video',
-        chunk_size: 10000000,
-        eager: [{ format: "mp4", quality: "auto" }]
-      });
-    }
-
-    fs.unlinkSync(req.file.path);
-
-    res.json({
-      success: true,
-      fileUrl: result.secure_url,
-      publicId: result.public_id,
-      type: req.file.mimetype.startsWith('image/') ? 'image' : 'video'
-    });
-  } catch (error) {
-    console.error('Lỗi upload file:', error);
-    res.status(500).json({ message: 'Lỗi khi upload file' });
-  }
-};
-
 const uploadMultipleFiles = async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
@@ -79,29 +44,38 @@ const uploadMultipleFiles = async (req, res) => {
     });
   } catch (error) {
     console.error('Lỗi upload nhiều file:', error);
-    res.status(500).json({ message: 'Lỗi khi upload nhiều file' });
+    res.status(500).json({  message: error.message || 'Lỗi khi upload nhiều file' });
   }
 };
 
 const deleteFile = async (req, res) => {
   try {
-    const { publicId } = req.params;
+    const publicId = req.params[0]; // vì dùng route wildcard '*'
+
+    console.log("publicId cần xoá:", publicId);
+
+    // Tự động xác định resource_type từ folder
+    let resourceType = 'image'; 
+    if (publicId.startsWith('videos/')) resourceType = 'video';
+
     const result = await cloudinary.uploader.destroy(publicId, {
-      resource_type: 'auto'
+      resource_type: resourceType
     });
+
     res.json({
       success: true,
-      message: 'Xóa file thành công',
+      message: 'Xoá file thành công',
       result
     });
   } catch (error) {
     console.error('Lỗi xóa file:', error);
-    res.status(500).json({ message: 'Lỗi khi xóa file' });
+    res.status(500).json({ message: error.message || 'Lỗi khi xoá file' });
   }
 };
 
+
+
 module.exports = {
-  uploadSingleFile,
   uploadMultipleFiles,
   deleteFile
 };

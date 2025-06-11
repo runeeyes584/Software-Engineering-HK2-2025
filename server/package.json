@@ -16,6 +16,8 @@
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.1.0",
+    "multer": "^2.0.1",
+    "ngrok": "^5.0.0-beta.2",
     "svix": "^1.67.0",
     "vnpay": "^2.3.0"
   },

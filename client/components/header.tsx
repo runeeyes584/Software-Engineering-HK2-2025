@@ -31,21 +31,14 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { usePathname } from "next/navigation"
+import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 
 export default function Header() {
   const { theme, setTheme } = useTheme()
   const { language, setLanguage, t } = useLanguage()
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const { user, isSignedIn } = useUser()
   const pathname = usePathname()
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
-  const toggleLogin = () => {
-    setIsLoggedIn(!isLoggedIn)
-  }
 
   const tourCategories = [
     { href: "/tours/adventure", label: t("categories.adventure"), icon: Mountain },
@@ -315,11 +308,12 @@ export default function Header() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" aria-label="Theme">
-                  {isMounted && (
-                    <>
-                      <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                      <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                    </>
+                  {theme === "light" ? (
+                    <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                  ) : theme === "dark" ? (
+                    <Moon className="h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                  ) : (
+                    <span className="mr-2">💻</span>
                   )}
                 </Button>
               </DropdownMenuTrigger>
@@ -339,39 +333,18 @@ export default function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label="Account">
-                  <User className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {isLoggedIn ? (
-                  <>
-                    <DropdownMenuItem asChild>
-                      <Link href="/account">{t("auth.myAccount")}</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/account/bookings">{t("auth.myBookings")}</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/account/settings">{t("auth.settings")}</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={toggleLogin}>{t("auth.logout")}</DropdownMenuItem>
-                  </>
-                ) : (
-                  <>
-                    <DropdownMenuItem asChild>
-                      <Link href="/login">{t("auth.login")}</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/register">{t("auth.register")}</Link>
-                    </DropdownMenuItem>
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {isSignedIn ? (
+              <UserButton afterSignOutUrl="/" />
+            ) : (
+              <>
+                <SignInButton mode="modal">
+                  <Button variant="outline" className="ml-2">Sign in</Button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <Button variant="default" className="ml-2">Sign up</Button>
+                </SignUpButton>
+              </>
+            )}
           </div>
         </div>
       </div>
