@@ -6,48 +6,26 @@ import { CalendarIcon, MapPin, Star } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import TourSearch from "@/components/tour-search"
+import { useEffect, useState } from "react"
 
 export default function HomePage() {
   const { t } = useLanguage()
+  const [featuredTours, setFeaturedTours] = useState<any[]>([])
 
-  const featuredTours = [
-    {
-      id: 1,
-      title: "Halong Bay Cruise",
-      location: "Vietnam",
-      image: "/placeholder.svg?height=400&width=600",
-      price: 299,
-      duration: "3 days",
-      rating: 4.8,
-    },
-    {
-      id: 2,
-      title: "Bangkok City Tour",
-      location: "Thailand",
-      image: "/placeholder.svg?height=400&width=600",
-      price: 199,
-      duration: "2 days",
-      rating: 4.6,
-    },
-    {
-      id: 3,
-      title: "Bali Paradise",
-      location: "Indonesia",
-      image: "/placeholder.svg?height=400&width=600",
-      price: 349,
-      duration: "5 days",
-      rating: 4.9,
-    },
-    {
-      id: 4,
-      title: "Tokyo Explorer",
-      location: "Japan",
-      image: "/placeholder.svg?height=400&width=600",
-      price: 499,
-      duration: "4 days",
-      rating: 4.7,
-    },
-  ]
+  useEffect(() => {
+    fetch("http://localhost:5000/api/tours")
+      .then((res) => res.json())
+      .then((data) => {
+        // Nếu có trường isFeatured thì lọc, nếu không lấy 4 tour đầu
+        const tours = Array.isArray(data)
+          ? (data.filter((t) => t.isFeatured).length > 0
+              ? data.filter((t) => t.isFeatured)
+              : data.slice(0, 4))
+          : []
+        setFeaturedTours(tours)
+      })
+      .catch(() => setFeaturedTours([]))
+  }, [])
 
   const popularDestinations = [
     {
@@ -181,40 +159,50 @@ export default function HomePage() {
         <div className="max-w-[1400px] mx-auto">
           <h2 className="text-3xl font-bold mb-8">{t("home.featured")}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredTours.map((tour) => (
-              <Card key={tour.id} className="overflow-hidden border border-border">
-                <div className="relative h-48">
-                  <Image src={tour.image || "/placeholder.svg"} alt={tour.title} fill className="object-cover" />
-                </div>
-                <CardHeader className="p-4">
-                  <CardTitle className="text-lg">{tour.title}</CardTitle>
-                  <CardDescription className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-1" /> {tour.location}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="p-4 pt-0">
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <CalendarIcon className="h-4 w-4 mr-1" /> {tour.duration}
+            {featuredTours.length === 0 ? (
+              <div className="col-span-4 text-center text-muted-foreground py-12 text-lg font-medium">
+                Chưa có tour du lịch
+              </div>
+            ) : (
+              featuredTours.map((tour) => (
+                <Card key={tour._id || tour.id} className="overflow-hidden border border-border rounded-2xl shadow-sm transition-transform duration-200 bg-white">
+                  <div className="relative h-56">
+                    <Image src={Array.isArray(tour.images) && tour.images[0] ? tour.images[0] : "/placeholder.svg"} alt={tour.name || "Ảnh tour du lịch"} fill className="object-cover" />
                   </div>
-                  <div className="flex items-center mt-1 text-sm">
-                    <Star className="h-4 w-4 mr-1 text-yellow-500" />
-                    <span>{tour.rating}</span>
-                  </div>
-                </CardContent>
-                <CardFooter className="p-4 pt-0 flex items-center justify-between">
-                  <div className="font-bold">${tour.price}</div>
-                  <Button size="sm" asChild>
-                    <Link href={`/tours/${tour.id}`}>View Details</Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
+                  <CardHeader className="p-5 pb-3">
+                    <CardTitle className="text-xl font-bold mb-1 line-clamp-2">{tour.name}</CardTitle>
+                    <CardDescription className="flex items-center text-sm text-muted-foreground mb-1">
+                      <MapPin className="h-4 w-4 mr-1" /> {tour.destination}
+                    </CardDescription>
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="flex items-center">
+                        <Star className="h-4 w-4 mr-1 text-yellow-500" />
+                        <span className="font-semibold text-yellow-600">{typeof tour.averageRating === "number" && !isNaN(tour.averageRating) ? tour.averageRating.toFixed(1) : "0.0"}</span>
+                        <span className="ml-1 text-muted-foreground">({tour.reviewCount || 0})</span>
+                      </div>
+                      <div className="flex items-center ml-4">
+                        <CalendarIcon className="h-4 w-4 mr-1" /> {tour.duration || "-"}
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardFooter className="p-5 pt-0 flex items-center justify-between">
+                    <div className="font-bold text-lg text-primary">${tour.price?.toLocaleString() || 0}</div>
+                    <Button size="sm" asChild className="rounded-full px-5 font-semibold">
+                      <Link href={`/tours/${tour._id || tour.id}`}>View Details</Link>
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))
+            )}
           </div>
-          <div className="text-center mt-8">
-            <Button variant="outline" asChild>
-              <Link href="/tours">View All Tours</Link>
-            </Button>
-          </div>
+          {/* Nút View All Tours chỉ hiện khi có tour */}
+          {featuredTours.length > 0 && (
+            <div className="text-center mt-8">
+              <Button variant="outline" asChild>
+                <Link href="/tours">View All Tours</Link>
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 

@@ -1,10 +1,26 @@
 const Tour = require('../models/Tour.js');
+const Review = require('../models/Review.js');
 
 // Lấy danh sách tất cả tour
 const getAllTours = async (req, res) => {
   try {
     const tours = await Tour.find();
-    res.status(200).json(tours);
+    // Lấy rating trung bình cho từng tour
+    const toursWithRating = await Promise.all(
+      tours.map(async (tour) => {
+        const reviews = await Review.find({ tour: tour._id });
+        let averageRating = 0;
+        if (reviews.length > 0) {
+          averageRating = reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length;
+        }
+        return {
+          ...tour.toObject(),
+          averageRating: Math.round(averageRating * 10) / 10,
+          reviewCount: reviews.length,
+        };
+      })
+    );
+    res.status(200).json(toursWithRating);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

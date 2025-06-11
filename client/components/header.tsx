@@ -28,6 +28,7 @@ import {
   Building,
   Waves,
   Tent,
+  Monitor,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { usePathname } from "next/navigation"
@@ -313,7 +314,7 @@ export default function Header() {
                   ) : theme === "dark" ? (
                     <Moon className="h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
                   ) : (
-                    <span className="mr-2">💻</span>
+                    <Monitor className="h-5 w-5" />
                   )}
                 </Button>
               </DropdownMenuTrigger>
@@ -327,11 +328,17 @@ export default function Header() {
                   {t("theme.dark")}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setTheme("system")} className={theme === "system" ? "bg-muted" : ""}>
-                  <span className="mr-2">💻</span>
+                  <Monitor className="mr-2 h-4 w-4" />
                   {t("theme.system")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
+            <Link href="/account" passHref legacyBehavior>
+              <Button variant="ghost" size="icon" aria-label="Account">
+                <User className="h-5 w-5" />
+              </Button>
+            </Link>
 
             {isSignedIn ? (
               <UserButton afterSignOutUrl="/" />
