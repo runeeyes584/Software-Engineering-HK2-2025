@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useLanguage } from "@/components/language-provider"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -11,13 +11,16 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { CalendarIcon, Clock, MapPin, Star, Plane, Bus, Ship, Car } from "lucide-react"
 import Image from "next/image"
-import { format, addDays } from "date-fns"
+import { format, addDays, differenceInDays } from "date-fns"
 import { useParams, useRouter } from "next/navigation"
 
 export default function TourDetailPage() {
   const { t } = useLanguage()
   const params = useParams()
   const router = useRouter()
+  const [tourData, setTourData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [departureDate, setDepartureDate] = useState<Date | undefined>(undefined)
   const [returnDate, setReturnDate] = useState<Date | undefined>(undefined)
   const [transportType, setTransportType] = useState("plane")
@@ -26,53 +29,80 @@ export default function TourDetailPage() {
   const [children, setChildren] = useState(0)
   const [infants, setInfants] = useState(0)
 
-  const tour = {
-    id: params.id,
-    title: t("tour.halongBay.title"),
-    location: t("tour.halongBay.location"),
-    images: [
-      "/placeholder.svg?height=600&width=800",
-      "/placeholder.svg?height=600&width=800",
-      "/placeholder.svg?height=600&width=800",
-    ],
-    price: 299,
-    duration: 3,
-    rating: 4.8,
-    reviews: 124,
-    category: t("categories.adventure"),
-    description: t("tour.halongBay.description"),
-    transportOptions: [
-      { id: "plane", name: t("transport.airplane"), icon: Plane, priceModifier: 1.2 },
-      { id: "bus", name: t("transport.bus"), icon: Bus, priceModifier: 1.0 },
-      { id: "ship", name: t("transport.cruiseShip"), icon: Ship, priceModifier: 1.3 },
-      { id: "car", name: t("transport.privateCar"), icon: Car, priceModifier: 1.5 },
-    ],
-    classOptions: [
-      { id: "economy", name: t("class.economy"), description: t("class.economyDesc"), priceModifier: 1.0 },
-      { id: "business", name: t("class.business"), description: t("class.businessDesc"), priceModifier: 1.5 },
-      { id: "luxury", name: t("class.luxury"), description: t("class.luxuryDesc"), priceModifier: 2.0 },
-    ],
-    highlights: t("tour.halongBay.highlights"),
-    itinerary: [
-      {
-        day: 1,
-        title: t("tour.halongBay.itinerary.day1.title"),
-        description: t("tour.halongBay.itinerary.day1.description"),
-      },
-      {
-        day: 2,
-        title: t("tour.halongBay.itinerary.day2.title"),
-        description: t("tour.halongBay.itinerary.day2.description"),
-      },
-      {
-        day: 3,
-        title: t("tour.halongBay.itinerary.day3.title"),
-        description: t("tour.halongBay.itinerary.day3.description"),
-      },
-    ],
-    included: t("tour.halongBay.included"),
-    excluded: t("tour.halongBay.excluded"),
+  useEffect(() => {
+    const fetchTourData = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/tours/${params.id}`)
+        if (!response.ok) {
+          throw new Error('Failed to fetch tour details')
+        }
+        const data = await response.json()
+        setTourData(data)
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'An unknown error occurred')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchTourData()
+  }, [params.id])
+
+  const mapTourDataToTour = (tourData: any) => {
+    return {
+      id: params.id,
+      title: tourData.name,
+      location: tourData.destination,
+      images: tourData.images || [
+        "/placeholder.svg?height=600&width=800",
+        "/placeholder.svg?height=600&width=800",
+        "/placeholder.svg?height=600&width=800",
+      ],
+      price: tourData.price,
+      duration: differenceInDays(new Date(tourData.endDate), new Date(tourData.startDate)) + 1,
+      rating: tourData.averageRating || 4.8,
+      reviews: tourData.reviewCount || 124,
+      category: t("categories.adventure"),
+      description: tourData.description,
+      transportOptions: [
+        { id: "plane", name: t("transport.airplane"), icon: Plane, priceModifier: 1.2 },
+        { id: "bus", name: t("transport.bus"), icon: Bus, priceModifier: 1.0 },
+        { id: "ship", name: t("transport.cruiseShip"), icon: Ship, priceModifier: 1.3 },
+        { id: "car", name: t("transport.privateCar"), icon: Car, priceModifier: 1.5 },
+      ],
+      classOptions: [
+        { id: "economy", name: t("class.economy"), description: t("class.economyDesc"), priceModifier: 1.0 },
+        { id: "business", name: t("class.business"), description: t("class.businessDesc"), priceModifier: 1.5 },
+        { id: "luxury", name: t("class.luxury"), description: t("class.luxuryDesc"), priceModifier: 2.0 },
+      ],
+      highlights: t("tour.halongBay.highlights"),
+      itinerary: [
+        {
+          day: 1,
+          title: t("tour.halongBay.itinerary.day1.title"),
+          description: t("tour.halongBay.itinerary.day1.description"),
+        },
+        {
+          day: 2,
+          title: t("tour.halongBay.itinerary.day2.title"),
+          description: t("tour.halongBay.itinerary.day2.description"),
+        },
+        {
+          day: 3,
+          title: t("tour.halongBay.itinerary.day3.title"),
+          description: t("tour.halongBay.itinerary.day3.description"),
+        },
+      ],
+      included: t("tour.halongBay.included"),
+      excluded: t("tour.halongBay.excluded"),
+    }
   }
+
+  if (loading) return <div>Loading...</div>
+  if (error) return <div>Error: {error}</div>
+  if (!tourData) return <div>Tour not found</div>
+
+  const tour = mapTourDataToTour(tourData)
 
   // Calculate price based on selections
   const getSelectedTransport = () =>
@@ -149,14 +179,13 @@ export default function TourDetailPage() {
 
             {/* Thumbnail Images */}
             <div className="grid grid-cols-3 gap-3">
-              {tour.images.slice(1).map((image, index) => (
+              {tour.images.slice(1).map((image: string, index: number) => (
                 <div key={index} className="relative aspect-video rounded-lg overflow-hidden border border-border">
                   <Image
-                    src={image || "/placeholder.svg?height=300&width=400"}
-                    alt={`${tour.title} ${index + 2}`}
+                    src={image}
+                    alt={`Tour image ${index + 2}`}
                     fill
-                    className="object-cover hover:scale-105 transition-transform duration-200"
-                    sizes="(max-width: 768px) 33vw, (max-width: 1200px) 22vw, 16vw"
+                    className="object-cover"
                   />
                 </div>
               ))}
@@ -422,8 +451,8 @@ export default function TourDetailPage() {
                               setReturnDate(addDays(date, tour.duration - 1))
                             }
                           }}
+                          disabled={(date: Date) => date < new Date()}
                           initialFocus
-                          disabled={(date) => date < new Date()}
                         />
                       </PopoverContent>
                     </Popover>
@@ -446,8 +475,11 @@ export default function TourDetailPage() {
                             mode="single"
                             selected={returnDate}
                             onSelect={setReturnDate}
+                            disabled={(date: Date) => {
+                              const today = new Date()
+                              return date < today || (departureDate ? date < departureDate : false)
+                            }}
                             initialFocus
-                            disabled={(date) => date < new Date() || (departureDate && date < departureDate)}
                           />
                         </PopoverContent>
                       </Popover>

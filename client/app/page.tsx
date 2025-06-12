@@ -2,7 +2,7 @@
 import { useLanguage } from "@/components/language-provider"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { CalendarIcon, MapPin, Star } from "lucide-react"
+import { CalendarIcon, MapPin, Star, ChevronLeft, ChevronRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import TourSearch from "@/components/tour-search"
@@ -11,6 +11,7 @@ import { useEffect, useState } from "react"
 export default function HomePage() {
   const { t } = useLanguage()
   const [featuredTours, setFeaturedTours] = useState<any[]>([])
+  const [imageIndexes, setImageIndexes] = useState<{ [key: string]: number }>({})
 
   useEffect(() => {
     fetch("http://localhost:5000/api/tours")
@@ -101,6 +102,20 @@ export default function HomePage() {
     window.location.href = `/tours?${params.toString()}`
   }
 
+  const handlePrev = (tourId: string, images: string[]) => {
+    setImageIndexes((prev) => ({
+      ...prev,
+      [tourId]: (prev[tourId] > 0 ? prev[tourId] : images.length) - 1,
+    }))
+  }
+
+  const handleNext = (tourId: string, images: string[]) => {
+    setImageIndexes((prev) => ({
+      ...prev,
+      [tourId]: ((prev[tourId] || 0) + 1) % images.length,
+    }))
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -164,35 +179,81 @@ export default function HomePage() {
                 Chưa có tour du lịch
               </div>
             ) : (
-              featuredTours.map((tour) => (
-                <Card key={tour._id || tour.id} className="overflow-hidden border border-border rounded-2xl shadow-sm transition-transform duration-200 bg-white">
-                  <div className="relative h-56">
-                    <Image src={Array.isArray(tour.images) && tour.images[0] ? tour.images[0] : "/placeholder.svg"} alt={tour.name || "Ảnh tour du lịch"} fill className="object-cover" />
-                  </div>
-                  <CardHeader className="p-5 pb-3">
-                    <CardTitle className="text-xl font-bold mb-1 line-clamp-2">{tour.name}</CardTitle>
-                    <CardDescription className="flex items-center text-sm text-muted-foreground mb-1">
-                      <MapPin className="h-4 w-4 mr-1" /> {tour.destination}
-                    </CardDescription>
-                    <div className="flex items-center gap-3 text-sm">
-                      <div className="flex items-center">
-                        <Star className="h-4 w-4 mr-1 text-yellow-500" />
-                        <span className="font-semibold text-yellow-600">{typeof tour.averageRating === "number" && !isNaN(tour.averageRating) ? tour.averageRating.toFixed(1) : "0.0"}</span>
-                        <span className="ml-1 text-muted-foreground">({tour.reviewCount || 0})</span>
+              featuredTours.map((tour) => {
+                const images = Array.isArray(tour.images) && tour.images.length > 0 ? tour.images : ["/placeholder.svg"];
+                const currentIndex = imageIndexes[tour._id || tour.id] || 0;
+                return (
+                  <Card
+                    key={tour._id || tour.id}
+                    className="overflow-hidden border border-border rounded-2xl shadow-md transition-transform duration-200 bg-white group"
+                  >
+                    <div className="relative h-56 group">
+                      <Image
+                        src={images[currentIndex]}
+                        alt={tour.name || "Ảnh tour du lịch"}
+                        fill
+                        className="object-cover rounded-t-2xl transition-transform duration-300"
+                      />
+                      <div className="absolute top-3 left-3 bg-white/80 rounded-full px-3 py-1 flex items-center gap-1 shadow text-xs font-medium">
+                        <MapPin className="h-4 w-4 text-primary" />
+                        <span className="text-primary font-semibold">{tour.destination}</span>
                       </div>
-                      <div className="flex items-center ml-4">
-                        <CalendarIcon className="h-4 w-4 mr-1" /> {tour.duration || "-"}
-                      </div>
+                      {images.length > 1 && (
+                        <>
+                          <button
+                            onClick={() => handlePrev(tour._id || tour.id, images)}
+                            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 hover:bg-black/70 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+                          >
+                            <ChevronLeft className="w-5 h-5" />
+                          </button>
+                          <button
+                            onClick={() => handleNext(tour._id || tour.id, images)}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 hover:bg-black/70 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+                          >
+                            <ChevronRight className="w-5 h-5" />
+                          </button>
+                        </>
+                      )}
+                      {images.length > 1 && (
+                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                          {images.map((_: any, idx: number) => (
+                            <span
+                              key={idx}
+                              className={`w-2 h-2 rounded-full ${idx === currentIndex ? "bg-primary" : "bg-white/70"}`}
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  </CardHeader>
-                  <CardFooter className="p-5 pt-0 flex items-center justify-between">
-                    <div className="font-bold text-lg text-primary">${tour.price?.toLocaleString() || 0}</div>
-                    <Button size="sm" asChild className="rounded-full px-5 font-semibold">
-                      <Link href={`/tours/${tour._id || tour.id}`}>View Details</Link>
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))
+                    <CardHeader className="p-5 pb-3">
+                      <CardTitle className="text-xl font-bold mb-1 line-clamp-2 group-hover:text-primary transition-colors">
+                        {tour.name}
+                      </CardTitle>
+                      <div className="flex items-center gap-2 text-sm mt-1">
+                        <Star className="h-4 w-4 text-yellow-500" />
+                        <span className="font-semibold text-yellow-600">
+                          {typeof tour.averageRating === "number" && !isNaN(tour.averageRating)
+                            ? tour.averageRating.toFixed(1)
+                            : "0.0"}
+                        </span>
+                        <span className="text-muted-foreground">({tour.reviewCount || 0})</span>
+                      </div>
+                    </CardHeader>
+                    <CardFooter className="p-5 pt-0 flex items-center justify-between">
+                      <div className="font-bold text-lg text-primary">
+                        {tour.price?.toLocaleString("vi-VN") || 0} ₫
+                      </div>
+                      <Button
+                        size="sm"
+                        asChild
+                        className="rounded-full px-5 font-semibold bg-primary text-white hover:bg-primary/90 transition-colors"
+                      >
+                        <Link href={`/tours/${tour._id || tour.id}`}>Xem chi tiết</Link>
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                );
+              })
             )}
           </div>
           {/* Nút View All Tours chỉ hiện khi có tour */}
