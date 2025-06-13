@@ -46,6 +46,47 @@ export default function TranslationTest() {
     "chatbot.title",
     "chatbot.suggestion.beaches",
     "chatbot.suggestion.booking",
+    
+    // Filter Keys (newly added)
+    "filters.title",
+    "filters.active", 
+    "filters.activeFilters",
+    "filters.clearAll",
+    "filters.days",
+    "filters.stars",
+    "filters.priceRange",
+    "filters.duration",
+    "filters.categories",
+    "filters.countries",
+    "filters.difficulties",
+    "filters.activities",
+    "filters.amenities",
+    "filters.tourLanguages",
+    "filters.groupSize",
+    "filters.person",
+    "filters.people",
+    
+    // Search Keys (newly added)
+    "search.button",
+    "search.active",
+    "search.noToursMatchFilters",
+    
+    // Home Keys (newly added)
+    "home.hero.title",
+    "home.hero.subtitle",
+    "home.hero.cta",
+    "home.featured",
+    "home.popular", 
+    "home.testimonials",
+    
+    // Transport & Tour Keys (newly added)
+    "transport.airplane",
+    "transport.bus",
+    "transport.cruiseShip",
+    "transport.privateCar",
+    "class.economy",
+    "class.business",
+    "class.luxury",
   ]
 
   return (

@@ -156,6 +156,43 @@ const translations: Record<string, Record<string, string>> = {
     "filters.person": "person",
     "filters.people": "people",
 
+    // Home
+    "home.hero.title": "Discover Amazing Destinations",
+    "home.hero.subtitle": "Explore the world with our carefully curated travel experiences",
+    "home.hero.cta": "Explore Tours",
+    "home.featured.title": "Featured Tours",
+    "home.featured": "Featured Tours",
+    "home.popular": "Popular Destinations",
+    "home.destinations.title": "Popular Destinations",
+    "home.whyChoose.title": "Why Choose Us",
+    "home.testimonials.title": "What Our Travelers Say",
+    "home.testimonials": "What Our Travelers Say",
+
+    // Transport
+    "transport.airplane": "Airplane",
+    "transport.bus": "Bus",
+    "transport.cruiseShip": "Cruise Ship",
+    "transport.privateCar": "Private Car",
+
+    // Class
+    "class.economy": "Economy",
+    "class.economyDesc": "Standard comfort with essential amenities",
+    "class.business": "Business",
+    "class.businessDesc": "Enhanced comfort with premium services",
+    "class.luxury": "Luxury",
+    "class.luxuryDesc": "Ultimate comfort with exclusive experiences",
+
+    // Tour Details
+    "tour.halongBay.highlights": "Spectacular limestone karsts, overnight cruise, floating villages, cave exploration",
+    "tour.halongBay.itinerary.day1.title": "Arrival & Cruise Departure",
+    "tour.halongBay.itinerary.day1.description": "Board your traditional junk boat and begin cruising through the stunning bay",
+    "tour.halongBay.itinerary.day2.title": "Cave Exploration & Kayaking", 
+    "tour.halongBay.itinerary.day2.description": "Explore Sung Sot Cave and kayak through hidden lagoons",
+    "tour.halongBay.itinerary.day3.title": "Sunrise & Return",
+    "tour.halongBay.itinerary.day3.description": "Watch sunrise over the bay before returning to Hanoi",
+    "tour.halongBay.included": "2 nights accommodation, all meals, transfers, English-speaking guide, entrance fees",
+    "tour.halongBay.excluded": "Personal expenses, tips, travel insurance, international flights",
+
     // Tours
     "tours.title": "Tours",
     "tours.featuredTours": "Featured Tours",
@@ -426,6 +463,43 @@ const translations: Record<string, Record<string, string>> = {
     "filters.maxGroupSize": "Kích thước nhóm tối đa",
     "filters.person": "người",
     "filters.people": "người",
+
+    // Home
+    "home.hero.title": "Khám Phá Những Điểm Đến Tuyệt Vời",
+    "home.hero.subtitle": "Trải nghiệm thế giới với những chuyến du lịch được tuyển chọn kỹ lưỡng",
+    "home.hero.cta": "Khám Phá Tours",
+    "home.featured.title": "Tours Nổi Bật",
+    "home.featured": "Tours Nổi Bật",
+    "home.popular": "Điểm Đến Phổ Biến",
+    "home.destinations.title": "Điểm Đến Phổ Biến",
+    "home.whyChoose.title": "Tại Sao Chọn Chúng Tôi",
+    "home.testimonials.title": "Khách Hàng Nói Gì Về Chúng Tôi",
+    "home.testimonials": "Khách Hàng Nói Gì Về Chúng Tôi",
+
+    // Transport
+    "transport.airplane": "Máy bay",
+    "transport.bus": "Xe buýt",
+    "transport.cruiseShip": "Tàu du lịch",
+    "transport.privateCar": "Xe riêng",
+
+    // Class
+    "class.economy": "Phổ thông",
+    "class.economyDesc": "Tiện nghi cơ bản với dịch vụ thiết yếu",
+    "class.business": "Thương gia",
+    "class.businessDesc": "Tiện nghi nâng cao với dịch vụ cao cấp",
+    "class.luxury": "Sang trọng",
+    "class.luxuryDesc": "Tiện nghi đỉnh cao với trải nghiệm độc quyền",
+
+    // Tour Details
+    "tour.halongBay.highlights": "Núi đá vôi ngoạn mục, du thuyền qua đêm, làng chài, khám phá hang động",
+    "tour.halongBay.itinerary.day1.title": "Đến & Khởi hành du thuyền",
+    "tour.halongBay.itinerary.day1.description": "Lên thuyền buồm truyền thống và bắt đầu hành trình qua vịnh tuyệt đẹp",
+    "tour.halongBay.itinerary.day2.title": "Khám phá hang động & Chèo kayak",
+    "tour.halongBay.itinerary.day2.description": "Khám phá hang Sửng Sốt và chèo kayak qua những đầm phá ẩn giấu",
+    "tour.halongBay.itinerary.day3.title": "Bình minh & Trở về",
+    "tour.halongBay.itinerary.day3.description": "Ngắm bình minh trên vịnh trước khi trở về Hà Nội",
+    "tour.halongBay.included": "2 đêm nghỉ dưỡng, tất cả bữa ăn, đưa đón, hướng dẫn viên tiếng Anh, phí tham quan",
+    "tour.halongBay.excluded": "Chi phí cá nhân, tiền tip, bảo hiểm du lịch, vé máy bay quốc tế",
 
     // Tours
     "tours.title": "Tours",
