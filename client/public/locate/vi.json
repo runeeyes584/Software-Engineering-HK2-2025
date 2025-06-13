@@ -1,0 +1,368 @@
+{
+  "nav": {
+    "home": "Trang chủ",
+    "tours": "Tours",
+    "destinations": "Điểm đến",
+    "about": "Giới thiệu",
+    "contact": "Liên hệ",
+    "search": "Tìm kiếm",
+    "account": "Tài khoản",
+    "admin": "Quản trị",
+    "login": "Đăng nhập",
+    "signup": "Đăng ký",
+    "logout": "Đăng xuất",
+    "allTours": "Tất cả Tours",
+    "allDestinations": "Tất cả điểm đến",
+    "tourCategories": "Danh mục Tours",
+    "regions": "Khu vực",
+    "popular": "Phổ biến"
+  },
+  "common": {
+    "loading": "Đang tải...",
+    "error": "Lỗi",
+    "success": "Thành công",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "delete": "Xóa",
+    "edit": "Chỉnh sửa",
+    "view": "Xem",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "previous": "Trước đó",
+    "submit": "Gửi",
+    "reset": "Đặt lại",
+    "search": "Tìm kiếm",
+    "filter": "Lọc",
+    "sort": "Sắp xếp",
+    "all": "Tất cả",
+    "none": "Không có",
+    "yes": "Có",
+    "no": "Không",
+    "ok": "OK",
+    "close": "Đóng",
+    "open": "Mở",
+    "more": "Thêm",
+    "less": "Ít hơn",
+    "show": "Hiển thị",
+    "hide": "Ẩn",
+    "expand": "Mở rộng",
+    "collapse": "Thu gọn",
+    "days": "ngày",
+    "hours": "giờ",
+    "minutes": "phút",
+    "performance": "Hiệu suất",
+    "minutesAgo": "phút trước",
+    "hourAgo": "giờ trước",
+    "hoursAgo": "giờ trước"
+  },
+  "categories": {
+    "adventure": "Phiêu lưu",
+    "cultural": "Văn hóa",
+    "beach": "Biển",
+    "cityBreaks": "Thành phố",
+    "wildlife": "Động vật hoang dã",
+    "cruise": "Du thuyền"
+  },
+  "regions": {
+    "asia": "Châu Á",
+    "europe": "Châu Âu",
+    "americas": "Châu Mỹ",
+    "africa": "Châu Phi",
+    "oceania": "Châu Đại Dương"
+  },
+  "search": {
+    "placeholder": "Bạn muốn đi đâu?",
+    "showing": "Hiển thị",
+    "of": "trên",
+    "tours": "tours",
+    "noToursFound": "Không tìm thấy tour nào",
+    "searchResults": "Kết quả tìm kiếm",
+    "filterResults": "Lọc kết quả",
+    "button": "Tìm kiếm",
+    "active": "Tìm kiếm đang hoạt động",
+    "noToursMatchFilters": "Không tìm thấy tour phù hợp với bộ lọc"
+  },
+  "sort": {
+    "sortBy": "Sắp xếp theo",
+    "recommended": "Đề xuất",
+    "priceLowToHigh": "Giá: Thấp đến Cao",
+    "priceHighToLow": "Giá: Cao đến Thấp",
+    "ratingHighToLow": "Đánh giá: Cao đến Thấp",
+    "durationShortToLong": "Thời gian: Ngắn đến Dài",
+    "durationLongToShort": "Thời gian: Dài đến Ngắn",
+    "newest": "Mới nhất",
+    "popular": "Phổ biến nhất"
+  },
+  "filters": {
+    "title": "Bộ lọc",
+    "active": "Bộ lọc đang áp dụng",
+    "activeFilters": "Bộ lọc đang hoạt động",
+    "clearAll": "Xóa tất cả",
+    "showFilters": "Hiển thị bộ lọc",
+    "hideFilters": "Ẩn bộ lọc",
+    "remove": "Xóa",
+    "currency": "VND",
+    "price": "Giá",
+    "priceRange": "Khoảng giá",
+    "duration": "Thời gian",
+    "durationRange": "Khoảng thời gian",
+    "days": "ngày",
+    "rating": "Đánh giá",
+    "minimumRating": "Đánh giá tối thiểu",
+    "stars": "sao",
+    "category": "Danh mục",
+    "categories": "Danh mục",
+    "destination": "Điểm đến",
+    "destinations": "Điểm đến",
+    "countries": "Quốc gia",
+    "difficulties": "Độ khó",
+    "difficulty": "Độ khó",
+    "activities": "Hoạt động",
+    "activity": "Hoạt động",
+    "activityLevels": "Mức độ hoạt động",
+    "activityLevel": "Mức độ hoạt động",
+    "amenities": "Tiện nghi",
+    "amenity": "Tiện nghi",
+    "accommodationTypes": "Loại chỗ ở",
+    "accommodation": "Chỗ ở",
+    "transportationTypes": "Phương tiện di chuyển",
+    "transportation": "Phương tiện",
+    "tourLanguages": "Ngôn ngữ tour",
+    "groupSize": "Kích thước nhóm",
+    "maxGroupSize": "Kích thước nhóm tối đa",
+    "person": "người",
+    "people": "người"
+  },
+  "home": {
+    "hero": {
+      "title": "Khám Phá Những Điểm Đến Tuyệt Vời",
+      "subtitle": "Trải nghiệm thế giới với những chuyến du lịch được tuyển chọn kỹ lưỡng",
+      "cta": "Khám Phá Tours"
+    },
+    "featured": {
+      "title": "Tours Nổi Bật"
+    },
+    "popular": "Điểm Đến Phổ Biến",
+    "destinations": {
+      "title": "Điểm Đến Phổ Biến"
+    },
+    "whyChoose": {
+      "title": "Tại Sao Chọn Chúng Tôi"
+    },
+    "testimonials": {
+      "title": "Khách Hàng Nói Gì Về Chúng Tôi"
+    }
+  },
+  "transport": {
+    "airplane": "Máy bay",
+    "bus": "Xe buýt",
+    "cruiseShip": "Tàu du lịch",
+    "privateCar": "Xe riêng"
+  },
+  "class": {
+    "economy": "Phổ thông",
+    "economyDesc": "Tiện nghi cơ bản với dịch vụ thiết yếu",
+    "business": "Thương gia",
+    "businessDesc": "Tiện nghi nâng cao với dịch vụ cao cấp",
+    "luxury": "Sang trọng",
+    "luxuryDesc": "Tiện nghi đỉnh cao với trải nghiệm độc quyền"
+  },
+  "tour": {
+    "halongBay": {
+      "highlights": "Núi đá vôi ngoạn mục, du thuyền qua đêm, làng chài, khám phá hang động",
+      "itinerary": {
+        "day1": {
+          "title": "Đến & Khởi hành du thuyền",
+          "description": "Lên thuyền buồm truyền thống và bắt đầu hành trình qua vịnh tuyệt đẹp"
+        },
+        "day2": {
+          "title": "Khám phá hang động & Chèo kayak",
+          "description": "Khám phá hang Sửng Sốt và chèo kayak qua những đầm phá ẩn giấu"
+        },
+        "day3": {
+          "title": "Bình minh & Trở về",
+          "description": "Ngắm bình minh trên vịnh trước khi trở về Hà Nội"
+        }
+      },
+      "included": "2 đêm nghỉ dưỡng, tất cả bữa ăn, đưa đón, hướng dẫn viên tiếng Anh, phí tham quan",
+      "excluded": "Chi phí cá nhân, tiền tip, bảo hiểm du lịch, vé máy bay quốc tế"
+    },
+    "departureDate": "Ngày đi",
+    "returnDate": "Ngày đến",
+    "selectDepartureDate": "Chọn ngày đi",
+    "selectReturnDate": "Chọn ngày đến",
+    "perPerson": "mỗi người",
+    "transportation": "Phương tiện",
+    "days": "ngày",
+    "type": "Loại tour",
+    "availableSlots": "Chỗ còn lại",
+    "slots": "chỗ",
+    "class": "Hạng vé",
+    "adults": "Người lớn",
+    "children": "Trẻ em",
+    "infants": "Em bé",
+    "serviceFee": "Phí dịch vụ",
+    "total": "Tổng cộng",
+    "images": "Hình ảnh",
+    "video": "Video",
+    "wontBeCharged": "Bạn sẽ không bị trừ tiền ngay",
+    "adminReply": "Phản hồi từ quản trị viên",
+    "selectClass": "Chọn hạng vé",
+    "noDepartureOptions": "Không có lịch khởi hành",
+    "viewDetails": "Xem chi tiết",
+    "reviews": "đánh giá"
+  },
+  "tours": {
+    "title": "Tours",
+    "featuredTours": "Tours nổi bật",
+    "popularTours": "Tours phổ biến",
+    "viewDetails": "Xem chi tiết",
+    "bookNow": "Đặt ngay",
+    "from": "Từ",
+    "perPerson": "mỗi người",
+    "rating": "Đánh giá",
+    "reviews": "đánh giá",
+    "includes": "Bao gồm",
+    "excludes": "Không bao gồm",
+    "itinerary": "Lịch trình",
+    "gallery": "Thư viện ảnh",
+    "location": "Địa điểm",
+    "duration": "Thời gian",
+    "groupSize": "Kích thước nhóm",
+    "difficulty": "Độ khó",
+    "languages": "Ngôn ngữ",
+    "cancellation": "Hủy tour",
+    "activityLevel": "Mức độ hoạt động",
+    "resetFilters": "Đặt lại bộ lọc",
+    "noToursFound": "Không tìm thấy tour nào phù hợp với tiêu chí của bạn",
+    "showing": "Hiển thị",
+    "tour": "tour",
+    "tours": "tours"
+  },
+  "contact": {
+    "title": "Liên hệ với chúng tôi",
+    "subtitle": "Liên hệ với các chuyên gia du lịch của chúng tôi",
+    "getInTouch": "Liên hệ",
+    "contactInfo": "Thông tin liên hệ",
+    "officeHours": "Giờ làm việc",
+    "name": "Họ và tên",
+    "email": "Địa chỉ email",
+    "phone": "Số điện thoại",
+    "subject": "Chủ đề",
+    "selectSubject": "Chọn chủ đề",
+    "message": "Tin nhắn",
+    "send": "Gửi tin nhắn",
+    "sending": "Đang gửi...",
+    "sent": "Tin nhắn đã được gửi thành công!",
+    "error": "Gửi tin nhắn thất bại. Vui lòng thử lại.",
+    "headquarters": "Trụ sở chính",
+    "weekdays": "Thứ 2 - Thứ 6",
+    "saturday": "Thứ 7",
+    "sunday": "Chủ nhật",
+    "closed": "Đóng cửa",
+    "timeZoneNote": "Tất cả thời gian theo múi giờ Việt Nam (GMT+7)",
+    "subjects": {
+      "general": "Câu hỏi chung",
+      "booking": "Hỗ trợ đặt tour",
+      "support": "Hỗ trợ khách hàng",
+      "feedback": "Phản hồi",
+      "partnership": "Hợp tác kinh doanh"
+    },
+    "faq": {
+      "title": "Câu hỏi thường gặp",
+      "q1": "Làm thế nào để đặt tour?",
+      "a1": "Bạn có thể đặt tour trực tiếp trên website của chúng tôi bằng cách chọn tour mong muốn và làm theo quy trình đặt tour.",
+      "q2": "Chính sách hủy tour của bạn như thế nào?",
+      "a2": "Chúng tôi cho phép hủy tour miễn phí trước 24 giờ so với thời gian bắt đầu tour. Vui lòng kiểm tra chính sách cụ thể của từng tour.",
+      "q3": "Bạn có cung cấp giảm giá cho nhóm không?",
+      "a3": "Có, chúng tôi cung cấp giá đặc biệt cho nhóm từ 10 người trở lên. Liên hệ với chúng tôi để được báo giá tùy chỉnh.",
+      "q4": "Các tour của bạn có phù hợp với trẻ em không?",
+      "a4": "Nhiều tour của chúng tôi phù hợp với gia đình có trẻ em. Kiểm tra chi tiết tour hoặc liên hệ với chúng tôi để tìm lựa chọn tốt nhất cho gia đình bạn."
+    }
+  },
+  "about": {
+    "ourStory": "Câu chuyện của chúng tôi",
+    "storyText": "Được thành lập vào năm 2015, TravelVista đã tận tụy tạo ra những trải nghiệm du lịch khó quên cho các nhà thám hiểm trên toàn thế giới. Chúng tôi tin rằng du lịch có sức mạnh thay đổi cuộc sống và tạo ra những kỷ niệm lâu dài.",
+    "ourMission": "Sứ mệnh của chúng tôi",
+    "missionText": "Cung cấp những trải nghiệm du lịch đặc biệt kết nối mọi người với những điểm đến đẹp nhất thế giới đồng thời thúc đẩy du lịch bền vững và hiểu biết văn hóa.",
+    "ourVision": "Tầm nhìn của chúng tôi",
+    "visionText": "Trở thành người bạn đồng hành du lịch đáng tin cậy nhất thế giới, truyền cảm hứng cho mọi người khám phá, khám phá và tạo ra những kỷ niệm kéo dài suốt đời.",
+    "ourValues": "Giá trị của chúng tôi",
+    "values": {
+      "authentic": {
+        "title": "Trải nghiệm chân thực",
+        "description": "Chúng tôi tạo ra những kết nối chân thực với văn hóa và cộng đồng địa phương."
+      },
+      "sustainable": {
+        "title": "Du lịch bền vững",
+        "description": "Chúng tôi cam kết bảo vệ môi trường và hỗ trợ nền kinh tế địa phương."
+      },
+      "satisfaction": {
+        "title": "Sự hài lòng của khách hàng",
+        "description": "Hạnh phúc và an toàn của bạn là ưu tiên hàng đầu của chúng tôi trong mọi chuyến đi."
+      },
+      "innovation": {
+        "title": "Đổi mới",
+        "description": "Chúng tôi liên tục cải thiện dịch vụ bằng công nghệ mới nhất và phản hồi."
+      }
+    },
+    "ourTeam": "Đội ngũ của chúng tôi",
+    "role": {
+      "ceo": "CEO & Người sáng lập",
+      "operations": "Trưởng phòng Vận hành",
+      "consultant": "Tư vấn Du lịch Cấp cao",
+      "marketing": "Giám đốc Marketing"
+    },
+    "bio": {
+      "sarah": "Với hơn 15 năm trong ngành du lịch, Sarah dẫn dắt tầm nhìn của chúng tôi về những trải nghiệm du lịch đặc biệt.",
+      "david": "David đảm bảo mọi tour diễn ra suôn sẻ với chuyên môn về logistics và dịch vụ khách hàng.",
+      "maria": "Maria thiết kế những hành trình độc đáo thể hiện điều tốt nhất của mỗi điểm đến.",
+      "james": "James giúp du khách khám phá cuộc phiêu lưu hoàn hảo thông qua marketing chiến lược và hợp tác."
+    },
+    "locations": "Địa điểm của chúng tôi",
+    "getInTouch": "Liên hệ",
+    "cta": "Sẵn sàng bắt đầu cuộc phiêu lưu?",
+    "ctaText": "Tham gia cùng hàng nghìn du khách hài lòng đã trải nghiệm thế giới với TravelVista."
+  },
+  "theme": {
+    "light": "Sáng",
+    "dark": "Tối",
+    "system": "Hệ thống"
+  },
+  "language": {
+    "english": "English",
+    "vietnamese": "Tiếng Việt"
+  },
+  "auth": {
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "logout": "Đăng xuất",
+    "profile": "Hồ sơ",
+    "settings": "Cài đặt"
+  },
+  "admin": {
+    "dashboard": "Bảng điều khiển",
+    "tours": "Tours",
+    "bookings": "Đặt tour",
+    "users": "Người dùng",
+    "settings": "Cài đặt",
+    "analytics": "Phân tích",
+    "profile": "Hồ sơ"
+  },
+  "footer": {
+    "terms": "Điều khoản dịch vụ",
+    "privacy": "Chính sách bảo mật",
+    "rights": "Bảo lưu mọi quyền"
+  },
+  "backToTop": "Về đầu trang",
+  "chatbot": {
+    "title": "Trợ lý Du lịch",
+    "suggestion": {
+      "beaches": "Bãi biển đẹp nhất để thăm",
+      "booking": "Cách đặt tour",
+      "cancellation": "Chính sách hủy tour",
+      "discounts": "Ưu đãi có sẵn",
+      "bestTime": "Thời gian tốt nhất để du lịch"
+    }
+  }
+}
