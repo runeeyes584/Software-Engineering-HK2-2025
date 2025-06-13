@@ -192,24 +192,24 @@ export default function ContactPage() {
 
       {/* FAQ Section */}
       <div className="mt-16">
-        <h2 className="text-2xl font-bold mb-6">{t("contact.faq")}</h2>
+        <h2 className="text-2xl font-bold mb-6">{t("contact.faq.title")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[
             {
-              question: t("contact.faq.booking.question"),
-              answer: t("contact.faq.booking.answer"),
+              question: t("contact.faq.q1"),
+              answer: t("contact.faq.a1"),
             },
             {
-              question: t("contact.faq.cancellation.question"),
-              answer: t("contact.faq.cancellation.answer"),
+              question: t("contact.faq.q2"),
+              answer: t("contact.faq.a2"),
             },
             {
-              question: t("contact.faq.groupDiscounts.question"),
-              answer: t("contact.faq.groupDiscounts.answer"),
+              question: t("contact.faq.q3"),
+              answer: t("contact.faq.a3"),
             },
             {
-              question: t("contact.faq.flights.question"),
-              answer: t("contact.faq.flights.answer"),
+              question: t("contact.faq.q4"),
+              answer: t("contact.faq.a4"),
             },
           ].map((faq, index) => (
             <Card key={index}>

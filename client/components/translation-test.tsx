@@ -87,6 +87,27 @@ export default function TranslationTest() {
     "class.economy",
     "class.business",
     "class.luxury",
+    
+    // Contact Keys (newly fixed)
+    "contact.getInTouch",
+    "contact.contactInfo",
+    "contact.officeHours",
+    "contact.name",
+    "contact.email",
+    "contact.subject",
+    "contact.selectSubject",
+    "contact.message",
+    "contact.send",
+    "contact.sending",
+    "contact.sent",
+    "contact.subjects.general",
+    "contact.subjects.booking",
+    "contact.subjects.support",
+    "contact.subjects.feedback",
+    "contact.subjects.partnership",
+    "contact.faq.title",
+    "contact.faq.q1",
+    "contact.faq.a1",
   ]
 
   return (

@@ -83,5 +83,3 @@
 The Tours page filter sidebar now displays completely in both English and Vietnamese with no raw translation keys visible. All UI elements are properly localized and the user experience is consistent across both languages.
 
 ---
-*Translation system completed by: GitHub Copilot*  
-*Date: June 13, 2025*
