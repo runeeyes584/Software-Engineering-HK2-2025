@@ -1,7 +1,7 @@
 "use client"
 
 import { useAuth } from "@/components/auth-provider"
-import { useLanguage } from "@/components/language-provider"
+import { useLanguage } from "@/components/language-provider-fixed"
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import {
