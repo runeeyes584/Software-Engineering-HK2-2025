@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useLanguage } from "@/components/language-provider-fixed"
+import { useLanguage } from "@/components/language-provider"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"

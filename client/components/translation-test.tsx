@@ -1,6 +1,6 @@
 "use client"
 
-import { useLanguage } from "@/components/language-provider-fixed"
+import { useLanguage } from "@/components/language-provider"
 
 // Component để test tất cả translation keys mới
 export default function TranslationTest() {

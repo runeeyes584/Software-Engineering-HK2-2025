@@ -1,0 +1,367 @@
+{
+  "common": {
+    "search": "Tìm kiếm",
+    "login": "Đăng nhập",
+    "signup": "Đăng ký",
+    "logout": "Đăng xuất",
+    "profile": "Hồ sơ",
+    "settings": "Cài đặt",
+    "language": "Ngôn ngữ",
+    "submitting": "Đang gửi..."
+  },
+  "home": {
+    "hero": {
+      "title": "Khám Phá Cuộc Phiêu Lưu Tiếp Theo",
+      "subtitle": "Khám phá những điểm đến đẹp nhất thế giới với các tour được chọn lọc của chúng tôi",
+      "cta": "Khám Phá Tour"
+    },
+    "popular": "Điểm Đến Phổ Biến",
+    "featured": "Tour Nổi Bật",
+    "testimonials": "Khách Hàng Nói Gì Về Chúng Tôi",
+    "cta": {
+      "title": "Sẵn sàng cho cuộc phiêu lưu tiếp theo?",
+      "subtitle": "Tham gia cùng hàng nghìn khách du lịch hài lòng đã trải nghiệm thế giới với chúng tôi",
+      "button": "Xem Tour"
+    },
+    "noTours": "Không có tour nào"
+  },
+  "about": {
+    "title": "Về Chúng Tôi",
+    "subtitle": "Đối Tác Du Lịch Đáng Tin Cậy",
+    "mission": {
+      "title": "Sứ Mệnh",
+      "description": "Cung cấp những trải nghiệm du lịch tuyệt vời, truyền cảm hứng và kết nối mọi người với những điểm đến đẹp nhất thế giới."
+    },
+    "vision": {
+      "title": "Tầm Nhìn",
+      "description": "Trở thành nền tảng du lịch hàng đầu, mang đến những cuộc phiêu lưu phi thường cho tất cả mọi người."
+    },
+    "values": {
+      "title": "Giá Trị Cốt Lõi",
+      "excellence": {
+        "title": "Xuất Sắc",
+        "description": "Chúng tôi luôn phấn đấu vì sự xuất sắc trong mọi khía cạnh dịch vụ."
+      },
+      "sustainability": {
+        "title": "Bền Vững",
+        "description": "Chúng tôi cam kết thực hiện các hoạt động du lịch bền vững."
+      },
+      "innovation": {
+        "title": "Đổi Mới",
+        "description": "Chúng tôi không ngừng đổi mới để nâng cao trải nghiệm du lịch."
+      },
+      "integrity": {
+        "title": "Chính Trực",
+        "description": "Chúng tôi kinh doanh với sự trung thực và minh bạch."
+      },
+      "customerFocus": {
+        "title": "Tập Trung Khách Hàng",
+        "description": "Chúng tôi đặt khách hàng làm trung tâm trong mọi hoạt động."
+      },
+      "authentic": {
+        "title": "Chân Thực",
+        "description": "Chúng tôi cam kết mang đến những trải nghiệm du lịch chân thực nhất."
+      },
+      "sustainable": {
+        "title": "Bền Vững",
+        "description": "Chúng tôi cam kết thực hiện các hoạt động du lịch bền vững."
+      },
+      "satisfaction": {
+        "title": "Hài Lòng",
+        "description": "Sự hài lòng của khách hàng là ưu tiên hàng đầu của chúng tôi."
+      }
+    },
+    "team": {
+      "title": "Đội Ngũ",
+      "subtitle": "Gặp gỡ những con người đam mê đứng sau thành công của chúng tôi",
+      "description": "Đội ngũ đa dạng gồm các chuyên gia và chuyên viên du lịch của chúng tôi luôn tận tâm tạo ra những trải nghiệm khó quên cho khách hàng.",
+      "roles": {
+        "leadership": "Ban Lãnh Đạo",
+        "operations": "Đội Vận Hành",
+        "customerService": "Đội Chăm Sóc Khách Hàng",
+        "marketing": "Đội Marketing",
+        "technology": "Đội Công Nghệ"
+      }
+    },
+    "history": {
+      "title": "Lịch Sử",
+      "description": "Được thành lập vào năm 2024, chúng tôi đã phát triển từ một công ty lữ hành địa phương nhỏ thành một nền tảng du lịch toàn cầu, phục vụ hàng nghìn khách du lịch hài lòng trên toàn thế giới."
+    },
+    "achievements": {
+      "title": "Thành Tựu",
+      "description": "Chúng tôi tự hào về những thành tựu đạt được và tiếp tục phấn đấu vì sự xuất sắc trong ngành du lịch.",
+      "stats": {
+        "tours": "Tour",
+        "destinations": "Điểm Đến",
+        "customers": "Khách Hàng Hài Lòng",
+        "countries": "Quốc Gia"
+      }
+    },
+    "partners": {
+      "title": "Đối Tác",
+      "description": "Chúng tôi hợp tác với các đối tác đáng tin cậy trên toàn thế giới để mang đến những trải nghiệm du lịch tốt nhất."
+    },
+    "cta": {
+      "title": "Tham Gia Hành Trình",
+      "description": "Trở thành một phần của cộng đồng du lịch đang phát triển của chúng tôi",
+      "button": "Khám Phá Tour"
+    },
+    "ourStory": "Câu chuyện của chúng tôi",
+    "storyText": "TravelVista được thành lập với sứ mệnh mang đến những trải nghiệm du lịch chân thực và đáng nhớ cho mọi người.",
+    "getInTouch": "Liên hệ với chúng tôi",
+    "ourMission": "Sứ mệnh của chúng tôi",
+    "missionText": "Cung cấp những trải nghiệm du lịch tuyệt vời, truyền cảm hứng và kết nối mọi người với những điểm đến đẹp nhất thế giới.",
+    "ourVision": "Tầm nhìn của chúng tôi",
+    "visionText": "Trở thành nền tảng du lịch hàng đầu, mang đến những cuộc phiêu lưu phi thường cho tất cả mọi người.",
+    "ourValues": "Giá trị cốt lõi",
+    "ourTeam": "Đội ngũ của chúng tôi",
+    "locations": "Văn phòng & Địa điểm",
+    "cta": "Tham gia hành trình cùng chúng tôi",
+    "ctaText": "Trở thành một phần của cộng đồng du lịch đang phát triển của chúng tôi.",
+    "role": {
+      "ceo": "Giám đốc điều hành",
+      "operations": "Quản lý vận hành",
+      "consultant": "Chuyên gia tư vấn",
+      "marketing": "Trưởng phòng Marketing"
+    },
+    "bio": {
+      "sarah": "Sarah là người sáng lập và dẫn dắt TravelVista với tầm nhìn toàn cầu.",
+      "david": "David chịu trách nhiệm vận hành và đảm bảo mọi tour diễn ra suôn sẻ.",
+      "maria": "Maria là chuyên gia tư vấn du lịch với nhiều năm kinh nghiệm quốc tế.",
+      "james": "James phụ trách marketing và phát triển thương hiệu TravelVista."
+    }
+  },
+  "contact": {
+    "title": "Liên Hệ",
+    "subtitle": "Chúng tôi rất muốn nghe từ bạn",
+    "description": "Có câu hỏi hoặc cần hỗ trợ? Đội ngũ của chúng tôi luôn sẵn sàng giúp đỡ.",
+    "form": {
+      "title": "Gửi tin nhắn cho chúng tôi",
+      "name": "Họ và tên",
+      "email": "Email",
+      "phone": "Số điện thoại",
+      "subject": "Tiêu đề",
+      "message": "Nội dung",
+      "submit": "Gửi tin nhắn",
+      "success": "Gửi tin nhắn thành công!",
+      "error": "Lỗi khi gửi tin nhắn. Vui lòng thử lại.",
+      "required": "Các trường bắt buộc",
+      "privacy": "Bằng việc gửi form này, bạn đồng ý với chính sách bảo mật của chúng tôi."
+    },
+    "info": {
+      "title": "Thông Tin Liên Hệ",
+      "address": {
+        "title": "Địa chỉ",
+        "line1": "123 Đường Du Lịch",
+        "line2": "Quận Du Lịch",
+        "city": "Thành phố Hồ Chí Minh",
+        "country": "Việt Nam"
+      },
+      "phone": {
+        "title": "Điện thoại",
+        "main": "Văn phòng chính",
+        "support": "Hỗ trợ khách hàng"
+      },
+      "email": {
+        "title": "Email",
+        "info": "Thông tin chung",
+        "support": "Hỗ trợ khách hàng",
+        "partners": "Hợp tác"
+      },
+      "hours": {
+        "title": "Giờ làm việc",
+        "weekdays": "Thứ Hai - Thứ Sáu",
+        "weekend": "Thứ Bảy - Chủ Nhật",
+        "holidays": "Ngày lễ"
+      },
+      "social": {
+        "title": "Theo dõi chúng tôi",
+        "facebook": "Facebook",
+        "twitter": "Twitter",
+        "instagram": "Instagram",
+        "linkedin": "LinkedIn"
+      }
+    },
+    "map": {
+      "title": "Tìm đường đến chúng tôi",
+      "description": "Thăm văn phòng của chúng tôi",
+      "directions": "Xem chỉ đường"
+    },
+    "faq": {
+      "title": "Câu Hỏi Thường Gặp",
+      "q1": "Làm thế nào để đặt tour?",
+      "a1": "Bạn có thể đặt tour trực tiếp trên website hoặc liên hệ với chúng tôi qua email/điện thoại.",
+      "q2": "Tôi có thể hủy tour không?",
+      "a2": "Bạn có thể hủy tour theo chính sách hoàn tiền của chúng tôi. Vui lòng liên hệ để biết thêm chi tiết.",
+      "q3": "Có hỗ trợ khách hàng 24/7 không?",
+      "a3": "Chúng tôi hỗ trợ khách hàng 24/7 qua hotline và email.",
+      "q4": "Tôi có thể thanh toán bằng hình thức nào?",
+      "a4": "Chúng tôi chấp nhận chuyển khoản, thẻ tín dụng và các ví điện tử phổ biến."
+    },
+    "emergency": {
+      "title": "Liên Hệ Khẩn Cấp",
+      "description": "Để được hỗ trợ khẩn cấp trong chuyến đi của bạn",
+      "phone": "Đường dây nóng 24/7"
+    },
+    "getInTouch": "Liên hệ với chúng tôi",
+    "contactInfo": "Thông tin liên hệ",
+    "officeHours": "Giờ làm việc",
+    "name": "Họ và tên",
+    "email": "Email",
+    "subject": "Tiêu đề",
+    "selectSubject": "Chọn chủ đề",
+    "message": "Nội dung",
+    "send": "Gửi đi",
+    "sending": "Đang gửi...",
+    "sent": "Đã gửi thành công!",
+    "subjects": {
+      "general": "Chung",
+      "booking": "Đặt tour",
+      "support": "Hỗ trợ",
+      "feedback": "Góp ý",
+      "partnership": "Hợp tác"
+    },
+    "phone": "Điện thoại",
+    "headquarters": "Trụ sở chính",
+    "weekdays": "Thứ Hai - Thứ Sáu",
+    "saturday": "Thứ Bảy",
+    "sunday": "Chủ Nhật",
+    "closed": "Đóng cửa",
+    "timeZoneNote": "Giờ làm việc theo múi giờ Việt Nam (GMT+7)"
+  },
+  "nav": {
+    "home": "Trang chủ",
+    "tours": "Tour",
+    "allTours": "Tất cả Tour",
+    "destinations": "Điểm đến",
+    "allDestinations": "Tất cả Điểm đến",
+    "about": "Giới thiệu",
+    "contact": "Liên hệ",
+    "tourCategories": "Danh mục Tour",
+    "regions": "Khu vực",
+    "popular": "Phổ biến"
+  },
+  "categories": {
+    "adventure": "Phiêu lưu",
+    "cultural": "Văn hóa",
+    "beach": "Biển",
+    "cityBreaks": "Du lịch thành phố",
+    "wildlife": "Động vật hoang dã",
+    "cruise": "Du thuyền"
+  },
+  "regions": {
+    "asia": "Châu Á",
+    "europe": "Châu Âu",
+    "americas": "Châu Mỹ",
+    "africa": "Châu Phi",
+    "oceania": "Châu Đại Dương"
+  },
+  "theme": {
+    "light": "Sáng",
+    "dark": "Tối",
+    "system": "Hệ thống"
+  },
+  "search": {
+    "placeholder": "Bạn muốn đi đâu?",
+    "button": "Tìm kiếm"
+  },
+  "filters": {
+    "title": "Bộ lọc",
+    "showFilters": "Hiện bộ lọc",
+    "hideFilters": "Ẩn bộ lọc",
+    "clearAll": "Xóa tất cả",
+    "activeFilters": "Bộ lọc đang hoạt động",
+    "remove": "Xóa",
+    "price": "Giá",
+    "priceRange": "Khoảng giá",
+    "currency": "đ",
+    "duration": "Thời gian",
+    "days": "ngày",
+    "durationRange": "Khoảng thời gian",
+    "categories": "Danh mục",
+    "countries": "Quốc gia",
+    "difficulties": "Độ khó",
+    "activities": "Hoạt động",
+    "activityLevels": "Cấp độ hoạt động",
+    "amenities": "Tiện nghi",
+    "accommodationTypes": "Loại chỗ ở",
+    "transportationTypes": "Loại phương tiện",
+    "tourLanguages": "Ngôn ngữ tour",
+    "minimumRating": "Đánh giá tối thiểu",
+    "stars": "sao",
+    "maxGroupSize": "Số người tối đa",
+    "person": "người",
+    "people": "người",
+    "maximum": "Tối đa",
+    "activityLevel": "Cấp độ hoạt động"
+  },
+  "tours": {
+    "title": "Tour của chúng tôi",
+    "filter": "Lọc Tour",
+    "sort": "Sắp xếp theo",
+    "price": "Giá",
+    "duration": "Thời gian",
+    "rating": "Đánh giá",
+    "bookNow": "Đặt ngay",
+    "viewDetails": "Xem chi tiết",
+    "addToWishlist": "Thêm vào danh sách yêu thích",
+    "share": "Chia sẻ",
+    "topRated": "Đánh giá cao nhất",
+    "more": "thêm",
+    "perPerson": "mỗi người",
+    "adminReply": "Phản hồi từ Admin",
+    "viewAll": "Xem tất cả Tour"
+  },
+  "review": {
+    "leaveReview": "Để lại đánh giá",
+    "commentPlaceholder": "Viết đánh giá của bạn tại đây...",
+    "submit": "Gửi đánh giá",
+    "submitted": "Gửi đánh giá thành công",
+    "error": "Lỗi khi gửi đánh giá",
+    "pleaseSelectRating": "Vui lòng chọn đánh giá"
+  },
+  "booking": {
+    "title": "Đặt Tour",
+    "personalInfo": "Thông tin cá nhân",
+    "paymentInfo": "Thông tin thanh toán",
+    "confirm": "Xác nhận đặt tour",
+    "success": "Đặt tour thành công"
+  },
+  "admin": {
+    "dashboard": "Bảng điều khiển",
+    "tours": "Quản lý Tour",
+    "bookings": "Quản lý Đặt tour",
+    "users": "Quản lý Người dùng",
+    "settings": "Cài đặt Admin"
+  },
+  "footer": {
+    "terms": "Điều khoản dịch vụ",
+    "privacy": "Chính sách bảo mật",
+    "rights": "Mọi quyền được bảo lưu."
+  },
+  "chatbot": {
+    "title": "Trợ lý du lịch ảo",
+    "welcome": "Xin chào! Tôi có thể giúp gì cho bạn hôm nay?",
+    "placeholder": "Nhập câu hỏi của bạn...",
+    "suggestions": "Gợi ý nhanh",
+    "suggestion": {
+      "beaches": "Bãi biển đẹp",
+      "booking": "Cách đặt tour",
+      "cancellation": "Chính sách hủy tour",
+      "discounts": "Ưu đãi & giảm giá",
+      "bestTime": "Thời điểm du lịch lý tưởng"
+    },
+    "response": {
+      "beaches": "Một số bãi biển đẹp nổi tiếng: Nha Trang, Phú Quốc, Đà Nẵng, Vũng Tàu... Bạn muốn biết thêm về bãi biển nào?",
+      "booking": "Bạn có thể đặt tour trực tiếp trên website hoặc liên hệ với chúng tôi để được hỗ trợ.",
+      "cancellation": "Chính sách hủy tour: bạn có thể hủy trước ngày khởi hành và nhận hoàn tiền theo quy định. Vui lòng liên hệ để biết chi tiết.",
+      "discounts": "Chúng tôi thường xuyên có các chương trình ưu đãi, giảm giá cho nhóm và khách hàng thân thiết.",
+      "bestTime": "Thời điểm lý tưởng để du lịch phụ thuộc vào điểm đến. Bạn muốn hỏi về địa điểm nào?",
+      "default": "Xin lỗi, tôi chưa hiểu ý bạn. Bạn có thể hỏi về tour, điểm đến, ưu đãi hoặc các vấn đề liên quan du lịch."
+    },
+    "minimize": "Thu nhỏ",
+    "expand": "Mở rộng",
+    "close": "Đóng",
+    "send": "Gửi"
+  }
+} 

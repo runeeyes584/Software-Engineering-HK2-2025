@@ -1,5 +1,5 @@
 "use client"
-import { useLanguage } from "@/components/language-provider-fixed"
+import { useLanguage } from "@/components/language-provider"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { CalendarIcon, MapPin, Star, ChevronLeft, ChevronRight } from "lucide-react"
@@ -239,12 +239,12 @@ export default function HomePage() {
       {/* CTA Section */}
       <section className="bg-primary text-primary-foreground py-16 -mx-4 sm:-mx-6 lg:-mx-8">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready for your next adventure?</h2>
+          <h2 className="text-3xl font-bold mb-4">{t("home.cta.title")}</h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto leading-relaxed">
-            Join thousands of satisfied travelers who have experienced the world with TravelVista.
+            {t("home.cta.subtitle")}
           </p>
           <Button size="lg" variant="secondary" asChild className="px-8 py-3 text-lg">
-            <Link href="/tours">Browse Tours</Link>
+            <Link href="/tours">{t("home.cta.button")}</Link>
           </Button>
         </div>
       </section>
