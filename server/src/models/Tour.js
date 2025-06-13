@@ -32,14 +32,12 @@ const tourSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    startDate: {
-      type: Date,
-      required: true,
-    },
-    endDate: {
-      type: Date,
-      required: true,
-    },
+    departureOptions: [
+      {
+        departureDate: { type: Date, required: true },
+        returnDate: { type: Date, required: true },
+      },
+    ],
     maxGuests: {
       type: Number,
       required: true,
@@ -65,9 +63,11 @@ const tourSchema = new mongoose.Schema(
 )
 
 tourSchema.virtual('duration').get(function () {
-  if (!this.startDate || !this.endDate) return 0
-  const start = new Date(this.startDate)
-  const end = new Date(this.endDate)
+  if (!this.departureOptions || this.departureOptions.length === 0) return 0
+  const { departureDate, returnDate } = this.departureOptions[0]
+  if (!departureDate || !returnDate) return 0
+  const start = new Date(departureDate)
+  const end = new Date(returnDate)
   const diffTime = Math.abs(end - start)
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
   return diffDays

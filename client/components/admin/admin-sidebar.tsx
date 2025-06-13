@@ -2,9 +2,6 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-<<<<<<< HEAD
-import { MapPin, FileText, MessageSquare, Users, Settings, BarChart3, Calendar, Star, CreditCard, LayoutDashboard } from "lucide-react"
-=======
 import { useLanguage } from "@/components/language-provider-fixed"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -22,7 +19,6 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react"
->>>>>>> 88e14c91d27da58ff1998bb65d5db7dcb76e3237
 
 const sidebarItems = [
   { title: "Dashboard", href: "/admin", icon: LayoutDashboard },

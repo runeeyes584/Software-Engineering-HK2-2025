@@ -60,7 +60,14 @@ export default function TourDetailPage() {
       images: tourData.images || ["/placeholder.svg?height=600&width=800"],
       videos: tourData.videos || [],
       price: tourData.price,
-      duration: differenceInDays(new Date(tourData.endDate), new Date(tourData.startDate)) + 1,
+      duration: (
+        tourData.departureOptions && tourData.departureOptions.length > 0
+          ? differenceInDays(
+              new Date(tourData.departureOptions[0].returnDate),
+              new Date(tourData.departureOptions[0].departureDate)
+            ) + 1
+          : 0
+      ),
       rating: tourData.averageRating || 4.8,
       reviews: tourData.reviewCount || 124,
       type: tourData.type,
@@ -111,6 +118,7 @@ export default function TourDetailPage() {
           adminReply: "We're thrilled to hear that your first experience with us was positive! We hope to welcome you back soon.",
         },
       ],
+      departureOptions: tourData.departureOptions || [],
     }
   }
 
@@ -317,59 +325,31 @@ export default function TourDetailPage() {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label className="text-sm font-medium">{t("tour.departureDate")}</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-full justify-start text-left font-normal h-11">
-                          <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
-                          <span className="truncate">
-                            {departureDate ? format(departureDate, "PPP") : t("tour.selectDepartureDate")}
-                          </span>
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={departureDate}
-                          onSelect={(date) => {
-                            setDepartureDate(date)
-                            if (date && !returnDate && tour.duration > 1) {
-                              setReturnDate(addDays(date, tour.duration - 1))
-                            }
-                          }}
-                          disabled={(date: Date) => date < new Date()}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
+                    <Select
+                      value={departureDate && returnDate ? `${departureDate.toISOString()}|${returnDate.toISOString()}` : ""}
+                      onValueChange={(val) => {
+                        const [dep, ret] = val.split("|");
+                        setDepartureDate(new Date(dep));
+                        setReturnDate(new Date(ret));
+                      }}
+                    >
+                      <SelectTrigger className="w-full h-11">
+                        <SelectValue placeholder={t("tour.selectDepartureDate")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {tour.departureOptions && tour.departureOptions.length > 0 && (
+                          tour.departureOptions.map((opt: any, idx: number) => (
+                            <SelectItem key={idx} value={`${opt.departureDate}|${opt.returnDate}`}>
+                              {`${format(new Date(opt.departureDate), "dd/MM/yyyy")} - ${format(new Date(opt.returnDate), "dd/MM/yyyy")}`}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                    {(!tour.departureOptions || tour.departureOptions.length === 0) && (
+                      <div className="text-red-500 text-sm mt-2">Không có lịch khởi hành</div>
+                    )}
                   </div>
-
-                  {tour.duration > 1 && (
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium">{t("tour.returnDate")}</Label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button variant="outline" className="w-full justify-start text-left font-normal h-11">
-                            <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
-                            <span className="truncate">
-                              {returnDate ? format(returnDate, "PPP") : t("tour.selectReturnDate")}
-                            </span>
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={returnDate}
-                            onSelect={setReturnDate}
-                            disabled={(date: Date) => {
-                              const today = new Date()
-                              return date < today || (departureDate ? date < departureDate : false)
-                            }}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                  )}
                 </div>
 
                 {/* Transportation */}

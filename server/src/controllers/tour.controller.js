@@ -42,8 +42,8 @@ const createTour = async (req, res) => {
   try {
     const {
       name, description, price, type, destination,
-      startDate, endDate, maxGuests, availableSlots,
-      createdBy, images, videos
+      maxGuests, availableSlots, createdBy, images, videos,
+      departureOptions
     } = req.body;
 
     const newTour = new Tour({
@@ -52,13 +52,12 @@ const createTour = async (req, res) => {
       price,
       type,
       destination,
-      startDate,
-      endDate,
       maxGuests,
       availableSlots,
       createdBy,
       images: images || [],
-      videos: videos || []
+      videos: videos || [],
+      departureOptions: departureOptions || [],
     });
 
     const savedTour = await newTour.save();
@@ -73,8 +72,8 @@ const updateTour = async (req, res) => {
   try {
     const {
       name, description, price, type, destination,
-      startDate, endDate, maxGuests, availableSlots,
-      isActive, images, videos
+      maxGuests, availableSlots, isActive, images, videos,
+      departureOptions
     } = req.body;
 
     const updatedTour = await Tour.findByIdAndUpdate(
@@ -85,13 +84,12 @@ const updateTour = async (req, res) => {
         price,
         type,
         destination,
-        startDate,
-        endDate,
         maxGuests,
         availableSlots,
         isActive,
         images: images || [],
-        videos: videos || []
+        videos: videos || [],
+        departureOptions: departureOptions || [],
       },
       { new: true }
     );
