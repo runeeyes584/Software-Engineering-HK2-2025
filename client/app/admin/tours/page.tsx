@@ -133,10 +133,10 @@ export default function AdminTours() {
           ) : error ? (
             <div className="p-8 text-center text-red-600 font-semibold">{error}</div>
           ) : (
-            <div className="overflow-x-auto">
+          <div className="overflow-x-auto">
               <Table className="min-w-[900px]">
-                <TableHeader>
-                  <TableRow className="bg-gray-50 dark:bg-gray-800/50">
+              <TableHeader>
+                <TableRow className="bg-gray-50 dark:bg-gray-800/50">
                     <TableHead className="font-bold text-base">{tt("admin.tours.table.name", "Tên tour")}</TableHead>
                     <TableHead className="font-bold text-base">{tt("admin.tours.table.category", "Loại tour")}</TableHead>
                     <TableHead className="font-bold text-base">{tt("admin.tours.table.price", "Giá")}</TableHead>
@@ -145,30 +145,30 @@ export default function AdminTours() {
                     <TableHead className="font-bold text-base">{tt("admin.tours.table.bookings", "Đặt chỗ")}</TableHead>
                     <TableHead className="font-bold text-base">{tt("admin.tours.table.rating", "Đánh giá")}</TableHead>
                     <TableHead className="font-bold text-base text-right">{tt("admin.tours.table.actions", "Thao tác")}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredTours.map((tour) => (
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredTours.map((tour) => (
                     <TableRow key={tour.id} className="hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-colors rounded-xl">
-                      <TableCell>
+                    <TableCell>
                         <div className="flex items-center space-x-4">
-                          <img
-                            src={tour.image || "/placeholder.svg"}
-                            alt={tour.name}
+                        <img
+                          src={tour.image || "/placeholder.svg"}
+                          alt={tour.name}
                             className="w-14 h-14 rounded-xl object-cover border border-gray-200 dark:border-gray-700 shadow"
-                          />
-                          <div>
+                        />
+                        <div>
                             <p className="font-semibold text-gray-900 dark:text-white text-lg">{tour.name}</p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">ID: {tour.id}</p>
-                          </div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">ID: {tour.id}</p>
                         </div>
-                      </TableCell>
-                      <TableCell>
+                      </div>
+                    </TableCell>
+                    <TableCell>
                         <Badge variant="outline" className="font-semibold px-3 py-1 rounded-full text-base">
-                          {tour.category}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
+                        {tour.category}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
                         <span className="text-green-600 font-bold text-lg flex items-center gap-1">
                           <DollarSign className="inline h-5 w-5" /> {tour.price}
                         </span>
@@ -177,43 +177,43 @@ export default function AdminTours() {
                         <span className="text-blue-600 font-semibold flex items-center gap-1">
                           <Calendar className="inline h-5 w-5" /> {tour.duration}
                         </span>
-                      </TableCell>
-                      <TableCell>
+                    </TableCell>
+                    <TableCell>
                         {getStatusBadge(tour.status)}
-                      </TableCell>
-                      <TableCell>
+                    </TableCell>
+                    <TableCell>
                         <span className="font-semibold text-base">{tour.bookings}</span>
-                      </TableCell>
-                      <TableCell>
+                    </TableCell>
+                    <TableCell>
                         <span className="flex items-center gap-1 font-semibold text-base">
                           <Star className="h-5 w-5 text-yellow-500" /> {tour.rating}
                         </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="h-8 w-8 p-0">
                               <MoreHorizontal className="h-5 w-5" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
                             <DropdownMenuItem className="flex items-center gap-2">
                               <Eye className="h-4 w-4" /> {tt("admin.tours.actions.view", "Xem chi tiết")}
-                            </DropdownMenuItem>
+                          </DropdownMenuItem>
                             <DropdownMenuItem className="flex items-center gap-2">
                               <Edit className="h-4 w-4" /> {tt("admin.tours.actions.edit", "Chỉnh sửa")}
-                            </DropdownMenuItem>
+                          </DropdownMenuItem>
                             <DropdownMenuItem className="flex items-center gap-2 text-red-600">
                               <Trash2 className="h-4 w-4" /> {tt("admin.tours.actions.delete", "Xóa")}
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
           )}
         </CardContent>
       </Card>

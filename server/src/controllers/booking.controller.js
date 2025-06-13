@@ -38,9 +38,32 @@ const getBookingById = async (req, res) => {
 // Tạo booking mới
 const createBooking = async (req, res) => {
   try {
-    const newBooking = new Booking(req.body);
+    // Nhận các trường cần thiết từ FE (không nhận user)
+    const {
+      tour, guests, totalPrice, note,
+      departureDate, returnDate, transportType, ticketClass, adults, children, infants
+    } = req.body;
+
+    // Lấy user MongoDB từ middleware
+    const user = req.dbUser._id;
+
+    const newBooking = new Booking({
+      tour,
+      user,
+      guests,
+      totalPrice,
+      note,
+      departureDate,
+      returnDate,
+      transportType,
+      ticketClass,
+      adults,
+      children,
+      infants,
+    });
     const savedBooking = await newBooking.save();
-    res.status(201).json(savedBooking);
+    // Trả về link thanh toán giả lập
+    res.status(201).json({ booking: savedBooking, paymentUrl: `/payment/${savedBooking._id}` });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -65,9 +88,28 @@ const updateBooking = async (req, res) => {
   }
 };
 
+// Lấy booking completed của user cho 1 tour
+const getCompletedBookingByUserAndTour = async (req, res) => {
+  try {
+    const userId = req.dbUser?._id || req.user?._id || req.userId || req.user?.id;
+    const tourId = req.params.tourId;
+    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+    const booking = await Booking.findOne({
+      user: userId,
+      tour: tourId,
+      status: { $in: ['completed', 'complete'] },
+    });
+    if (!booking) return res.status(404).json({ message: 'No completed booking found' });
+    res.status(200).json({ booking });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 module.exports = {
   getAllBookings,
   getBookingById,
   createBooking,
-  updateBooking
+  updateBooking,
+  getCompletedBookingByUserAndTour,
 };

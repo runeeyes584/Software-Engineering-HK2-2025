@@ -15,6 +15,9 @@ import { format, addDays, differenceInDays } from "date-fns"
 import { useParams, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { TourReview } from "@/components/tour-review"
+import { toast } from "sonner"
+import { ReviewForm } from "@/components/review-form"
+import { useAuth, useUser } from "@clerk/nextjs"
 
 export default function TourDetailPage() {
   const { t } = useLanguage()
@@ -32,6 +35,15 @@ export default function TourDetailPage() {
   const [infants, setInfants] = useState(0)
   const [selectedImage, setSelectedImage] = useState(0)
   const [activeTab, setActiveTab] = useState<"images" | "video">("images")
+  const [reviews, setReviews] = useState<any[]>([])
+  const [reviewLoading, setReviewLoading] = useState(true)
+  const [reviewError, setReviewError] = useState<string | null>(null)
+  const { getToken } = useAuth()
+  const [bookingId, setBookingId] = useState<string | null>(null)
+  const [bookingLoading, setBookingLoading] = useState(true)
+  const { user } = useUser();
+  const userId = user?.id;
+  const [hasReviewed, setHasReviewed] = useState(false);
 
   useEffect(() => {
     const fetchTourData = async () => {
@@ -51,6 +63,56 @@ export default function TourDetailPage() {
 
     fetchTourData()
   }, [params.id])
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      setReviewLoading(true);
+      const res = await fetch(`http://localhost:5000/api/reviews?tour=${params.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        setReviews(data || []);
+      } else {
+        setReviews([]);
+      }
+      setReviewLoading(false);
+    };
+    fetchReviews();
+  }, [params.id]);
+
+  useEffect(() => {
+    const fetchBookings = async () => {
+      setBookingLoading(true)
+      const token = await getToken()
+      const res = await fetch("http://localhost:5000/api/bookings", {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      })
+      if (res.ok) {
+        const data = await res.json()
+        const completed = data.find(
+          (b: any) =>
+            (b.tour === params.id || b.tour?._id === params.id) &&
+            b.status === "completed"
+        )
+        setBookingId(completed?._id || null)
+      } else {
+        setBookingId(null)
+      }
+      setBookingLoading(false)
+    }
+    fetchBookings()
+  }, [params.id, getToken])
+
+  useEffect(() => {
+    console.log("DEBUG userId:", userId);
+    console.log("DEBUG reviews:", reviews);
+    setHasReviewed(
+      reviews.some((r) =>
+        r.user?.clerkId === userId
+      )
+    );
+  }, [reviews, userId]);
 
   const mapTourDataToTour = (tourData: any) => {
     return {
@@ -145,21 +207,37 @@ export default function TourDetailPage() {
 
   const handleBookNow = () => {
     if (!departureDate) {
-      alert(t("tour.selectDepartureDateFirst"))
+      toast.error(t("Bạn cần chọn thời gian khởi hành"))
       return
     }
 
     if (!returnDate && tour.duration > 1) {
-      alert(t("tour.selectReturnDateFirst"))
+      toast.error(t("Bạn cần chọn thời gian khởi hành"))
       return
     }
 
     router.push(
-      `/booking?tourId=${tour.id}&departureDate=${format(departureDate, "yyyy-MM-dd")}&returnDate=${returnDate ? format(returnDate, "yyyy-MM-dd") : ""}&transportType=${transportType}&ticketClass=${ticketClass}&adults=${adults}&children=${children}&infants=${infants}`,
+      `/booking?tourId=${tour.id}&departureDate=${format(departureDate, "yyyy-MM-dd")}&returnDate=${returnDate ? format(returnDate, "yyyy-MM-dd") : ""}&transportType=${transportType}&ticketClass=${ticketClass}&adults=${adults}&children=${children}&infants=${infants}&totalPrice=${totalPrice}`,
     )
   }
 
   const TransportIcon = getSelectedTransport().icon
+
+  // Mapping reviews từ DB sang props cho TourReview
+  const mappedReviews = reviews.map((r) => ({
+    id: r._id,
+    user: {
+      name: r.user?.username || r.user?.name || 'User',
+      avatar: r.user?.avatar || undefined,
+    },
+    rating: r.rating,
+    comment: r.comment,
+    date: r.createdAt ? new Date(r.createdAt).toLocaleDateString() : '',
+    adminReply: r.adminReply,
+  }))
+  const averageRating =
+    reviews.length > 0 ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1) : 0
+  const totalReviews = reviews.length
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -279,7 +357,7 @@ export default function TourDetailPage() {
                 <div className="flex items-center gap-1.5">
                   <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
                   <span className="font-medium text-foreground">
-                    {tour.rating} ({tour.reviews} {t("tour.reviews")})
+                    {averageRating} ({totalReviews} {t("tour.reviews")})
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5">
@@ -505,14 +583,9 @@ export default function TourDetailPage() {
                     </div>
                   )}
 
-                  <div className="flex justify-between text-sm">
-                    <span>{t("tour.serviceFee")}</span>
-                    <span className="font-medium">${Math.round(totalPrice * 0.1)}</span>
-                  </div>
-
                   <div className="flex justify-between font-bold text-lg pt-3 border-t">
                     <span>{t("tour.total")}</span>
-                    <span className="text-primary">${Math.round(totalPrice * 1.1)}</span>
+                    <span className="text-primary">${totalPrice}</span>
                   </div>
                 </div>
 
@@ -532,10 +605,23 @@ export default function TourDetailPage() {
       <div className="mt-16">
         <h2 className="text-2xl font-bold mb-8">{t("tour.reviews")}</h2>
         <TourReview
-          reviews={tour.tourReviews}
-          averageRating={tour.rating}
-          totalReviews={tour.reviews}
+          reviews={mappedReviews}
+          averageRating={Number(averageRating)}
+          totalReviews={totalReviews}
         />
+        {bookingLoading ? null : bookingId && !hasReviewed && (
+          <ReviewForm
+            tourId={String(tour.id)}
+            bookingId={bookingId}
+            onReviewSubmitted={() => {
+              setReviewLoading(true);
+              fetch(`http://localhost:5000/api/reviews?tour=${params.id}`)
+                .then(res => res.json())
+                .then(data => setReviews(data || []))
+                .finally(() => setReviewLoading(false));
+            }}
+          />
+        )}
       </div>
     </div>
   )

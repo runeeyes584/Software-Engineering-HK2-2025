@@ -11,6 +11,7 @@ import BackToTop from "@/components/back-to-top"
 import Chatbot from "@/components/chatbot"
 import LanguageDebug from "@/components/language-debug"
 import { ClerkProvider } from "@clerk/nextjs"
+import { Toaster } from "sonner"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -32,6 +33,7 @@ export default function RootLayout({
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
             <LanguageProvider>
               <AuthProvider>
+                <Toaster richColors expand={true} position="top-center" closeButton />
                 <div className="min-h-screen flex flex-col">
                   <Header />
                   <main className="flex-1 px-4 sm:px-6 lg:px-8 max-w-[1400px] mx-auto w-full">{children}</main>

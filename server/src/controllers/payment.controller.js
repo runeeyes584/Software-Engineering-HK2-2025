@@ -16,13 +16,13 @@ const createVNPayUrl = async (req, res) => {
   try {
     const { bookingId } = req.body;
     const booking = await Booking.findById(bookingId).populate('user');
-
     if (!booking) return res.status(404).send("Không tìm thấy đơn đặt tour");
     if (!booking.totalPrice || isNaN(booking.totalPrice)) {
       return res.status(400).send("Tổng giá trị không hợp lệ");
     }
 
-    const amount = Math.round(booking.totalPrice);
+    const usdToVndRate = 250;
+    const amount = Math.round(booking.totalPrice * usdToVndRate);
     const now = new Date();
     const expire = new Date(now.getTime() + 15 * 60 * 1000);
 
@@ -40,7 +40,6 @@ const createVNPayUrl = async (req, res) => {
 
     return res.status(201).json(vnpayResponse);
   } catch (error) {
-    console.error("❌ Lỗi tạo QR:", error);
     return res.status(500).send("Không tạo được QR thanh toán");
   }
 };
@@ -82,7 +81,6 @@ const handleVNPayReturn = async (req, res) => {
       return res.redirect('http://localhost:3000/checkout/failure');
     }
   } catch (error) {
-    console.error("❌ Lỗi callback VNPay:", error);
     return res.status(500).send("Lỗi callback VNPay");
   }
 };

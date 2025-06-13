@@ -19,7 +19,10 @@ const requireAuth = require('./middleware/clerk');
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000', // Đúng domain FE
+  credentials: true, // Cho phép gửi cookie/session
+}));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, {

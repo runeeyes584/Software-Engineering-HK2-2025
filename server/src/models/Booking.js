@@ -9,7 +9,8 @@ const bookingSchema = new mongoose.Schema({
   payment: { type: mongoose.Schema.Types.ObjectId, ref: 'Payment' },
   promotion: { type: mongoose.Schema.Types.ObjectId, ref: 'Promotion' },
   review: { type: mongoose.Schema.Types.ObjectId, ref: 'Review' },
-  bookingDate: { type: Date, default: Date.now }
+  bookingDate: { type: Date, default: Date.now },
+  note: { type: String },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Booking', bookingSchema); 

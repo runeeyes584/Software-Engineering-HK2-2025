@@ -6,6 +6,7 @@ const {
   deleteReview
 } = require('../controllers/review.controller');
 const requireAuth = require('../middleware/clerk.js');
+const findOrCreateUser = require('../middleware/findOrCreateUser');
 
 const router = express.Router();
 
@@ -13,7 +14,7 @@ const router = express.Router();
 router.get('/', getReviews);         
 
 // Tạo review mới
-router.post('/', requireAuth, createReview);      
+router.post('/', requireAuth, findOrCreateUser, createReview);      
 
 // Cập nhật review
 router.put('/:id', requireAuth, updateReview);    

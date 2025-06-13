@@ -36,7 +36,7 @@ const tourSchema = new mongoose.Schema(
       {
         departureDate: { type: Date, required: true },
         returnDate: { type: Date, required: true },
-      },
+    },
     ],
     maxGuests: {
       type: Number,
