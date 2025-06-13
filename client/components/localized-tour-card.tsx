@@ -1,6 +1,6 @@
 "use client"
 
-import { useLanguage } from "@/components/language-provider"
+import { useLanguage } from "@/components/language-provider-fixed"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"

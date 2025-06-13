@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useLanguage } from "@/components/language-provider"
+import { useLanguage } from "@/components/language-provider-fixed"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -61,20 +61,18 @@ export default function ToursPage() {
     <div className="py-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">{t("nav.tours")}</h1>
-        <div className="flex items-center gap-2">
-          <Button
+        <div className="flex items-center gap-2">            <Button
             variant="outline"
             size="sm"
             onClick={() => setShowPerformanceMonitor(!showPerformanceMonitor)}
             className="hidden md:flex"
           >
             <Zap className="h-4 w-4 mr-1" />
-            Performance
-          </Button>
-          {activeFilterCount > 0 && (
+            {t("common.performance")}
+          </Button>          {activeFilterCount > 0 && (
             <Badge variant="secondary" className="flex items-center gap-1">
               <Filter className="h-3 w-3" />
-              {activeFilterCount} active
+              {activeFilterCount} {t("filters.active")}
             </Badge>
           )}
         </div>
@@ -116,36 +114,32 @@ export default function ToursPage() {
         />
 
         <div className="flex-1">
-          <div className="flex justify-between items-center mb-6">
-            <div className="text-sm text-muted-foreground flex items-center gap-2">
+          <div className="flex justify-between items-center mb-6">            <div className="text-sm text-muted-foreground flex items-center gap-2">
               <span>
-                Showing {filteredTours.length} of {allTours.length} tours
-              </span>
-              {activeFilterCount > 0 && (
+                {t("search.showing")} {filteredTours.length} {t("search.of")} {allTours.length} {t("search.tours")}
+              </span>              {activeFilterCount > 0 && (
                 <Badge variant="outline" className="text-xs">
-                  {activeFilterCount} filters
+                  {activeFilterCount} {t("filters.title")}
                 </Badge>
-              )}
-              {filters.searchQuery && (
+              )}              {filters.searchQuery && (
                 <Badge variant="outline" className="text-xs flex items-center gap-1">
                   <Search className="h-3 w-3" />
-                  Search active
+                  {t("search.active")}
                 </Badge>
               )}
-            </div>
-            <Select value={sortBy} onValueChange={setSortBy}>
+            </div>            <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Sort by" />
+                <SelectValue placeholder={t("sort.sortBy")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="recommended">Recommended</SelectItem>
-                {filters.searchQuery && <SelectItem value="relevance">Most Relevant</SelectItem>}
-                <SelectItem value="price-low">Price: Low to High</SelectItem>
-                <SelectItem value="price-high">Price: High to Low</SelectItem>
-                <SelectItem value="rating">Highest Rated</SelectItem>
-                <SelectItem value="duration-short">Duration: Short to Long</SelectItem>
-                <SelectItem value="duration-long">Duration: Long to Short</SelectItem>
-                <SelectItem value="alphabetical">Alphabetical</SelectItem>
+                <SelectItem value="recommended">{t("sort.recommended")}</SelectItem>
+                {filters.searchQuery && <SelectItem value="relevance">{t("sort.mostRelevant")}</SelectItem>}
+                <SelectItem value="price-low">{t("sort.priceLowToHigh")}</SelectItem>
+                <SelectItem value="price-high">{t("sort.priceHighToLow")}</SelectItem>
+                <SelectItem value="rating">{t("sort.highestRated")}</SelectItem>
+                <SelectItem value="duration-short">{t("sort.durationShortToLong")}</SelectItem>
+                <SelectItem value="duration-long">{t("sort.durationLongToShort")}</SelectItem>
+                <SelectItem value="alphabetical">{t("sort.alphabetical")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -195,10 +189,9 @@ export default function ToursPage() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{tour.description}</p>
-                    <div className="flex items-center justify-between text-sm mb-3">
-                      <div className="flex items-center gap-1">
+                    <div className="flex items-center justify-between text-sm mb-3">                      <div className="flex items-center gap-1">
                         <CalendarIcon className="h-4 w-4" />
-                        {tour.duration} days
+                        {tour.duration} {t("common.days")}
                       </div>
                       <div className="flex items-center gap-1">
                         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
@@ -211,48 +204,44 @@ export default function ToursPage() {
                           <Badge key={index} variant="outline" className="text-xs">
                             {activity}
                           </Badge>
-                        ))}
-                        {tour.activities.length > 3 && (
+                        ))}                        {tour.activities.length > 3 && (
                           <Badge variant="outline" className="text-xs">
-                            +{tour.activities.length - 3} more
+                            +{tour.activities.length - 3} {t("common.more")}
                           </Badge>
                         )}
                       </div>
                     )}
-                    {tour.activityLevel && (
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    {tour.activityLevel && (                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <TrendingUp className="h-3 w-3" />
-                        Activity Level: {tour.activityLevel}
+                        {t("tour.activityLevel")}: {tour.activityLevel}
                       </div>
                     )}
-                  </CardContent>
-                  <CardFooter>
+                  </CardContent>                  <CardFooter>
                     <Button asChild className="w-full">
-                      <Link href={`/tours/${tour.id}`}>View Details</Link>
+                      <Link href={`/tours/${tour.id}`}>{t("tour.viewDetails")}</Link>
                     </Button>
                   </CardFooter>
                 </Card>
               ))}
             </div>
-          ) : (
-            <Card className="p-8 text-center">
+          ) : (            <Card className="p-8 text-center">
               <div className="space-y-4">
                 <div className="text-muted-foreground">
                   <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <h3 className="text-lg font-medium">No tours found</h3>
+                  <h3 className="text-lg font-medium">{t("search.noToursFound")}</h3>
                   <p className="text-sm">
                     {filters.searchQuery
-                      ? `No tours match your search for "${filters.searchQuery}"`
-                      : "No tours match your current filters"}
+                      ? t("search.noToursMatchSearch", { query: filters.searchQuery })
+                      : t("search.noToursMatchFilters")}
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2 justify-center">
                   <Button variant="outline" onClick={resetFilters}>
-                    Clear All Filters
+                    {t("filters.clearAll")}
                   </Button>
                   {popularSearches.length > 0 && (
                     <div className="flex flex-wrap gap-2 justify-center">
-                      <span className="text-sm text-muted-foreground">Try:</span>
+                      <span className="text-sm text-muted-foreground">{t("search.try")}:</span>
                       {popularSearches.slice(0, 3).map((search, index) => (
                         <Button key={index} variant="ghost" size="sm" onClick={() => handleSearchSelect(search)}>
                           {search}

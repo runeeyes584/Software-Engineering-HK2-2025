@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useLanguage } from "@/components/language-provider"
+import { useLanguage } from "@/components/language-provider-fixed"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import {
