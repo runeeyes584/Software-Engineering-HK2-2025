@@ -9,10 +9,12 @@ import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { CalendarIcon, Clock, MapPin, Star, Plane, Bus, Ship, Car } from "lucide-react"
+import { CalendarIcon, Clock, MapPin, Star, Plane, Bus, Ship, Car, ChevronLeft, ChevronRight } from "lucide-react"
 import Image from "next/image"
 import { format, addDays, differenceInDays } from "date-fns"
 import { useParams, useRouter } from "next/navigation"
+import { cn } from "@/lib/utils"
+import { TourReview } from "@/components/tour-review"
 
 export default function TourDetailPage() {
   const { t } = useLanguage()
@@ -28,6 +30,8 @@ export default function TourDetailPage() {
   const [adults, setAdults] = useState(2)
   const [children, setChildren] = useState(0)
   const [infants, setInfants] = useState(0)
+  const [selectedImage, setSelectedImage] = useState(0)
+  const [activeTab, setActiveTab] = useState<"images" | "video">("images")
 
   useEffect(() => {
     const fetchTourData = async () => {
@@ -53,17 +57,23 @@ export default function TourDetailPage() {
       id: params.id,
       title: tourData.name,
       location: tourData.destination,
-      images: tourData.images || [
-        "/placeholder.svg?height=600&width=800",
-        "/placeholder.svg?height=600&width=800",
-        "/placeholder.svg?height=600&width=800",
-      ],
+      images: tourData.images || ["/placeholder.svg?height=600&width=800"],
+      videos: tourData.videos || [],
       price: tourData.price,
-      duration: differenceInDays(new Date(tourData.endDate), new Date(tourData.startDate)) + 1,
+      duration: (
+        tourData.departureOptions && tourData.departureOptions.length > 0
+          ? differenceInDays(
+              new Date(tourData.departureOptions[0].returnDate),
+              new Date(tourData.departureOptions[0].departureDate)
+            ) + 1
+          : 0
+      ),
       rating: tourData.averageRating || 4.8,
       reviews: tourData.reviewCount || 124,
-      category: t("categories.adventure"),
+      type: tourData.type,
       description: tourData.description,
+      maxGuests: tourData.maxGuests,
+      availableSlots: tourData.availableSlots,
       transportOptions: [
         { id: "plane", name: t("transport.airplane"), icon: Plane, priceModifier: 1.2 },
         { id: "bus", name: t("transport.bus"), icon: Bus, priceModifier: 1.0 },
@@ -75,26 +85,40 @@ export default function TourDetailPage() {
         { id: "business", name: t("class.business"), description: t("class.businessDesc"), priceModifier: 1.5 },
         { id: "luxury", name: t("class.luxury"), description: t("class.luxuryDesc"), priceModifier: 2.0 },
       ],
-      highlights: t("tour.halongBay.highlights"),
-      itinerary: [
+      tourReviews: [
         {
-          day: 1,
-          title: t("tour.halongBay.itinerary.day1.title"),
-          description: t("tour.halongBay.itinerary.day1.description"),
+          id: "1",
+          user: {
+            name: "Sarah Johnson",
+            avatar: "/avatars/sarah.jpg",
+          },
+          rating: 5,
+          comment: "Amazing experience! The tour guide was knowledgeable and friendly. The accommodations were comfortable and the food was delicious.",
+          date: "October 2023",
+          adminReply: "Thank you for your wonderful review! We're glad you enjoyed your experience with us.",
         },
         {
-          day: 2,
-          title: t("tour.halongBay.itinerary.day2.title"),
-          description: t("tour.halongBay.itinerary.day2.description"),
+          id: "2",
+          user: {
+            name: "David Chen",
+          },
+          rating: 4,
+          comment: "Great tour overall. The itinerary was well-planned and we got to see all the highlights. Would have given 5 stars if the weather was better.",
+          date: "September 2023",
         },
         {
-          day: 3,
-          title: t("tour.halongBay.itinerary.day3.title"),
-          description: t("tour.halongBay.itinerary.day3.description"),
+          id: "3",
+          user: {
+            name: "Maria Garcia",
+            avatar: "/avatars/maria.jpg",
+          },
+          rating: 5,
+          comment: "This was my first time booking with this company and I was impressed. Everything was organized perfectly and the staff was very helpful.",
+          date: "August 2023",
+          adminReply: "We're thrilled to hear that your first experience with us was positive! We hope to welcome you back soon.",
         },
       ],
-      included: t("tour.halongBay.included"),
-      excluded: t("tour.halongBay.excluded"),
+      departureOptions: tourData.departureOptions || [],
     }
   }
 
@@ -137,291 +161,160 @@ export default function TourDetailPage() {
 
   const TransportIcon = getSelectedTransport().icon
 
-  const reviews = [
-    {
-      name: "Sarah Johnson",
-      date: "October 2023",
-      rating: 5,
-      comment: t("tour.reviews.sarah.comment"),
-    },
-    {
-      name: "David Chen",
-      date: "September 2023",
-      rating: 4,
-      comment: t("tour.reviews.david.comment"),
-    },
-    {
-      name: "Maria Garcia",
-      date: "August 2023",
-      rating: 5,
-      comment: t("tour.reviews.maria.comment"),
-    },
-  ]
-
   return (
-    <div className="py-8">
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        {/* Main Content - Left Side */}
-        <div className="xl:col-span-2 space-y-8">
+    <div className="container mx-auto px-4 py-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column - Main Content */}
+        <div className="lg:col-span-2 space-y-8">
           {/* Image Gallery */}
-          <div className="w-full">
-            {/* Main Image */}
-            <div className="relative w-full h-[400px] md:h-[500px] rounded-xl overflow-hidden border border-border shadow-sm mb-4">
-              <Image
-                src={tour.images[0] || "/placeholder.svg?height=600&width=800"}
-                alt={tour.title}
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 50vw"
-              />
-            </div>
-
-            {/* Thumbnail Images */}
-            <div className="grid grid-cols-3 gap-3">
-              {tour.images.slice(1).map((image: string, index: number) => (
-                <div key={index} className="relative aspect-video rounded-lg overflow-hidden border border-border">
+          <div className="space-y-4">
+            {/* Main Image/Video */}
+            <div className="relative aspect-[16/9] rounded-xl overflow-hidden bg-muted group">
+              {activeTab === "images" ? (
+                <>
                   <Image
-                    src={image}
-                    alt={`Tour image ${index + 2}`}
+                    src={tour.images[selectedImage]}
+                    alt={tour.title}
                     fill
                     className="object-cover"
+                    priority
                   />
-                </div>
-              ))}
+                  {tour.images.length > 1 && (
+                    <>
+                      <button
+                        onClick={() => setSelectedImage((selectedImage - 1 + tour.images.length) % tour.images.length)}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/40 hover:bg-black/70 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+                        type="button"
+                      >
+                        <ChevronLeft className="w-6 h-6" />
+                      </button>
+                      <button
+                        onClick={() => setSelectedImage((selectedImage + 1) % tour.images.length)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/40 hover:bg-black/70 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+                        type="button"
+                      >
+                        <ChevronRight className="w-6 h-6" />
+                      </button>
+                    </>
+                  )}
+                </>
+              ) : (
+                tour.videos[0] && (
+                  <video
+                    src={tour.videos[0]}
+                    controls
+                    className="w-full h-full object-cover"
+                  />
+                )
+              )}
             </div>
+
+            {/* Tab Navigation */}
+            {(tour.images.length > 0 || tour.videos.length > 0) && (
+              <div className="flex gap-2">
+                {tour.images.length > 0 && (
+                  <button
+                    onClick={() => setActiveTab("images")}
+                    className={cn(
+                      "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                      activeTab === "images"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted hover:bg-muted/80"
+                    )}
+                  >
+                    {t("tour.images")}
+                  </button>
+                )}
+                {tour.videos.length > 0 && (
+                  <button
+                    onClick={() => setActiveTab("video")}
+                    className={cn(
+                      "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                      activeTab === "video"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted hover:bg-muted/80"
+                    )}
+                  >
+                    {t("tour.video")}
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Thumbnails */}
+            {activeTab === "images" && tour.images.length > 1 && (
+              <div className="grid grid-cols-4 gap-2">
+                {tour.images.map((image: string, index: number) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(index)}
+                    className={cn(
+                      "relative aspect-video rounded-lg overflow-hidden border-2 transition-all",
+                      selectedImage === index
+                        ? "border-primary"
+                        : "border-transparent hover:border-muted-foreground/20"
+                    )}
+                  >
+                    <Image
+                      src={image}
+                      alt={`${tour.title} - Image ${index + 1}`}
+                      fill
+                      className="object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Tour Information */}
           <div className="space-y-6">
-            {/* Header */}
-            <div className="space-y-4">
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground leading-tight">{tour.title}</h1>
-
-              <div className="flex flex-wrap items-center gap-4 text-sm">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">{tour.title}</h1>
+              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1.5">
-                  <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                  <span className="text-muted-foreground">{tour.location}</span>
+                  <MapPin className="h-4 w-4" />
+                  <span>{tour.location}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 flex-shrink-0" />
-                  <span className="font-medium">
-                    {tour.rating} ({tour.reviews} reviews)
+                  <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                  <span className="font-medium text-foreground">
+                    {tour.rating} ({tour.reviews} {t("tour.reviews")})
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Clock className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                  <span className="text-muted-foreground">{tour.duration} days</span>
+                  <Clock className="h-4 w-4" />
+                  <span>{tour.duration} {t("tour.days")}</span>
                 </div>
               </div>
             </div>
 
-            {/* Tabs Content */}
-            <div className="w-full">
-              <Tabs defaultValue="overview" className="w-full">
-                <TabsList className="grid w-full grid-cols-4 mb-6">
-                  <TabsTrigger value="overview" className="text-xs sm:text-sm">
-                    {t("tour.overview")}
-                  </TabsTrigger>
-                  <TabsTrigger value="itinerary" className="text-xs sm:text-sm">
-                    {t("tour.itinerary")}
-                  </TabsTrigger>
-                  <TabsTrigger value="details" className="text-xs sm:text-sm">
-                    {t("tour.details")}
-                  </TabsTrigger>
-                  <TabsTrigger value="reviews" className="text-xs sm:text-sm">
-                    {t("tour.reviews")}
-                  </TabsTrigger>
-                </TabsList>
+            <div className="prose prose-gray max-w-none">
+              <p className="text-muted-foreground leading-relaxed">{tour.description}</p>
+            </div>
 
-                <TabsContent value="overview" className="space-y-6 mt-0">
-                  <div className="prose prose-gray max-w-none">
-                    <p className="text-muted-foreground leading-relaxed">{tour.description}</p>
-                  </div>
-
-                  <div>
-                    <h3 className="text-xl font-semibold mb-4">{t("tour.highlights")}</h3>
-                    <ul className="space-y-3">
-                      {Array.isArray(tour.highlights) ? (
-                        tour.highlights.map((highlight, index) => (
-                          <li key={index} className="flex items-start gap-3">
-                            <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                            <span className="text-muted-foreground leading-relaxed">{highlight}</span>
-                          </li>
-                        ))
-                      ) : (
-                        <li className="flex items-start gap-3">
-                          <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                          <span className="text-muted-foreground leading-relaxed">{tour.highlights}</span>
-                        </li>
-                      )}
-                    </ul>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="itinerary" className="space-y-6 mt-0">
-                  {tour.itinerary.map((day) => (
-                    <div key={day.day} className="relative pl-8 pb-8 last:pb-0">
-                      <div className="absolute left-0 top-0 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                        <span className="text-xs font-bold text-primary-foreground">{day.day}</span>
-                      </div>
-                      <div className="absolute left-3 top-6 w-0.5 h-full bg-border last:hidden" />
-                      <div className="space-y-2">
-                        <h3 className="text-lg font-semibold">{day.title}</h3>
-                        <p className="text-muted-foreground leading-relaxed">{day.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </TabsContent>
-
-                <TabsContent value="details" className="space-y-8 mt-0">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div>
-                      <h3 className="text-xl font-semibold mb-4 text-green-700">{t("tour.included")}</h3>
-                      <ul className="space-y-3">
-                        {Array.isArray(tour.included) ? (
-                          tour.included.map((item, index) => (
-                            <li key={index} className="flex items-start gap-3">
-                              <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0">
-                                <span className="text-green-600 text-xs font-bold">✓</span>
-                              </div>
-                              <span className="text-muted-foreground leading-relaxed">{item}</span>
-                            </li>
-                          ))
-                        ) : (
-                          <li className="flex items-start gap-3">
-                            <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0">
-                              <span className="text-green-600 text-xs font-bold">✓</span>
-                            </div>
-                            <span className="text-muted-foreground leading-relaxed">{tour.included}</span>
-                          </li>
-                        )}
-                      </ul>
-                    </div>
-
-                    <div>
-                      <h3 className="text-xl font-semibold mb-4 text-red-700">{t("tour.notIncluded")}</h3>
-                      <ul className="space-y-3">
-                        {Array.isArray(tour.excluded) ? (
-                          tour.excluded.map((item, index) => (
-                            <li key={index} className="flex items-start gap-3">
-                              <div className="w-5 h-5 bg-red-100 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0">
-                                <span className="text-red-600 text-xs font-bold">✗</span>
-                              </div>
-                              <span className="text-muted-foreground leading-relaxed">{item}</span>
-                            </li>
-                          ))
-                        ) : (
-                          <li className="flex items-start gap-3">
-                            <div className="w-5 h-5 bg-red-100 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0">
-                              <span className="text-red-600 text-xs font-bold">✗</span>
-                            </div>
-                            <span className="text-muted-foreground leading-relaxed">{tour.excluded}</span>
-                          </li>
-                        )}
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-xl font-semibold mb-4">{t("tour.transportation")}</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {tour.transportOptions.map((option) => {
-                        const Icon = option.icon
-                        return (
-                          <div
-                            key={option.id}
-                            className="flex flex-col items-center gap-2 p-4 border border-border rounded-lg"
-                          >
-                            <Icon className="h-6 w-6 text-primary" />
-                            <span className="text-sm font-medium text-center">{option.name}</span>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-xl font-semibold mb-4">{t("tour.additionalInfo")}</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-foreground">{t("tour.language")}</h4>
-                        <p className="text-muted-foreground">{t("tour.englishVietnamese")}</p>
-                      </div>
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-foreground">{t("tour.groupSize")}</h4>
-                        <p className="text-muted-foreground">{t("tour.maximum20People")}</p>
-                      </div>
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-foreground">{t("tour.transportation")}</h4>
-                        <p className="text-muted-foreground">{t("tour.airConditionedVehicle")}</p>
-                      </div>
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-foreground">{t("tour.accommodation")}</h4>
-                        <p className="text-muted-foreground">{t("tour.deluxeCabin")}</p>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="reviews" className="space-y-6 mt-0">
-                  <div className="flex items-center gap-6 p-6 bg-muted/30 rounded-xl">
-                    <div className="flex flex-col items-center">
-                      <div className="text-4xl font-bold text-primary">{tour.rating}</div>
-                      <div className="flex items-center mt-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`h-4 w-4 ${
-                              i < Math.floor(tour.rating) ? "text-yellow-500 fill-yellow-500" : "text-muted-foreground"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">
-                        {t("tour.basedOnReviews").replace("{count}", tour.reviews.toString())}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-6">
-                    {reviews.map((review, index) => (
-                      <div key={index} className="border-b border-border pb-6 last:border-b-0">
-                        <div className="flex justify-between items-start mb-3">
-                          <div>
-                            <h4 className="font-medium">{review.name}</h4>
-                            <p className="text-sm text-muted-foreground">{review.date}</p>
-                          </div>
-                          <div className="flex">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`h-4 w-4 ${
-                                  i < review.rating ? "text-yellow-500 fill-yellow-500" : "text-muted-foreground"
-                                }`}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        <p className="text-muted-foreground leading-relaxed">{review.comment}</p>
-                      </div>
-                    ))}
-                  </div>
-                </TabsContent>
-              </Tabs>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 rounded-lg bg-muted/30">
+                <h3 className="font-medium mb-2">{t("tour.type")}</h3>
+                <p className="text-muted-foreground">{tour.type}</p>
+              </div>
+              <div className="p-4 rounded-lg bg-muted/30">
+                <h3 className="font-medium mb-2">{t("tour.availableSlots")}</h3>
+                <p className="text-muted-foreground">
+                  {tour.availableSlots} / {tour.maxGuests} {t("tour.slots")}
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Booking Card - Right Side */}
-        <div className="xl:col-span-1">
+        {/* Right Column - Booking Card */}
+        <div className="lg:col-span-1">
           <div className="sticky top-24">
-            <Card className="shadow-lg border-border">
+            <Card className="shadow-lg">
               <CardContent className="p-6 space-y-6">
                 {/* Price Header */}
-                <div className="flex items-baseline justify-between border-b border-border pb-4">
+                <div className="flex items-baseline justify-between border-b pb-4">
                   <div className="flex items-baseline gap-2">
                     <span className="text-3xl font-bold text-primary">${basePrice}</span>
                     <span className="text-sm text-muted-foreground">{t("tour.perPerson")}</span>
@@ -432,59 +325,31 @@ export default function TourDetailPage() {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label className="text-sm font-medium">{t("tour.departureDate")}</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-full justify-start text-left font-normal h-11">
-                          <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
-                          <span className="truncate">
-                            {departureDate ? format(departureDate, "PPP") : t("tour.selectDepartureDate")}
-                          </span>
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={departureDate}
-                          onSelect={(date) => {
-                            setDepartureDate(date)
-                            if (date && !returnDate && tour.duration > 1) {
-                              setReturnDate(addDays(date, tour.duration - 1))
-                            }
-                          }}
-                          disabled={(date: Date) => date < new Date()}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
+                    <Select
+                      value={departureDate && returnDate ? `${departureDate.toISOString()}|${returnDate.toISOString()}` : ""}
+                      onValueChange={(val) => {
+                        const [dep, ret] = val.split("|");
+                        setDepartureDate(new Date(dep));
+                        setReturnDate(new Date(ret));
+                      }}
+                    >
+                      <SelectTrigger className="w-full h-11">
+                        <SelectValue placeholder={t("tour.selectDepartureDate")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {tour.departureOptions && tour.departureOptions.length > 0 && (
+                          tour.departureOptions.map((opt: any, idx: number) => (
+                            <SelectItem key={idx} value={`${opt.departureDate}|${opt.returnDate}`}>
+                              {`${format(new Date(opt.departureDate), "dd/MM/yyyy")} - ${format(new Date(opt.returnDate), "dd/MM/yyyy")}`}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                    {(!tour.departureOptions || tour.departureOptions.length === 0) && (
+                      <div className="text-red-500 text-sm mt-2">Không có lịch khởi hành</div>
+                    )}
                   </div>
-
-                  {tour.duration > 1 && (
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium">{t("tour.returnDate")}</Label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button variant="outline" className="w-full justify-start text-left font-normal h-11">
-                            <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
-                            <span className="truncate">
-                              {returnDate ? format(returnDate, "PPP") : t("tour.selectReturnDate")}
-                            </span>
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={returnDate}
-                            onSelect={setReturnDate}
-                            disabled={(date: Date) => {
-                              const today = new Date()
-                              return date < today || (departureDate ? date < departureDate : false)
-                            }}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                  )}
                 </div>
 
                 {/* Transportation */}
@@ -534,92 +399,78 @@ export default function TourDetailPage() {
 
                 {/* Travelers */}
                 <div className="space-y-4">
-                  <Label className="text-sm font-medium">{t("tour.travelers")}</Label>
-
-                  <div className="space-y-3">
-                    {/* Adults */}
-                    <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                      <div className="flex-1">
-                        <div className="font-medium text-sm">{t("tour.adults")}</div>
-                        <div className="text-xs text-muted-foreground">{t("tour.age12Plus")}</div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => setAdults(Math.max(1, adults - 1))}
-                          disabled={adults <= 1}
-                        >
-                          -
-                        </Button>
-                        <span className="w-8 text-center font-medium">{adults}</span>
-                        <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setAdults(adults + 1)}>
-                          +
-                        </Button>
-                      </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">{t("tour.adults")}</Label>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => setAdults(Math.max(1, adults - 1))}
+                      >
+                        -
+                      </Button>
+                      <span className="w-8 text-center">{adults}</span>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => setAdults(Math.min(tour.availableSlots - children - infants, adults + 1))}
+                      >
+                        +
+                      </Button>
                     </div>
+                  </div>
 
-                    {/* Children */}
-                    <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                      <div className="flex-1">
-                        <div className="font-medium text-sm">{t("tour.children")}</div>
-                        <div className="text-xs text-muted-foreground">{t("tour.age2to11")}</div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => setChildren(Math.max(0, children - 1))}
-                          disabled={children <= 0}
-                        >
-                          -
-                        </Button>
-                        <span className="w-8 text-center font-medium">{children}</span>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => setChildren(children + 1)}
-                        >
-                          +
-                        </Button>
-                      </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">{t("tour.children")}</Label>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => setChildren(Math.max(0, children - 1))}
+                      >
+                        -
+                      </Button>
+                      <span className="w-8 text-center">{children}</span>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => setChildren(Math.min(tour.availableSlots - adults - infants, children + 1))}
+                      >
+                        +
+                      </Button>
                     </div>
+                  </div>
 
-                    {/* Infants */}
-                    <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                      <div className="flex-1">
-                        <div className="font-medium text-sm">{t("tour.infants")}</div>
-                        <div className="text-xs text-muted-foreground">{t("tour.under2")}</div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => setInfants(Math.max(0, infants - 1))}
-                          disabled={infants <= 0}
-                        >
-                          -
-                        </Button>
-                        <span className="w-8 text-center font-medium">{infants}</span>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => setInfants(infants + 1)}
-                        >
-                          +
-                        </Button>
-                      </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">{t("tour.infants")}</Label>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => setInfants(Math.max(0, infants - 1))}
+                      >
+                        -
+                      </Button>
+                      <span className="w-8 text-center">{infants}</span>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => setInfants(Math.min(tour.availableSlots - adults - children, infants + 1))}
+                      >
+                        +
+                      </Button>
                     </div>
                   </div>
                 </div>
 
-                {/* Price Summary */}
-                <div className="border-t border-border pt-4 space-y-3">
+                {/* Price Breakdown */}
+                <div className="border-t pt-4 space-y-3">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
                     <TransportIcon className="h-4 w-4 flex-shrink-0" />
                     <span className="truncate">
@@ -659,7 +510,7 @@ export default function TourDetailPage() {
                     <span className="font-medium">${Math.round(totalPrice * 0.1)}</span>
                   </div>
 
-                  <div className="flex justify-between font-bold text-lg pt-3 border-t border-border">
+                  <div className="flex justify-between font-bold text-lg pt-3 border-t">
                     <span>{t("tour.total")}</span>
                     <span className="text-primary">${Math.round(totalPrice * 1.1)}</span>
                   </div>
@@ -675,6 +526,16 @@ export default function TourDetailPage() {
             </Card>
           </div>
         </div>
+      </div>
+
+      {/* Reviews Section */}
+      <div className="mt-16">
+        <h2 className="text-2xl font-bold mb-8">{t("tour.reviews")}</h2>
+        <TourReview
+          reviews={tour.tourReviews}
+          averageRating={tour.rating}
+          totalReviews={tour.reviews}
+        />
       </div>
     </div>
   )

@@ -7,6 +7,7 @@ import Image from "next/image"
 import Link from "next/link"
 import TourSearch from "@/components/tour-search"
 import { useEffect, useState } from "react"
+import TourCard from "@/components/tour-card"
 
 export default function HomePage() {
   const { t } = useLanguage()
@@ -183,75 +184,20 @@ export default function HomePage() {
                 const images = Array.isArray(tour.images) && tour.images.length > 0 ? tour.images : ["/placeholder.svg"];
                 const currentIndex = imageIndexes[tour._id || tour.id] || 0;
                 return (
-                  <Card
+                  <TourCard
                     key={tour._id || tour.id}
-                    className="overflow-hidden border border-border rounded-2xl shadow-md transition-transform duration-200 bg-white group"
-                  >
-                    <div className="relative h-56 group">
-                      <Image
-                        src={images[currentIndex]}
-                        alt={tour.name || "Ảnh tour du lịch"}
-                        fill
-                        className="object-cover rounded-t-2xl transition-transform duration-300"
-                      />
-                      <div className="absolute top-3 left-3 bg-white/80 rounded-full px-3 py-1 flex items-center gap-1 shadow text-xs font-medium">
-                        <MapPin className="h-4 w-4 text-primary" />
-                        <span className="text-primary font-semibold">{tour.destination}</span>
-                      </div>
-                      {images.length > 1 && (
-                        <>
-                          <button
-                            onClick={() => handlePrev(tour._id || tour.id, images)}
-                            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 hover:bg-black/70 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
-                          >
-                            <ChevronLeft className="w-5 h-5" />
-                          </button>
-                          <button
-                            onClick={() => handleNext(tour._id || tour.id, images)}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 hover:bg-black/70 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
-                          >
-                            <ChevronRight className="w-5 h-5" />
-                          </button>
-                        </>
-                      )}
-                      {images.length > 1 && (
-                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-                          {images.map((_: any, idx: number) => (
-                            <span
-                              key={idx}
-                              className={`w-2 h-2 rounded-full ${idx === currentIndex ? "bg-primary" : "bg-white/70"}`}
-                            />
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <CardHeader className="p-5 pb-3">
-                      <CardTitle className="text-xl font-bold mb-1 line-clamp-2 group-hover:text-primary transition-colors">
-                        {tour.name}
-                      </CardTitle>
-                      <div className="flex items-center gap-2 text-sm mt-1">
-                        <Star className="h-4 w-4 text-yellow-500" />
-                        <span className="font-semibold text-yellow-600">
-                          {typeof tour.averageRating === "number" && !isNaN(tour.averageRating)
-                            ? tour.averageRating.toFixed(1)
-                            : "0.0"}
-                        </span>
-                        <span className="text-muted-foreground">({tour.reviewCount || 0})</span>
-                      </div>
-                    </CardHeader>
-                    <CardFooter className="p-5 pt-0 flex items-center justify-between">
-                      <div className="font-bold text-lg text-primary">
-                        {tour.price?.toLocaleString("vi-VN") || 0} ₫
-                      </div>
-                      <Button
-                        size="sm"
-                        asChild
-                        className="rounded-full px-5 font-semibold bg-primary text-white hover:bg-primary/90 transition-colors"
-                      >
-                        <Link href={`/tours/${tour._id || tour.id}`}>Xem chi tiết</Link>
-                      </Button>
-                    </CardFooter>
-                  </Card>
+                    name={tour.name}
+                    destination={tour.destination}
+                    price={tour.price}
+                    averageRating={typeof tour.averageRating === "number" && !isNaN(tour.averageRating) ? tour.averageRating : 0}
+                    reviewCount={tour.reviewCount || 0}
+                    images={images}
+                    duration={tour.duration}
+                    currentIndex={currentIndex}
+                    onPrev={() => handlePrev(tour._id || tour.id, images)}
+                    onNext={() => handleNext(tour._id || tour.id, images)}
+                    onViewDetail={() => window.location.href = `/tours/${tour._id || tour.id}`}
+                  />
                 );
               })
             )}
