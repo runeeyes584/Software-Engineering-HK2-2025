@@ -1,11 +1,5 @@
 import type React from "react"
-import { Inter } from "next/font/google"
-import AdminNavbar from "@/components/admin/admin-navbar"
-import AdminSidebar from "@/components/admin/admin-sidebar"
-import AdminFooter from "@/components/admin/admin-footer"
-import RealTimeChatbox from "@/components/admin/real-time-chatbox"
-
-const inter = Inter({ subsets: ["latin"] })
+import { AdminSidebar } from "@/components/admin/admin-sidebar"
 
 export default function AdminLayout({
   children,
@@ -13,14 +7,9 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex flex-col h-screen">
-      <AdminNavbar />
-      <div className="flex flex-1">
-        <AdminSidebar />
-        <main className="flex-1 p-4">{children}</main>
-      </div>
-      <AdminFooter />
-      <RealTimeChatbox />
+    <div className="flex min-h-screen w-full bg-gray-50 dark:bg-gray-900">
+      <AdminSidebar />
+      <main className="flex-1 p-8 overflow-y-auto h-screen">{children}</main>
     </div>
   )
 }
