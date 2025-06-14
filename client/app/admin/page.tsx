@@ -1,6 +1,6 @@
 "use client"
 
-import { useLanguage } from "@/components/language-provider"
+import { useLanguage } from "@/components/language-provider-fixed"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -228,9 +228,9 @@ export default function AdminDashboard() {
                   <div className="flex items-center space-x-6 flex-1">
                     <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-full flex items-center justify-center text-white font-extrabold text-2xl shadow-xl">
                       {msg.avatar}
-                    </div>
+                  </div>
                     <div className="flex-1">
-                      <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between">
                         <p className="font-bold text-gray-900 dark:text-white text-lg">{msg.user}</p>
                         {msg.unread && <span className="ml-2 px-3 py-1 bg-red-500 text-white text-sm rounded-full">New</span>}
                       </div>

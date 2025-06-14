@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useLanguage } from "@/components/language-provider"
+import { useLanguage } from "@/components/language-provider-fixed"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -209,12 +209,12 @@ export default function TourDetailPage() {
 
   const handleBookNow = () => {
     if (!departureDate) {
-      toast.error(t("Bạn cần chọn thời gian khởi hành"))
+      toast.error(t("tour.selectDepartureDateRequired"))
       return
     }
 
     if (!returnDate && tour.duration > 1) {
-      toast.error(t("Bạn cần chọn thời gian khởi hành"))
+      toast.error(t("tour.selectDepartureDateRequired"))
       return
     }
 

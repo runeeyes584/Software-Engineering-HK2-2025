@@ -217,6 +217,8 @@ export function TourReview({ reviews, averageRating, totalReviews, onRefreshRevi
                       bookingId={""}
                       initialRating={editData?.rating}
                       initialComment={editData?.comment}
+                      initialImages={review.images || []}
+                      initialVideos={review.videos || []}
                       onReviewSubmitted={() => {
                         setEditingReviewId(null)
                         onRefreshReviews?.()

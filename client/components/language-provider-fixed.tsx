@@ -329,7 +329,7 @@ const translations: Record<string, Record<string, string>> = {
     "tour.departureDate": "Departure Date",
     "tour.returnDate": "Return Date",
     "tour.selectDepartureDate": "Select departure date",
-    "tour.selectReturnDate": "Select return date",
+    "tour.selectDepartureDateRequired": "You need to select a departure date",
     "tour.perPerson": "per person",
     "tour.transportation": "Transportation",
     "tour.days": "days",
@@ -373,7 +373,8 @@ const translations: Record<string, Record<string, string>> = {
     "review.delete": "Delete",
     "review.submitted": "Review submitted successfully!",
     "review.deleteConfirm": "Are you sure you want to delete this review?",
-    "review.likeError": "Failed to like review!"
+    "review.likeError": "Failed to like review!",
+    "review.uploadFile": "Upload file"
   },
   vi: {
     // Navigation
@@ -691,7 +692,7 @@ const translations: Record<string, Record<string, string>> = {
     "tour.departureDate": "Ngày đi",
     "tour.returnDate": "Ngày đến",
     "tour.selectDepartureDate": "Chọn ngày đi",
-    "tour.selectReturnDate": "Chọn ngày đến",
+    "tour.selectDepartureDateRequired": "Bạn cần chọn thời gian khởi hành",
     "tour.perPerson": "mỗi người",
     "tour.transportation": "Phương tiện",
     "tour.days": "ngày",
@@ -735,7 +736,8 @@ const translations: Record<string, Record<string, string>> = {
     "review.delete": "Xóa",
     "review.submitted": "Gửi đánh giá thành công!",
     "review.deleteConfirm": "Bạn có chắc muốn xóa review này?",
-    "review.likeError": "Lỗi khi like review!"
+    "review.likeError": "Lỗi khi like review!",
+    "review.uploadFile": "Tải file lên"
   },
 }
 

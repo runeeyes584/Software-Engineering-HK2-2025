@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useLanguage } from "@/components/language-provider"
+import { useLanguage } from "@/components/language-provider-fixed"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
@@ -16,6 +16,8 @@ interface ReviewFormProps {
   onReviewSubmitted?: () => void
   initialRating?: number
   initialComment?: string
+  initialImages?: string[]
+  initialVideos?: string[]
   reviewId?: string
   isEdit?: boolean
   onCancel?: () => void
@@ -40,7 +42,7 @@ async function uploadFilesToCloudinary(files: File[]): Promise<{images: string[]
   return { images, videos };
 }
 
-export function ReviewForm({ tourId, bookingId, onReviewSubmitted, initialRating = 0, initialComment = "", reviewId, isEdit = false, onCancel }: ReviewFormProps) {
+export function ReviewForm({ tourId, bookingId, onReviewSubmitted, initialRating = 0, initialComment = "", initialImages = [], initialVideos = [], reviewId, isEdit = false, onCancel }: ReviewFormProps) {
   const { t } = useLanguage()
   const { getToken } = useAuth()
   const [rating, setRating] = useState(initialRating)
@@ -49,7 +51,9 @@ export function ReviewForm({ tourId, bookingId, onReviewSubmitted, initialRating
   const [hoveredRating, setHoveredRating] = useState(0)
   const maxLength = 500
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [mediaUrls, setMediaUrls] = useState<{images: string[], videos: string[]}>({ images: [], videos: [] });
+  const [mediaUrls, setMediaUrls] = useState<{images: string[], videos: string[]}>(
+    isEdit ? { images: initialImages, videos: initialVideos } : { images: [], videos: [] }
+  );
   const [isUploading, setIsUploading] = useState(false);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -175,7 +179,24 @@ export function ReviewForm({ tourId, bookingId, onReviewSubmitted, initialRating
           </div>
           {/* Media upload & preview */}
           <div className="flex flex-col gap-2">
-            <input type="file" multiple accept="image/*,video/*" onChange={handleFileChange} />
+            <div className="flex items-center gap-2">
+              <label htmlFor="review-upload" className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary text-white rounded-full cursor-pointer hover:bg-primary/90 transition text-sm font-medium shadow-sm">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5-5m0 0l5 5m-5-5v12" /></svg>
+                {t('review.uploadFile')}
+              </label>
+              <input
+                id="review-upload"
+                type="file"
+                multiple
+                accept="image/*,video/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+              {selectedFiles.length > 0 && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary ml-1">{selectedFiles.length}</span>
+              )}
+              {isUploading && <span className="ml-2 text-xs text-primary animate-pulse">Đang tải...</span>}
+            </div>
             <div className="flex flex-wrap gap-2 mt-2">
               {mediaUrls.images.map(url => (
                 <div key={url} className="relative group">
