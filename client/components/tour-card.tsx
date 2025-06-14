@@ -62,17 +62,6 @@ export default function TourCard({
             </button>
           </>
         )}
-        {/* Dots indicator nếu muốn giữ lại */}
-        {images.length > 1 && (
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-            {images.map((_: any, idx: number) => (
-              <span
-                key={idx}
-                className={`w-2 h-2 rounded-full ${idx === currentIndex ? "bg-primary" : "bg-white/70"}`}
-              />
-            ))}
-          </div>
-        )}
       </div>
       <CardHeader className="p-5 pb-3">
         <CardTitle className="text-xl font-bold mb-1 line-clamp-2 group-hover:text-primary transition-colors">
@@ -90,7 +79,7 @@ export default function TourCard({
         </div>
       </CardHeader>
       <CardContent className="flex items-center justify-between px-5 pb-5">
-        <span className="text-lg font-bold text-primary">{price.toLocaleString()} đ</span>
+        <span className="text-lg font-bold text-primary">${price.toLocaleString()}</span>
         <Button size="sm" className="rounded-full px-4" onClick={onViewDetail}>
           Xem chi tiết
         </Button>

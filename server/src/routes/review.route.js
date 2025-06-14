@@ -3,7 +3,9 @@ const {
   getReviews,
   createReview,
   updateReview,
-  deleteReview
+  deleteReview,
+  likeReview,
+  unlikeReview
 } = require('../controllers/review.controller');
 const requireAuth = require('../middleware/clerk.js');
 const findOrCreateUser = require('../middleware/findOrCreateUser');
@@ -21,5 +23,10 @@ router.put('/:id', requireAuth, updateReview);
 
 // Xoá review
 router.delete('/:id', requireAuth, deleteReview); 
+
+// Like review
+router.post('/:id/like', requireAuth, likeReview);
+// Unlike review
+router.post('/:id/unlike', requireAuth, unlikeReview);
 
 module.exports = router;

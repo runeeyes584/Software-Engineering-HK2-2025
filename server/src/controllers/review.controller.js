@@ -9,7 +9,7 @@ const getReviews = async (req, res) => {
     if (req.query.user) query.user = req.query.user;
 
     const reviews = await Review.find(query)
-      .populate('user', 'clerkId username _id')
+      .populate('user', 'clerkId username firstname lastname avatar _id')
       .populate('tour', 'name');
 
     res.json(reviews);
@@ -23,7 +23,7 @@ const getReviews = async (req, res) => {
 const createReview = async (req, res) => {
   try {
     const userId = req.dbUser?._id || req.user?._id || req.userId || req.user?.id;
-    const { tourId, bookingId, rating, comment } = req.body;
+    const { tourId, bookingId, rating, comment, images = [], videos = [] } = req.body;
     if (!userId || !tourId || !bookingId || !rating) {
       return res.status(400).json({ message: 'Thiếu dữ liệu bắt buộc' });
     }
@@ -42,7 +42,7 @@ const createReview = async (req, res) => {
     if (existed) return res.status(400).json({ message: 'Already reviewed' });
 
     // Tạo review
-    const review = await Review.create({ user: userId, tour: tourId, rating, comment });
+    const review = await Review.create({ user: userId, tour: tourId, rating, comment, images, videos });
 
     // Gắn review vào booking (nếu muốn)
     booking.review = review._id;
@@ -59,11 +59,11 @@ const createReview = async (req, res) => {
 const updateReview = async (req, res) => {
   try {
     const { id } = req.params;
-    const { rating, comment, adminReply } = req.body;
+    const { rating, comment, adminReply, images = [], videos = [] } = req.body;
 
     const updated = await Review.findByIdAndUpdate(
       id,
-      { rating, comment, adminReply },
+      { rating, comment, adminReply, images, videos },
       { new: true }
     );
 
@@ -89,9 +89,65 @@ const deleteReview = async (req, res) => {
   }
 };
 
+// Like review
+const likeReview = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userClerkId = req.auth?.userId;
+    if (!userClerkId) return res.status(401).json({ message: 'Chưa đăng nhập' });
+    
+    const review = await Review.findById(id);
+    if (!review) return res.status(404).json({ message: 'Review không tồn tại' });
+    
+    if (!review.likes) review.likes = [];
+    if (!review.likes.includes(userClerkId)) {
+      review.likes.push(userClerkId);
+      await review.save();
+    }
+    
+    // Trả về review đầy đủ để FE cập nhật UI
+    const updatedReview = await Review.findById(id)
+      .populate('user', 'clerkId username firstname lastname avatar _id')
+      .populate('tour', 'name');
+    
+    res.json(updatedReview);
+  } catch (err) {
+    console.error('Lỗi likeReview:', err);
+    res.status(500).json({ message: 'Lỗi khi like review' });
+  }
+};
+
+// Unlike review
+const unlikeReview = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userClerkId = req.auth?.userId;
+    if (!userClerkId) return res.status(401).json({ message: 'Chưa đăng nhập' });
+    
+    const review = await Review.findById(id);
+    if (!review) return res.status(404).json({ message: 'Review không tồn tại' });
+    
+    if (!review.likes) review.likes = [];
+    review.likes = review.likes.filter(cid => cid !== userClerkId);
+    await review.save();
+    
+    // Trả về review đầy đủ để FE cập nhật UI
+    const updatedReview = await Review.findById(id)
+      .populate('user', 'clerkId username firstname lastname avatar _id')
+      .populate('tour', 'name');
+    
+    res.json(updatedReview);
+  } catch (err) {
+    console.error('Lỗi unlikeReview:', err);
+    res.status(500).json({ message: 'Lỗi khi unlike review' });
+  }
+};
+
 module.exports = {
   getReviews,
   createReview,
   updateReview,
-  deleteReview
+  deleteReview,
+  likeReview,
+  unlikeReview
 };

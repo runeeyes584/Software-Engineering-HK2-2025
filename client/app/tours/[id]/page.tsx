@@ -64,18 +64,20 @@ export default function TourDetailPage() {
     fetchTourData()
   }, [params.id])
 
+  // Định nghĩa hàm fetchReviews ở ngoài useEffect để có thể truyền xuống prop
+  const fetchReviews = async () => {
+    setReviewLoading(true);
+    const res = await fetch(`http://localhost:5000/api/reviews?tour=${params.id}`);
+    if (res.ok) {
+      const data = await res.json();
+      setReviews(data || []);
+    } else {
+      setReviews([]);
+    }
+    setReviewLoading(false);
+  };
+
   useEffect(() => {
-    const fetchReviews = async () => {
-      setReviewLoading(true);
-      const res = await fetch(`http://localhost:5000/api/reviews?tour=${params.id}`);
-      if (res.ok) {
-        const data = await res.json();
-        setReviews(data || []);
-      } else {
-        setReviews([]);
-      }
-      setReviewLoading(false);
-    };
     fetchReviews();
   }, [params.id]);
 
@@ -227,13 +229,17 @@ export default function TourDetailPage() {
   const mappedReviews = reviews.map((r) => ({
     id: r._id,
     user: {
-      name: r.user?.username || r.user?.name || 'User',
+      name: (r.user?.firstname || r.user?.lastname) ? `${r.user?.firstname || ''} ${r.user?.lastname || ''}`.trim() : (r.user?.username || 'User'),
       avatar: r.user?.avatar || undefined,
+      clerkId: r.user?.clerkId || undefined,
     },
     rating: r.rating,
     comment: r.comment,
     date: r.createdAt ? new Date(r.createdAt).toLocaleDateString() : '',
     adminReply: r.adminReply,
+    likes: r.likes || [],
+    images: r.images || [],
+    videos: r.videos || [],
   }))
   const averageRating =
     reviews.length > 0 ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1) : 0
@@ -608,6 +614,7 @@ export default function TourDetailPage() {
           reviews={mappedReviews}
           averageRating={Number(averageRating)}
           totalReviews={totalReviews}
+          onRefreshReviews={fetchReviews}
         />
         {bookingLoading ? null : bookingId && !hasReviewed && (
           <ReviewForm
