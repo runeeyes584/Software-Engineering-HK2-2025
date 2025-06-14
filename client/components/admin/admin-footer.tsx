@@ -1,6 +1,6 @@
 "use client"
 
-import { useLanguage } from "@/components/language-provider-fixed"
+import { useLanguage } from "@/components/language-provider"
 import { Heart, ExternalLink } from "lucide-react"
 import Link from "next/link"
 

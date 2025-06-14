@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useLanguage } from "@/components/language-provider-fixed"
+import { useLanguage } from "@/components/language-provider"
 import { Facebook, Instagram, Twitter, Youtube } from "lucide-react"
 
 export default function Footer() {
