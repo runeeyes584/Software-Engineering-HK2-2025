@@ -13,28 +13,24 @@ export default function AboutPage() {
 
   const teamMembers = [
     {
-      name: "Sarah Johnson",
+      name: "Lê Anh Tiến",
       role: t("about.role.ceo"),
-      image: "/placeholder.svg?height=200&width=200",
-      bio: t("about.bio.sarah"),
+      image: "/images/LeAnhTien.jpg",
     },
     {
-      name: "David Chen",
+      name: "Nguyễn Hùng Sơn",
       role: t("about.role.operations"),
-      image: "/placeholder.svg?height=200&width=200",
-      bio: t("about.bio.david"),
+      image: "/images/NguyenHungSon.jpg",
     },
     {
-      name: "Maria Garcia",
+      name: "Trương Vĩnh Phúc",
       role: t("about.role.consultant"),
-      image: "/placeholder.svg?height=200&width=200",
-      bio: t("about.bio.maria"),
+      image: "/images/TruongVinhPhuc.jpg",
     },
     {
-      name: "James Wilson",
+      name: "Trần Văn Thắng",
       role: t("about.role.marketing"),
-      image: "/placeholder.svg?height=200&width=200",
-      bio: t("about.bio.james"),
+      image: "/images/TranVanThang.jpg",
     },
   ]
 
@@ -63,7 +59,7 @@ export default function AboutPage() {
 
       {/* Hero Section */}
       <div className="relative h-[400px] rounded-lg overflow-hidden mb-12">
-        <Image src="/placeholder.svg?height=800&width=1600" alt="Our team exploring" fill className="object-cover" />
+        <Image src="/images/HALH.jpg" alt="Our team exploring" fill className="object-cover" />
         <div className="absolute inset-0 bg-black/40 flex items-center">
           <div className="text-white p-8 max-w-2xl">
             <h2 className="text-3xl font-bold mb-4">{t("about.ourStory")}</h2>
@@ -115,7 +111,6 @@ export default function AboutPage() {
                 </Avatar>
                 <h3 className="text-xl font-bold">{member.name}</h3>
                 <p className="text-sm text-muted-foreground mb-4">{member.role}</p>
-                <p className="text-sm text-muted-foreground">{member.bio}</p>
               </CardContent>
             </Card>
           ))}
@@ -123,7 +118,7 @@ export default function AboutPage() {
       </div>
 
       {/* Locations */}
-      <div className="mb-16">
+      {/* <div className="mb-16">
         <h2 className="text-2xl font-bold mb-6">{t("about.locations")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
@@ -146,7 +141,7 @@ export default function AboutPage() {
             </Card>
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* CTA */}
       <div className="bg-primary text-primary-foreground rounded-lg p-8 text-center">
