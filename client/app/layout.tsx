@@ -8,7 +8,6 @@ import Header from "@/components/header"
 import Footer from "@/components/footer"
 import BackToTop from "@/components/back-to-top"
 import Chatbot from "@/components/chatbot"
-import LanguageDebug from "@/components/language-debug"
 import { ClerkProvider } from "@clerk/nextjs"
 import { Toaster } from "sonner"
 
@@ -43,7 +42,6 @@ export default function RootLayout({
                   <Footer />
                   <BackToTop />
                   <Chatbot />
-                  <LanguageDebug />
                 </div>
               </AuthProvider>
             </LanguageProvider>
