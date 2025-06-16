@@ -18,7 +18,7 @@ import { TourReview } from "@/components/tour-review"
 import { toast } from "sonner"
 import { ReviewForm } from "@/components/review-form"
 import { useAuth, useUser } from "@clerk/nextjs"
-import SaveButton from "@/components/SaveButton"
+import SaveButton from "@/components/save-button"
 
 export default function TourDetailPage() {
   const { t } = useLanguage()
@@ -45,7 +45,8 @@ export default function TourDetailPage() {
   const { user } = useUser();
   const userId = user?.id;
   const [hasReviewed, setHasReviewed] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
+  const [isSaved, setIsSaved] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     const fetchTourData = async () => {
@@ -117,8 +118,8 @@ export default function TourDetailPage() {
   }, [reviews, userId]);
 
   useEffect(() => {
-    if (!user?.id) return;
-    const fetchSaved = async () => {
+    const fetchSavedTours = async () => {
+      if (!user?.id) return;
       try {
         const res = await fetch(`http://localhost:5000/api/saved-tours/user/${user.id}`);
         if (res.ok) {
@@ -126,11 +127,17 @@ export default function TourDetailPage() {
           if (Array.isArray(data)) {
             const ids = data.map((item: any) => String(item.tour?._id || item.tour));
             setIsSaved(ids.includes(String(params.id)));
+          } else {
+            setIsSaved(false);
           }
+        } else {
+          setIsSaved(false);
         }
-      } catch {}
+      } catch {
+        setIsSaved(false);
+      }
     };
-    fetchSaved();
+    fetchSavedTours();
   }, [user, params.id]);
 
   const mapTourDataToTour = (tourData: any) => {
@@ -262,11 +269,12 @@ export default function TourDetailPage() {
     reviews.length > 0 ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1) : 0
   const totalReviews = reviews.length
 
-  const handleToggleSave = async () => {
+  const handleSaveTour = async () => {
     if (!user?.id) {
       toast.error("Vui lòng đăng nhập để lưu tour!");
       return;
     }
+    setIsLoading(true);
     const token = await getToken();
     try {
       if (isSaved) {
@@ -279,7 +287,7 @@ export default function TourDetailPage() {
           setIsSaved(false);
           toast.success(t('tour.unsaved'));
         } else {
-          toast.error(t('tour.saveError') || "Có lỗi xảy ra, vui lòng thử lại!");
+          toast.error("Có lỗi xảy ra, vui lòng thử lại!");
         }
       } else {
         // Lưu tour
@@ -300,6 +308,8 @@ export default function TourDetailPage() {
       }
     } catch {
       toast.error(t('tour.saveError') || "Có lỗi xảy ra, vui lòng thử lại!");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -413,7 +423,7 @@ export default function TourDetailPage() {
           <div className="space-y-6">
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
               <h1 style={{ fontSize: 32, fontWeight: 700 }}>{tour.title}</h1>
-              <SaveButton isSaved={isSaved} onToggle={handleToggleSave} />
+              <SaveButton isSaved={isSaved} onToggle={handleSaveTour} />
             </div>
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1.5">
