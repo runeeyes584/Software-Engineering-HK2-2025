@@ -24,16 +24,14 @@ app.use(cors({
   credentials: true, // Cho phép gửi cookie/session
 }));
 
+app.use('/api/users', userRoutes);
+
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, {
   dbName: 'travelbooking',
 })
 .then(() => console.log('Connected to MongoDB'))
 .catch((err) => console.error('Could not connect to MongoDB:', err));
-
-app.use('/api/users', userRoutes);
-
-app.use(express.json());
 
 // Routes
 // app.use('/api/auth', authRoutes);

@@ -1,4 +1,5 @@
 const SavedTour = require('../models/SavedTour');
+const Review = require('../models/Review');
 
 // Lấy danh sách tour đã lưu của 1 user
 const getSavedToursByUser = async (req, res) => {
@@ -11,8 +12,25 @@ const getSavedToursByUser = async (req, res) => {
         if (!user) return res.json([]);
         userId = user._id;
       }
-      const savedTours = await SavedTour.find({ user: userId })
-        .populate('tour'); // optional: load thông tin tour
+      let savedTours = await SavedTour.find({ user: userId })
+        .populate('tour');
+
+      // Tính rating và reviewCount cho từng tour
+      savedTours = await Promise.all(savedTours.map(async (item) => {
+        if (item.tour && item.tour._id) {
+          const reviews = await Review.find({ tour: item.tour._id });
+          const reviewCount = reviews.length;
+          const averageRating = reviewCount > 0
+            ? reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviewCount
+            : 0;
+          item.tour = {
+            ...item.tour.toObject(),
+            averageRating,
+            reviewCount
+          };
+        }
+        return item;
+      }));
       res.json(savedTours);
     } catch (error) {
       console.error('Lỗi getSavedToursByUser:', error);

@@ -1,5 +1,7 @@
 const express = require('express');
-const { handleClerkWebhook, getAllUsers } = require('../controllers/user.controller.js');
+const { handleClerkWebhook, getAllUsers, updateUserProfile, getUserProfile } = require('../controllers/user.controller.js');
+const requireAuth = require('../middleware/clerk.js');
+const findOrCreateUser = require('../middleware/findOrCreateUser.js');
 
 const router = express.Router();
 
@@ -8,5 +10,11 @@ router.post('/', express.raw({ type: 'application/json' }), handleClerkWebhook);
 
 // Lấy danh sách tất cả user
 router.get('/', getAllUsers);
+
+// Lấy thông tin profile của user hiện tại
+router.get('/profile', requireAuth, findOrCreateUser, getUserProfile);
+
+// Cập nhật thông tin profile của user (phone, address)
+router.patch('/profile', express.json(), requireAuth, findOrCreateUser, updateUserProfile);
 
 module.exports = router;

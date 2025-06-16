@@ -68,6 +68,10 @@ const handleClerkWebhook = async (req, res) => {
       avatar: image_url || null,
     };
 
+    // Nếu webhook hoặc request có phone/address thì lưu luôn
+    if (evt.data.phone) userData.phone = evt.data.phone;
+    if (evt.data.address) userData.address = evt.data.address;
+
     Object.keys(userData).forEach(key => userData[key] === undefined && delete userData[key]);
 
     await User.findOneAndUpdate(
@@ -95,7 +99,70 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+// Cập nhật thông tin profile của user (phone, address)
+const updateUserProfile = async (req, res) => {
+  try {
+    // Lấy userId từ middleware (ví dụ: req.dbUser từ findOrCreateUser)
+    const userId = req.dbUser?._id; 
+    if (!userId) {
+      return res.status(401).json({ message: 'Người dùng chưa được xác thực.' });
+    }
+
+    const { phone, address } = req.body;
+    
+    // Tạo object chứa các trường cần cập nhật
+    const updateFields = {};
+    if (phone !== undefined) updateFields.phone = phone;
+    if (address !== undefined) updateFields.address = address;
+
+    // Nếu không có trường nào để cập nhật
+    if (Object.keys(updateFields).length === 0) {
+      return res.status(400).json({ message: 'Không có thông tin nào để cập nhật.' });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: updateFields },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
+    }
+
+    // Trả về thông tin user đã cập nhật (có thể lọc bỏ password)
+    res.status(200).json({ message: 'Cập nhật profile thành công!', user: updatedUser.toObject({ getters: true, virtuals: false }) });
+
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi server khi cập nhật profile.' });
+  }
+};
+
+// Lấy thông tin profile của user hiện tại
+const getUserProfile = async (req, res) => {
+  try {
+    const userId = req.dbUser?._id; 
+    if (!userId) {
+      return res.status(401).json({ message: 'Người dùng chưa được xác thực.' });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
+    }
+
+    // Trả về thông tin user (có thể lọc bỏ password)
+    res.status(200).json({ user: user.toObject({ getters: true, virtuals: false }) });
+
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi server khi lấy profile.' });
+  }
+};
+
 module.exports = {
   handleClerkWebhook,
-  getAllUsers
+  getAllUsers,
+  updateUserProfile,
+  getUserProfile
 };

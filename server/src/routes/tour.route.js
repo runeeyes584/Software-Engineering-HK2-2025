@@ -11,6 +11,8 @@ const isAdmin = require('../middleware/isAdmin.js');
 
 const router = express.Router();
 
+router.use(express.json());
+
 // Lấy danh sách tất cả tour
 router.get('/', getAllTours);
 

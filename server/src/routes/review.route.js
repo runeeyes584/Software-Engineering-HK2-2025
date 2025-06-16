@@ -12,6 +12,8 @@ const findOrCreateUser = require('../middleware/findOrCreateUser');
 
 const router = express.Router();
 
+router.use(express.json());
+
 // Lấy danh sách review
 router.get('/', getReviews);         
 

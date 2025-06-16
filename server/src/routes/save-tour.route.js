@@ -5,6 +5,8 @@ const findOrCreateUser = require('../middleware/findOrCreateUser.js');
 
 const router = express.Router();
 
+router.use(express.json());
+
 // Lấy danh sách tour đã lưu của 1 user
 router.get('/user/:userId', getSavedToursByUser);
 

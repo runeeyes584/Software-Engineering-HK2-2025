@@ -244,32 +244,32 @@ export default function ToursPage() {
               })}
             </div>
           ) : (
-            <div className="space-y-4">
-              <div className="text-muted-foreground">
-                <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <h3 className="text-lg font-medium">{t("search.noToursFound")}</h3>
-                <p className="text-sm">
-                  {filters.searchQuery
-                    ? t("search.noToursMatchSearch", { query: filters.searchQuery })
-                    : t("search.noToursMatchFilters")}
-                </p>
+              <div className="space-y-4">
+                <div className="text-muted-foreground">
+                  <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <h3 className="text-lg font-medium">{t("search.noToursFound")}</h3>
+                  <p className="text-sm">
+                    {filters.searchQuery
+                      ? t("search.noToursMatchSearch", { query: filters.searchQuery })
+                      : t("search.noToursMatchFilters")}
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                  <Button variant="outline" onClick={resetFilters}>
+                    {t("filters.clearAll")}
+                  </Button>
+                  {popularSearches.length > 0 && (
+                    <div className="flex flex-wrap gap-2 justify-center">
+                      <span className="text-sm text-muted-foreground">{t("search.try")}:</span>
+                      {popularSearches.slice(0, 3).map((search, index) => (
+                        <Button key={index} variant="ghost" size="sm" onClick={() => handleSearchSelect(search)}>
+                          {search}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                <Button variant="outline" onClick={resetFilters}>
-                  {t("filters.clearAll")}
-                </Button>
-                {popularSearches.length > 0 && (
-                  <div className="flex flex-wrap gap-2 justify-center">
-                    <span className="text-sm text-muted-foreground">{t("search.try")}:</span>
-                    {popularSearches.slice(0, 3).map((search, index) => (
-                      <Button key={index} variant="ghost" size="sm" onClick={() => handleSearchSelect(search)}>
-                        {search}
-                      </Button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
           )}
         </div>
       </div>

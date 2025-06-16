@@ -4,6 +4,8 @@ const requireAuth = require('../middleware/clerk.js');
 
 const router = express.Router();
 
+router.use(express.json());
+
 // Tạo QR thanh toán VNPay cho đơn đặt tour (booking)
 router.post('/create-qr', requireAuth, createVNPayUrl);
 

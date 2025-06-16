@@ -67,6 +67,7 @@ export default function TourCard({
         if (res.ok) {
           setIsSaved(false);
           toast.success(t('tour.unsaved'));
+          if (onToggleSave) onToggleSave();
         } else {
           toast.error("Có lỗi xảy ra, vui lòng thử lại!");
         }
