@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useCallback, useEffect, useRef } from "react"
+import React, { useState, useMemo, useCallback, useEffect, useRef } from "react"
 import { TourSearchEngine, type SearchResult, type Tour } from "@/lib/search-engine"
 
 export interface FilterState {
@@ -58,8 +58,8 @@ export function useOptimizedTourFilters(tours: Tour[]) {
   })
 
   const searchEngine = useMemo(() => new TourSearchEngine(tours), [tours])
-  const searchTimeoutRef = useRef<NodeJS.Timeout>()
-  const isInitializedRef = useRef(false)
+  const searchTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
+  const isInitializedRef = useRef<boolean>(false)
 
   // Load saved data only once on mount
   useEffect(() => {
@@ -382,4 +382,20 @@ export function useOptimizedTourFilters(tours: Tour[]) {
   }
 }
 
-export type { Tour }
+export interface TourUI {
+  id?: string;
+  _id?: string;
+  name?: string;
+  title?: string;
+  destination?: string;
+  location?: string;
+  images?: string[];
+  image?: string;
+  averageRating?: number;
+  rating?: number;
+  reviewCount?: number;
+  duration?: string | number;
+  days?: number;
+  price?: number;
+  // ... các trường khác nếu có
+}

@@ -12,20 +12,54 @@ import Link from "next/link"
 import TourFilters from "@/components/tour-filters"
 import OptimizedSearch from "@/components/optimized-search"
 import PerformanceMonitor from "@/components/performance-monitor"
-import { useOptimizedTourFilters, type Tour } from "@/hooks/use-optimized-tour-filters"
+import { useOptimizedTourFilters, type TourUI } from "@/hooks/use-optimized-tour-filters"
+import { toast } from "sonner"
+import { useAuth, useUser } from "@clerk/nextjs"
+import TourCard from "@/components/tour-card"
 
 export default function ToursPage() {
   const { t } = useLanguage()
   const [showMobileFilters, setShowMobileFilters] = useState(false)
   const [showPerformanceMonitor, setShowPerformanceMonitor] = useState(false)
-  const [allTours, setAllTours] = useState<Tour[]>([])
+  const [allTours, setAllTours] = useState<TourUI[]>([])
+  const [savedTourIds, setSavedTourIds] = useState<string[]>([])
+  const { getToken } = useAuth()
+  const { user } = useUser()
 
   useEffect(() => {
     fetch("http://localhost:5000/api/tours")
       .then((res) => res.json())
-      .then((data) => setAllTours(data))
+      .then((data) => setAllTours(
+        data.map((tour: any) => ({
+          ...tour,
+          id: tour._id && typeof tour._id === 'object' && tour._id.toString
+            ? tour._id.toString()
+            : String(tour._id || tour.id)
+        }))
+      ))
       .catch(() => setAllTours([]))
   }, [])
+
+  useEffect(() => {
+    const fetchSavedTours = async () => {
+      if (!user?.id) return
+      try {
+        const res = await fetch(`http://localhost:5000/api/saved-tours/user/${user.id}`)
+        if (res.ok) {
+          const data = await res.json()
+          if (Array.isArray(data)) {
+            const ids = data.map((item: any) => String(item.tour?._id || item.tour))
+            setSavedTourIds(ids)
+          } else {
+            setSavedTourIds([])
+          }
+        }
+      } catch {
+        setSavedTourIds([])
+      }
+    }
+    fetchSavedTours()
+  }, [user])
 
   const {
     filters,
@@ -43,7 +77,7 @@ export default function ToursPage() {
     setSortBy,
     addToSearchHistory,
     getPopularSearches,
-  } = useOptimizedTourFilters(allTours)
+  } = useOptimizedTourFilters(allTours as any)
 
   const popularSearches = getPopularSearches()
 
@@ -57,11 +91,37 @@ export default function ToursPage() {
 
   const isSearching = filters.searchQuery.length > 0 && searchResults.length === 0
 
+  const handleToggleSave = async (tourId: string) => {
+    if (!user?.id) {
+      toast.error("Vui lòng đăng nhập để lưu tour!")
+      return
+    }
+    const isSaved = savedTourIds.includes(tourId)
+    const token = await getToken()
+    try {
+      const res = await fetch(`http://localhost:5000/api/saved-tours/${tourId}`, {
+        method: isSaved ? "DELETE" : "POST",
+        headers: { "Authorization": `Bearer ${token}` }
+      })
+      if (res.ok) {
+        setSavedTourIds((prev) =>
+          isSaved ? prev.filter(id => id !== tourId) : [...prev, tourId]
+        )
+        toast.success(isSaved ? "Đã bỏ lưu tour!" : "Đã lưu tour vào yêu thích!")
+      } else {
+        toast.error("Có lỗi xảy ra, vui lòng thử lại!")
+      }
+    } catch {
+      toast.error("Có lỗi xảy ra, vui lòng thử lại!")
+    }
+  }
+
   return (
     <div className="py-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">{t("nav.tours")}</h1>
-        <div className="flex items-center gap-2">            <Button
+        <div className="flex items-center gap-2">
+          <Button
             variant="outline"
             size="sm"
             onClick={() => setShowPerformanceMonitor(!showPerformanceMonitor)}
@@ -69,7 +129,8 @@ export default function ToursPage() {
           >
             <Zap className="h-4 w-4 mr-1" />
             {t("common.performance")}
-          </Button>          {activeFilterCount > 0 && (
+          </Button>
+          {activeFilterCount > 0 && (
             <Badge variant="secondary" className="flex items-center gap-1">
               <Filter className="h-3 w-3" />
               {activeFilterCount} {t("filters.active")}
@@ -114,20 +175,24 @@ export default function ToursPage() {
         />
 
         <div className="flex-1">
-          <div className="flex justify-between items-center mb-6">            <div className="text-sm text-muted-foreground flex items-center gap-2">
+          <div className="flex justify-between items-center mb-6">
+            <div className="text-sm text-muted-foreground flex items-center gap-2">
               <span>
                 {t("search.showing")} {filteredTours.length} {t("search.of")} {allTours.length} {t("search.tours")}
-              </span>              {activeFilterCount > 0 && (
+              </span>
+              {activeFilterCount > 0 && (
                 <Badge variant="outline" className="text-xs">
                   {activeFilterCount} {t("filters.title")}
                 </Badge>
-              )}              {filters.searchQuery && (
+              )}
+              {filters.searchQuery && (
                 <Badge variant="outline" className="text-xs flex items-center gap-1">
                   <Search className="h-3 w-3" />
                   {t("search.active")}
                 </Badge>
               )}
-            </div>            <Select value={sortBy} onValueChange={setSortBy}>
+            </div>
+            <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-[200px]">
                 <SelectValue placeholder={t("sort.sortBy")} />
               </SelectTrigger>
@@ -146,112 +211,65 @@ export default function ToursPage() {
 
           {filteredTours.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filteredTours.map((tour) => (
-                <Card key={tour.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <div className="relative">
-                    <Image
-                      src={tour.image || "/placeholder.svg"}
-                      alt={tour.title}
-                      width={400}
-                      height={250}
-                      className="w-full h-48 object-cover"
-                    />
-                    <div className="absolute top-2 left-2">
-                      <Badge variant="secondary">{tour.category}</Badge>
-                    </div>
-                    <div className="absolute top-2 right-2">
-                      <Badge variant="default" className="bg-black/70 text-white">
-                        ${tour.price}
-                      </Badge>
-                    </div>
-                    {tour.difficulty && (
-                      <div className="absolute bottom-2 left-2">
-                        <Badge
-                          variant={
-                            tour.difficulty === "Easy"
-                              ? "default"
-                              : tour.difficulty === "Moderate"
-                                ? "secondary"
-                                : "destructive"
-                          }
-                        >
-                          {tour.difficulty}
-                        </Badge>
-                      </div>
-                    )}
-                  </div>
-                  <CardHeader>
-                    <CardTitle className="line-clamp-1">{tour.title}</CardTitle>
-                    <CardDescription className="flex items-center gap-1">
-                      <MapPin className="h-4 w-4" />
-                      {tour.location}, {tour.country}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{tour.description}</p>
-                    <div className="flex items-center justify-between text-sm mb-3">                      <div className="flex items-center gap-1">
-                        <CalendarIcon className="h-4 w-4" />
-                        {tour.duration} {t("common.days")}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        {tour.rating}
-                      </div>
-                    </div>
-                    {tour.activities && tour.activities.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mb-3">
-                        {tour.activities.slice(0, 3).map((activity, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            {activity}
-                          </Badge>
-                        ))}                        {tour.activities.length > 3 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{tour.activities.length - 3} {t("common.more")}
-                          </Badge>
-                        )}
-                      </div>
-                    )}
-                    {tour.activityLevel && (                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <TrendingUp className="h-3 w-3" />
-                        {t("tour.activityLevel")}: {tour.activityLevel}
-                      </div>
-                    )}
-                  </CardContent>                  <CardFooter>
-                    <Button asChild className="w-full">
-                      <Link href={`/tours/${tour.id}`}>{t("tour.viewDetails")}</Link>
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
+              {(filteredTours as TourUI[]).map((tour) => {
+                const id = String(tour._id || tour.id || "");
+                const images = Array.isArray(tour.images) && tour.images.length > 0
+                  ? tour.images
+                  : (tour.image ? [tour.image] : ["/placeholder.svg"]);
+                const durationStr = typeof tour.duration === "string"
+                  ? tour.duration
+                  : (typeof tour.duration === "number"
+                    ? `${tour.duration} ngày`
+                    : (typeof tour.days === "number" ? `${tour.days} ngày` : ""));
+                return (
+                  <TourCard
+                    key={id}
+                    id={id}
+                    name={tour.name || tour.title || ""}
+                    destination={tour.destination || tour.location || ""}
+                    price={tour.price ?? 0}
+                    averageRating={typeof tour.averageRating === "number" && !isNaN(tour.averageRating)
+                      ? tour.averageRating
+                      : (typeof tour.rating === "number" && !isNaN(tour.rating) ? tour.rating : 0)}
+                    reviewCount={tour.reviewCount ?? 0}
+                    images={images}
+                    duration={durationStr}
+                    currentIndex={0}
+                    isSaved={savedTourIds.map(String).includes(id)}
+                    onPrev={() => {}}
+                    onNext={() => {}}
+                    onViewDetail={() => window.location.href = `/tours/${id}`}
+                  />
+                );
+              })}
             </div>
-          ) : (            <Card className="p-8 text-center">
-              <div className="space-y-4">
-                <div className="text-muted-foreground">
-                  <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <h3 className="text-lg font-medium">{t("search.noToursFound")}</h3>
-                  <p className="text-sm">
-                    {filters.searchQuery
-                      ? t("search.noToursMatchSearch", { query: filters.searchQuery })
-                      : t("search.noToursMatchFilters")}
-                  </p>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                  <Button variant="outline" onClick={resetFilters}>
-                    {t("filters.clearAll")}
-                  </Button>
-                  {popularSearches.length > 0 && (
-                    <div className="flex flex-wrap gap-2 justify-center">
-                      <span className="text-sm text-muted-foreground">{t("search.try")}:</span>
-                      {popularSearches.slice(0, 3).map((search, index) => (
-                        <Button key={index} variant="ghost" size="sm" onClick={() => handleSearchSelect(search)}>
-                          {search}
-                        </Button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="text-muted-foreground">
+                <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <h3 className="text-lg font-medium">{t("search.noToursFound")}</h3>
+                <p className="text-sm">
+                  {filters.searchQuery
+                    ? t("search.noToursMatchSearch", { query: filters.searchQuery })
+                    : t("search.noToursMatchFilters")}
+                </p>
               </div>
-            </Card>
+              <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                <Button variant="outline" onClick={resetFilters}>
+                  {t("filters.clearAll")}
+                </Button>
+                {popularSearches.length > 0 && (
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    <span className="text-sm text-muted-foreground">{t("search.try")}:</span>
+                    {popularSearches.slice(0, 3).map((search, index) => (
+                      <Button key={index} variant="ghost" size="sm" onClick={() => handleSearchSelect(search)}>
+                        {search}
+                      </Button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           )}
         </div>
       </div>

@@ -337,10 +337,6 @@ const translations: Record<string, Record<string, string>> = {
     "tour.availableSlots": "Available Slots",
     "tour.slots": "slots",
     "tour.reviews": "reviews",
-    "transport.airplane": "Airplane",
-    "transport.bus": "Bus",
-    "transport.cruiseShip": "Cruise Ship",
-    "transport.privateCar": "Private Car",
     "tour.class": "Class",
     "tour.adults": "Adults",
     "tour.children": "Children",
@@ -348,12 +344,6 @@ const translations: Record<string, Record<string, string>> = {
     "tour.serviceFee": "Service Fee",
     "tour.total": "Total",
     "tour.bookNow": "Book Now",
-    "class.economy": "Economy",
-    "class.economyDesc": "Standard comfort and amenities",
-    "class.business": "Business",
-    "class.businessDesc": "Enhanced comfort and premium services",
-    "class.luxury": "Luxury",
-    "class.luxuryDesc": "Ultimate luxury experience with exclusive services",
     "tour.images": "Images",
     "tour.video": "Video",
     "tour.wontBeCharged": "You won't be charged yet",
@@ -374,7 +364,16 @@ const translations: Record<string, Record<string, string>> = {
     "review.submitted": "Review submitted successfully!",
     "review.deleteConfirm": "Are you sure you want to delete this review?",
     "review.likeError": "Failed to like review!",
-    "review.uploadFile": "Upload file"
+    "review.uploadFile": "Upload file",
+    "tour.saved": "Tour saved to favorites!",
+    "tour.unsaved": "Tour removed from favorites!",
+    "tour.saveButton": "Save",
+    "tour.savedButton": "Saved",
+
+    // Home CTA (phẳng)
+    "home.cta.title": "Ready for your next adventure?",
+    "home.cta.subtitle": "Join thousands of satisfied travelers who have experienced the world with us",
+    "home.cta.button": "Browse Tours"
   },
   vi: {
     // Navigation
@@ -700,10 +699,6 @@ const translations: Record<string, Record<string, string>> = {
     "tour.availableSlots": "Chỗ còn lại",
     "tour.slots": "chỗ",
     "tour.reviews": "đánh giá",
-    "transport.airplane": "Máy bay",
-    "transport.bus": "Xe buýt",
-    "transport.cruiseShip": "Du thuyền",
-    "transport.privateCar": "Xe riêng",
     "tour.class": "Hạng vé",
     "tour.adults": "Người lớn",
     "tour.children": "Trẻ em",
@@ -711,12 +706,6 @@ const translations: Record<string, Record<string, string>> = {
     "tour.serviceFee": "Phí dịch vụ",
     "tour.total": "Tổng cộng",
     "tour.bookNow": "Đặt ngay",
-    "class.economy": "Phổ thông",
-    "class.economyDesc": "Tiện nghi tiêu chuẩn",
-    "class.business": "Thương gia",
-    "class.businessDesc": "Tiện nghi và dịch vụ cao cấp",
-    "class.luxury": "Hạng sang",
-    "class.luxuryDesc": "Trải nghiệm sang trọng bậc nhất",
     "tour.images": "Hình ảnh",
     "tour.video": "Video",
     "tour.wontBeCharged": "Bạn sẽ không bị trừ tiền ngay",
@@ -737,7 +726,16 @@ const translations: Record<string, Record<string, string>> = {
     "review.submitted": "Gửi đánh giá thành công!",
     "review.deleteConfirm": "Bạn có chắc muốn xóa review này?",
     "review.likeError": "Lỗi khi like review!",
-    "review.uploadFile": "Tải file lên"
+    "review.uploadFile": "Tải file lên",
+    "tour.saved": "Đã lưu tour vào yêu thích!",
+    "tour.unsaved": "Đã bỏ lưu tour!",
+    "tour.saveButton": "Lưu",
+    "tour.savedButton": "Đã lưu",
+
+    // Home CTA (phẳng)
+    "home.cta.title": "Sẵn sàng cho cuộc phiêu lưu tiếp theo?",
+    "home.cta.subtitle": "Tham gia cùng hàng nghìn khách du lịch hài lòng đã trải nghiệm thế giới với chúng tôi",
+    "home.cta.button": "Xem Tour"
   },
 }
 
@@ -762,36 +760,25 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
     }
   }, [])
 
-  // Translation function with fallback
+  // Translation function with fallback (key phẳng)
   const t = useCallback(
     (id: string, values?: Record<string, any>): string => {
-      const currentTranslations = translations[language] || {}
-      let translation = currentTranslations[id]
-
+      const currentTranslations = translations[language] || {};
+      let translation = currentTranslations[id];
       // Fallback to English if translation not found
       if (!translation && language !== "en") {
-        translation = translations.en[id]
+        translation = translations.en[id];
       }
-
-      // Final fallback to the key itself
-      if (!translation) {
-        if (process.env.NODE_ENV === "development") {
-          console.warn(`Missing translation for key: ${id}`)
-        }
-        return id
-      }
-
-      // Simple variable replacement if values provided
+      if (!translation) return id;
       if (values) {
         Object.keys(values).forEach((key) => {
-          translation = translation.replace(`{${key}}`, String(values[key]))
-        })
+          translation = translation.replace(`{${key}}`, String(values[key]));
+        });
       }
-
-      return translation
+      return translation;
     },
-    [language],
-  )
+    [language]
+  );
 
   const contextValue = useMemo(
     () => ({

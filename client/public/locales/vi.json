@@ -310,7 +310,8 @@
     "more": "thêm",
     "perPerson": "mỗi người",
     "adminReply": "Phản hồi từ Admin",
-    "viewAll": "Xem tất cả Tour"
+    "viewAll": "Xem tất cả Tour",
+    "tour.saved": "Đã lưu tour vào yêu thích!"
   },
   "review": {
     "leaveReview": "Để lại đánh giá",

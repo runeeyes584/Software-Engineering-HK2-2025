@@ -8,11 +8,14 @@ import Link from "next/link"
 import TourSearch from "@/components/tour-search"
 import { useEffect, useState } from "react"
 import TourCard from "@/components/tour-card"
+import { useUser } from "@clerk/nextjs"
 
 export default function HomePage() {
   const { t } = useLanguage()
+  const { user } = useUser()
   const [featuredTours, setFeaturedTours] = useState<any[]>([])
   const [imageIndexes, setImageIndexes] = useState<{ [key: string]: number }>({})
+  const [savedTours, setSavedTours] = useState<string[]>([])
 
   useEffect(() => {
     fetch("http://localhost:5000/api/tours")
@@ -28,6 +31,27 @@ export default function HomePage() {
       })
       .catch(() => setFeaturedTours([]))
   }, [])
+
+  useEffect(() => {
+    const fetchSavedTours = async () => {
+      if (!user?.id) return
+      try {
+        const res = await fetch(`http://localhost:5000/api/saved-tours/user/${user.id}`)
+        if (res.ok) {
+          const data = await res.json()
+          if (Array.isArray(data)) {
+            const ids = data.map((item: any) => String(item.tour?._id || item.tour))
+            setSavedTours(ids)
+          } else {
+            console.error('[DEBUG] Saved tours data is not an array:', data)
+          }
+        }
+      } catch (error) {
+        console.error('[DEBUG] Error fetching saved tours:', error)
+      }
+    }
+    fetchSavedTours()
+  }, [user])
 
   const popularDestinations = [
     {
@@ -183,17 +207,20 @@ export default function HomePage() {
               featuredTours.map((tour) => {
                 const images = Array.isArray(tour.images) && tour.images.length > 0 ? tour.images : ["/placeholder.svg"];
                 const currentIndex = imageIndexes[tour._id || tour.id] || 0;
+                const durationStr = typeof tour.duration === "string" ? tour.duration : `${tour.duration} ngày`
                 return (
                   <TourCard
                     key={tour._id || tour.id}
+                    id={tour._id || tour.id}
                     name={tour.name}
                     destination={tour.destination}
                     price={tour.price}
                     averageRating={typeof tour.averageRating === "number" && !isNaN(tour.averageRating) ? tour.averageRating : 0}
                     reviewCount={tour.reviewCount || 0}
                     images={images}
-                    duration={tour.duration}
+                    duration={durationStr}
                     currentIndex={currentIndex}
+                    isSaved={savedTours.includes(String(tour._id))}
                     onPrev={() => handlePrev(tour._id || tour.id, images)}
                     onNext={() => handleNext(tour._id || tour.id, images)}
                     onViewDetail={() => window.location.href = `/tours/${tour._id || tour.id}`}

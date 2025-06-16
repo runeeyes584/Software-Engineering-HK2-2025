@@ -18,6 +18,7 @@ import { TourReview } from "@/components/tour-review"
 import { toast } from "sonner"
 import { ReviewForm } from "@/components/review-form"
 import { useAuth, useUser } from "@clerk/nextjs"
+import SaveButton from "@/components/SaveButton"
 
 export default function TourDetailPage() {
   const { t } = useLanguage()
@@ -44,6 +45,7 @@ export default function TourDetailPage() {
   const { user } = useUser();
   const userId = user?.id;
   const [hasReviewed, setHasReviewed] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
     const fetchTourData = async () => {
@@ -107,14 +109,29 @@ export default function TourDetailPage() {
   }, [params.id, getToken])
 
   useEffect(() => {
-    console.log("DEBUG userId:", userId);
-    console.log("DEBUG reviews:", reviews);
     setHasReviewed(
       reviews.some((r) =>
         r.user?.clerkId === userId
       )
     );
   }, [reviews, userId]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    const fetchSaved = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/saved-tours/user/${user.id}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            const ids = data.map((item: any) => String(item.tour?._id || item.tour));
+            setIsSaved(ids.includes(String(params.id)));
+          }
+        }
+      } catch {}
+    };
+    fetchSaved();
+  }, [user, params.id]);
 
   const mapTourDataToTour = (tourData: any) => {
     return {
@@ -245,6 +262,47 @@ export default function TourDetailPage() {
     reviews.length > 0 ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1) : 0
   const totalReviews = reviews.length
 
+  const handleToggleSave = async () => {
+    if (!user?.id) {
+      toast.error("Vui lòng đăng nhập để lưu tour!");
+      return;
+    }
+    const token = await getToken();
+    try {
+      if (isSaved) {
+        // Bỏ lưu
+        const res = await fetch(`http://localhost:5000/api/saved-tours/${params.id}`, {
+          method: "DELETE",
+          headers: { "Authorization": `Bearer ${token}` },
+        });
+        if (res.ok) {
+          setIsSaved(false);
+          toast.success(t('tour.unsaved'));
+        } else {
+          toast.error(t('tour.saveError') || "Có lỗi xảy ra, vui lòng thử lại!");
+        }
+      } else {
+        // Lưu tour
+        const res = await fetch(`http://localhost:5000/api/saved-tours/`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ user: user.id, tour: params.id })
+        });
+        if (res.ok) {
+          setIsSaved(true);
+          toast.success(t('tour.saved'));
+        } else {
+          toast.error(t('tour.saveError') || "Có lỗi xảy ra, vui lòng thử lại!");
+        }
+      }
+    } catch {
+      toast.error(t('tour.saveError') || "Có lỗi xảy ra, vui lòng thử lại!");
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -353,23 +411,24 @@ export default function TourDetailPage() {
 
           {/* Tour Information */}
           <div className="space-y-6">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">{tour.title}</h1>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1.5">
-                  <MapPin className="h-4 w-4" />
-                  <span>{tour.location}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                  <span className="font-medium text-foreground">
-                    {averageRating} ({totalReviews} {t("tour.reviews")})
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Clock className="h-4 w-4" />
-                  <span>{tour.duration} {t("tour.days")}</span>
-                </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <h1 style={{ fontSize: 32, fontWeight: 700 }}>{tour.title}</h1>
+              <SaveButton isSaved={isSaved} onToggle={handleToggleSave} />
+            </div>
+            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1.5">
+                <MapPin className="h-4 w-4" />
+                <span>{tour.location}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                <span className="font-medium text-foreground">
+                  {averageRating} ({totalReviews} {t("tour.reviews")})
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Clock className="h-4 w-4" />
+                <span>{tour.duration} {t("tour.days")}</span>
               </div>
             </div>
 

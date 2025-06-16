@@ -5,7 +5,7 @@ export interface SearchResult {
 }
 
 export interface Tour {
-  id: number
+  id: string
   title: string
   location: string
   country: string

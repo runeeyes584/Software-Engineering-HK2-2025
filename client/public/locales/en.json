@@ -361,5 +361,6 @@
     "expand": "Expand",
     "close": "Close",
     "send": "Send"
-  }
+  },
+  "tour.saved": "Tour saved to favorites!"
 } 
