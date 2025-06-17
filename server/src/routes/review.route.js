@@ -5,10 +5,12 @@ const {
   updateReview,
   deleteReview,
   likeReview,
-  unlikeReview
+  unlikeReview,
+  adminReplyToReview
 } = require('../controllers/review.controller');
 const requireAuth = require('../middleware/clerk.js');
 const findOrCreateUser = require('../middleware/findOrCreateUser');
+const isAdmin = require('../middleware/isAdmin');
 
 const router = express.Router();
 
@@ -30,5 +32,8 @@ router.delete('/:id', requireAuth, deleteReview);
 router.post('/:id/like', requireAuth, likeReview);
 // Unlike review
 router.post('/:id/unlike', requireAuth, unlikeReview);
+
+// Admin reply to review
+router.post('/:id/admin-reply', requireAuth, findOrCreateUser, isAdmin, adminReplyToReview);
 
 module.exports = router;

@@ -16,6 +16,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useUser, useAuth } from "@clerk/nextjs"
 import TourCard from "@/components/tour-card"
 import { toast } from "react-hot-toast"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { provinces, districts, wards } from "@/lib/vietnam-administrative-divisions"
 
 export default function AccountPage() {
   const { t } = useLanguage()
@@ -31,6 +34,12 @@ export default function AccountPage() {
   const [userPhone, setUserPhone] = useState('')
   const [userAddress, setUserAddress] = useState('')
   const [isSavingProfile, setIsSavingProfile] = useState(false)
+  const [gender, setGender] = useState<'male' | 'female' | ''>('')
+  const [dateOfBirth, setDateOfBirth] = useState<{ day: string, month: string, year: string }>({ day: '', month: '', year: '' })
+  const [province, setProvince] = useState('')
+  const [district, setDistrict] = useState('')
+  const [ward, setWard] = useState('')
+  const [detailedAddress, setDetailedAddress] = useState('')
 
   const { getToken } = useAuth()
 
@@ -51,6 +60,17 @@ export default function AccountPage() {
           const data = await res.json();
           setUserPhone(data.user?.phone || '');
           setUserAddress(data.user?.address || '');
+          setGender(data.user?.gender || '');
+          setDateOfBirth(data.user?.dateOfBirth || { day: '', month: '', year: '' });
+
+          // Parse address if it's a string
+          if (typeof data.user?.address === 'string') {
+            const parts = data.user.address.split(', ').reverse(); // Assuming format: detailed, ward, district, province
+            setProvince(parts[0] || '');
+            setDistrict(parts[1] || '');
+            setWard(parts[2] || '');
+            setDetailedAddress(parts.slice(3).reverse().join(', ') || '');
+          }
         } else {
           // console.error('Failed to fetch user profile:', await res.json());
         }
@@ -145,7 +165,19 @@ export default function AccountPage() {
   useEffect(() => {
     if (user) {
       setUserPhone(user.primaryPhoneNumber?.phoneNumber || '');
-      setUserAddress((user.unsafeMetadata as any)?.address || '');
+      // setUserAddress((user.unsafeMetadata as any)?.address || '');
+      // Initialize gender and date of birth from user metadata if available
+      setGender((user.unsafeMetadata as any)?.gender || '');
+      setDateOfBirth((user.unsafeMetadata as any)?.dateOfBirth || { day: '', month: '', year: '' });
+
+      const fullAddress = (user.unsafeMetadata as any)?.address || '';
+      if (typeof fullAddress === 'string') {
+        const parts = fullAddress.split(', ').reverse();
+        setProvince(parts[0] || '');
+        setDistrict(parts[1] || '');
+        setWard(parts[2] || '');
+        setDetailedAddress(parts.slice(3).reverse().join(', ') || '');
+      }
     }
   }, [user]);
 
@@ -296,7 +328,9 @@ export default function AccountPage() {
                     onSubmit={async (e) => {
                       e.preventDefault();
                       setIsSavingProfile(true);
-                      // console.log('Sending update request with data:', { phone: userPhone, address: userAddress });
+                      
+                      const fullAddress = [detailedAddress, ward, district, province].filter(Boolean).join(', ');
+                      // console.log('Sending update request with data:', { phone: userPhone, address: fullAddress, gender, dateOfBirth });
                       
                       try {
                         // Lấy token từ Clerk
@@ -311,7 +345,9 @@ export default function AccountPage() {
                           },
                           body: JSON.stringify({ 
                             phone: userPhone, 
-                            address: userAddress 
+                            address: fullAddress,
+                            gender,
+                            dateOfBirth
                           })
                         });
 
@@ -323,7 +359,17 @@ export default function AccountPage() {
                           toast.success('Cập nhật profile thành công!');
                           // Cập nhật state với dữ liệu mới từ backend
                           setUserPhone(data.user?.phone || '');
-                          setUserAddress(data.user?.address || '');
+                          // setUserAddress(data.user?.address || ''); // This will be parsed later
+                          setGender(data.user?.gender || '');
+                          setDateOfBirth(data.user?.dateOfBirth || { day: '', month: '', year: '' });
+                          
+                          if (typeof data.user?.address === 'string') {
+                            const parts = data.user.address.split(', ').reverse();
+                            setProvince(parts[0] || '');
+                            setDistrict(parts[1] || '');
+                            setWard(parts[2] || '');
+                            setDetailedAddress(parts.slice(3).reverse().join(', ') || '');
+                          }
                         } else {
                           toast.error(data.message || 'Cập nhật profile thất bại!');
                         }
@@ -337,41 +383,125 @@ export default function AccountPage() {
                   >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <Label htmlFor="firstName" className="text-sm font-medium">First Name</Label>
-                        <div className="h-11 flex items-center rounded-md bg-muted px-3">{user?.firstName || ""}</div>
+                        <Label htmlFor="phone" className="text-sm font-medium">Số điện thoại <span className="text-red-500">*</span></Label>
+                        <Input
+                          id="phone"
+                          className="h-11 rounded-md focus:ring-2 focus:ring-primary/20"
+                          placeholder="Nhập số điện thoại của bạn"
+                          value={userPhone}
+                          onChange={(e) => setUserPhone(e.target.value)}
+                        />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="lastName" className="text-sm font-medium">Last Name</Label>
-                        <div className="h-11 flex items-center rounded-md bg-muted px-3">{user?.lastName || ""}</div>
+                        <Label className="text-sm font-medium">Giới tính <span className="text-red-500">*</span></Label>
+                        <RadioGroup defaultValue={gender} onValueChange={(value: 'male' | 'female') => setGender(value)} className="flex h-11 items-center space-x-4">
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="male" id="gender-male" />
+                            <Label htmlFor="gender-male">Nam</Label>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <RadioGroupItem value="female" id="gender-female" />
+                            <Label htmlFor="gender-female">Nữ</Label>
+                          </div>
+                        </RadioGroup>
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email" className="text-sm font-medium">Email</Label>
-                      <div className="h-11 flex items-center rounded-md bg-muted px-3">{email}</div>
+                      <Label className="text-sm font-medium">Ngày sinh <span className="text-red-500">*</span></Label>
+                      <div className="flex gap-4">
+                        <Select value={dateOfBirth.day} onValueChange={(value) => setDateOfBirth(prev => ({ ...prev, day: value }))}>
+                          <SelectTrigger className="h-11 w-[80px] rounded-md focus:ring-2 focus:ring-primary/20">
+                            <SelectValue placeholder="Chọn" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
+                              <SelectItem key={day} value={String(day).padStart(2, '0')}>{String(day).padStart(2, '0')}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Select value={dateOfBirth.month} onValueChange={(value) => setDateOfBirth(prev => ({ ...prev, month: value }))}>
+                          <SelectTrigger className="h-11 w-[80px] rounded-md focus:ring-2 focus:ring-primary/20">
+                            <SelectValue placeholder="Chọn" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
+                              <SelectItem key={month} value={String(month).padStart(2, '0')}>{String(month).padStart(2, '0')}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Select value={dateOfBirth.year} onValueChange={(value) => setDateOfBirth(prev => ({ ...prev, year: value }))}>
+                          <SelectTrigger className="h-11 w-[90px] rounded-md focus:ring-2 focus:ring-primary/20">
+                            <SelectValue placeholder="Chọn" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                              <SelectItem key={year} value={String(year)}>{String(year)}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="province" className="text-sm font-medium">Tỉnh/Thành phố</Label>
+                        <Select value={province} onValueChange={(value) => {
+                          setProvince(value);
+                          setDistrict(''); // Reset district when province changes
+                          setWard(''); // Reset ward when province changes
+                        }}>
+                          <SelectTrigger className="h-11 rounded-md focus:ring-2 focus:ring-primary/20">
+                            <SelectValue placeholder="Tỉnh/TP" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {provinces.map((p) => (
+                              <SelectItem key={p.code} value={p.name}>{p.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="district" className="text-sm font-medium">Quận/Huyện</Label>
+                        <Select value={district} onValueChange={(value) => {
+                          setDistrict(value);
+                          setWard(''); // Reset ward when district changes
+                        }} disabled={!province}>
+                          <SelectTrigger className="h-11 rounded-md focus:ring-2 focus:ring-primary/20">
+                            <SelectValue placeholder="Quận/Huyện" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {districts.filter(d => d.province === province).map((d) => (
+                              <SelectItem key={d.code} value={d.name}>{d.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="ward" className="text-sm font-medium">Phường/Xã</Label>
+                        <Select value={ward} onValueChange={setWard} disabled={!district}>
+                          <SelectTrigger className="h-11 rounded-md focus:ring-2 focus:ring-primary/20">
+                            <SelectValue placeholder="Phường/Xã" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {wards.filter(w => w.district === district).map((w) => (
+                              <SelectItem key={w.code} value={w.name}>{w.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="phone" className="text-sm font-medium">Phone</Label>
+                      <Label htmlFor="detailedAddress" className="text-sm font-medium">Địa chỉ chi tiết</Label>
                       <Input
-                        id="phone"
+                        id="detailedAddress"
                         className="h-11 rounded-md focus:ring-2 focus:ring-primary/20"
-                        placeholder="Enter your phone number"
-                        value={userPhone}
-                        onChange={(e) => setUserPhone(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="address" className="text-sm font-medium">Address</Label>
-                      <Input
-                        id="address"
-                        className="h-11 rounded-md focus:ring-2 focus:ring-primary/20"
-                        placeholder="Enter your address"
-                        value={userAddress}
-                        onChange={(e) => setUserAddress(e.target.value)}
+                        placeholder="Nhập địa chỉ chi tiết của bạn"
+                        value={detailedAddress}
+                        onChange={(e) => setDetailedAddress(e.target.value)}
                       />
                     </div>
                     <div className="flex justify-end">
                       <Button type="submit" className="h-11 px-6 font-medium" disabled={isSavingProfile}>
-                        {isSavingProfile ? 'Saving...' : 'Save Changes'}
+                        {isSavingProfile ? 'Đang lưu...' : 'Lưu thông tin'}
                       </Button>
                     </div>
                   </form>
@@ -541,3 +671,4 @@ export default function AccountPage() {
     </div>
   )
 }
+

@@ -1,4 +1,4 @@
-import { Star, ThumbsUp, MessageCircle, Calendar, Clock, MoreVertical, Pencil, Trash2, ChevronLeft, ChevronRight, X } from "lucide-react"
+import { Star, ThumbsUp, MessageCircle, Calendar, Clock, MoreVertical, Pencil, Trash2, ChevronLeft, ChevronRight, X, PlayCircle, Circle, Play, Reply } from "lucide-react"
 import { useLanguage } from "@/components/language-provider-fixed"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -10,6 +10,8 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { Dialog, DialogContent, DialogHeader, DialogFooter } from "@/components/ui/dialog"
 import { toast } from "sonner"
 import { ReviewForm } from "@/components/review-form"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 
 interface Review {
   id: string
@@ -35,46 +37,96 @@ interface TourReviewProps {
   averageRating: number
   totalReviews: number
   onRefreshReviews?: () => void
+  tourId: string
+  bookingId: string | null
+  hasReviewed: boolean
+  bookingLoading: boolean
 }
 
-export function TourReview({ reviews, averageRating, totalReviews, onRefreshReviews }: TourReviewProps) {
+export function TourReview({ reviews, averageRating, totalReviews, onRefreshReviews, tourId, bookingId, hasReviewed, bookingLoading }: TourReviewProps) {
   const { t } = useLanguage()
   const { user } = useUser()
   const { getToken } = useAuth()
   const userId = user?.id
+
+  const [isAdminFromDB, setIsAdminFromDB] = useState(false);
+  const [currentReplyText, setCurrentReplyText] = useState<string>('');
+
+  // Fetch user role from database
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      if (!userId) return;
+      try {
+        const token = await getToken();
+        const res = await fetch(`http://localhost:5000/api/users/profile`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.user && data.user.role === 'admin') {
+            setIsAdminFromDB(true);
+          } else {
+            setIsAdminFromDB(false);
+          }
+        } else {
+          console.error("Failed to fetch user profile for role check:", res.statusText);
+          setIsAdminFromDB(false);
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+        setIsAdminFromDB(false);
+      }
+    };
+    fetchUserRole();
+  }, [userId, getToken]);
+
+  const isAdmin = isAdminFromDB; // Check if current user is admin from database
   const [editingReviewId, setEditingReviewId] = useState<string | null>(null)
   const [deletingReviewId, setDeletingReviewId] = useState<string | null>(null)
   const [editData, setEditData] = useState<{ rating: number; comment: string } | null>(null)
   const [localReviews, setLocalReviews] = useState<Review[]>(reviews)
   const [likingReviewId, setLikingReviewId] = useState<string | null>(null)
-  const [imageModal, setImageModal] = useState<{images: string[], index: number} | null>(null)
+  const [mediaModal, setMediaModal] = useState<{ 
+    url: string; 
+    type: 'image' | 'video'; 
+    reviewMedia: { url: string; type: 'image' | 'video' }[]; 
+    currentIndex: number 
+  } | null>(null);
+  const [showAllReviews, setShowAllReviews] = useState(false);
+  const [replyingToReviewId, setReplyingToReviewId] = useState<string | null>(null);
 
   // Cập nhật localReviews khi reviews prop thay đổi
   useEffect(() => {
     setLocalReviews(reviews)
   }, [reviews])
 
-  // Xử lý phím mũi tên trong modal
+  // Xử lý phím mũi tên và Esc trong modal chung
   useEffect(() => {
-    if (!imageModal) return;
+    if (!mediaModal) return;
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') {
-        setImageModal((prev) => prev && {
-          images: prev.images,
-          index: (prev.index - 1 + prev.images.length) % prev.images.length
-        });
-      } else if (e.key === 'ArrowRight') {
-        setImageModal((prev) => prev && {
-          images: prev.images,
-          index: (prev.index + 1) % prev.images.length
-        });
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        const { reviewMedia, currentIndex } = mediaModal;
+        const totalMedia = reviewMedia.length;
+        let newIndex = currentIndex;
+
+        if (e.key === 'ArrowLeft') {
+          newIndex = (currentIndex - 1 + totalMedia) % totalMedia;
+        } else { // ArrowRight
+          newIndex = (currentIndex + 1) % totalMedia;
+        }
+
+        const nextMedia = reviewMedia[newIndex];
+        setMediaModal({ ...mediaModal, url: nextMedia.url, type: nextMedia.type, currentIndex: newIndex });
       } else if (e.key === 'Escape') {
-        setImageModal(null);
+        setMediaModal(null);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [imageModal]);
+  }, [mediaModal]);
 
   // Calculate rating distribution
   const ratingDistribution = localReviews.reduce((acc, review) => {
@@ -131,6 +183,15 @@ export function TourReview({ reviews, averageRating, totalReviews, onRefreshRevi
         </div>
       </div>
 
+      {/* Review Form */}
+      {!bookingLoading && bookingId && !hasReviewed && (
+        <ReviewForm
+          tourId={tourId}
+          bookingId={bookingId}
+          onReviewSubmitted={onRefreshReviews}
+        />
+      )}
+
       {/* Nếu chưa có review thì hiện thông báo */}
       {totalReviews === 0 && (
         <div className="py-12 text-center text-muted-foreground text-lg">
@@ -141,9 +202,15 @@ export function TourReview({ reviews, averageRating, totalReviews, onRefreshRevi
       {/* Reviews List */}
       {totalReviews > 0 && (
         <div className="space-y-6">
-          {localReviews.map((review) => {
+          {localReviews.slice(0, showAllReviews ? localReviews.length : 3).map((review) => {
             const isOwner = userId && review.user?.clerkId && userId === review.user.clerkId
             const hasLiked = userId && Array.isArray(review.likes) ? review.likes.includes(userId) : false
+
+            // Kết hợp ảnh và video vào một mảng media chung cho đánh giá này
+            const reviewMedia: { url: string; type: 'image' | 'video' }[] = [];
+            review.images?.forEach(url => reviewMedia.push({ url, type: 'image' }));
+            review.videos?.forEach(url => reviewMedia.push({ url, type: 'video' }));
+
             return (
               <div
                 key={review.id}
@@ -233,19 +300,43 @@ export function TourReview({ reviews, averageRating, totalReviews, onRefreshRevi
                     <p className="text-sm text-muted-foreground leading-relaxed mb-4">{review.comment}</p>
                     {/* Gallery ảnh/video nếu có */}
                     {((Array.isArray(review.images) && review.images.length > 0) || (Array.isArray(review.videos) && review.videos.length > 0)) && (
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        {Array.isArray(review.images) && review.images.map((url, idx, arr) => (
-                          <img
-                            key={url+idx}
-                            src={url}
-                            alt="img"
-                            className="w-24 h-24 object-cover rounded cursor-pointer hover:ring-2 hover:ring-primary"
-                            onClick={() => setImageModal({ images: arr, index: idx })}
-                          />
+                      <div className="flex flex-wrap gap-2 mb-2 items-center">
+                        {reviewMedia.slice(0, 4).map((media, index) => (
+                          <div
+                            key={index}
+                            className="relative w-24 h-24 bg-muted rounded-lg overflow-hidden group cursor-pointer hover:ring-2 hover:ring-primary transition-all duration-300"
+                            onClick={() => setMediaModal({ url: media.url, type: media.type, reviewMedia, currentIndex: index })}
+                          >
+                            {media.type === 'image' ? (
+                              <img
+                                src={media.url}
+                                alt={`Review media ${index + 1}`}
+                                className="w-full h-full object-cover rounded transition-transform duration-300"
+                              />
+                            ) : (
+                              <>
+                                <video
+                                  src={media.url}
+                                  className="w-full h-full object-cover"
+                                  preload="metadata"
+                                  muted
+                                  playsInline
+                                />
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
+                                  <PlayCircle className="w-8 h-8 text-white/90 group-hover:text-white transition-colors" />
+                                </div>
+                              </>
+                            )}
+                          </div>
                         ))}
-                        {Array.isArray(review.videos) && review.videos.map((url, idx) => (
-                          <video key={url+idx} src={url} controls className="w-24 h-24 rounded" />
-                        ))}
+                        {reviewMedia.length > 4 && (
+                          <div
+                            className="relative w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center text-sm font-bold text-primary bg-primary/10 border border-primary/20 cursor-pointer"
+                            onClick={() => setMediaModal({ url: reviewMedia[3].url, type: reviewMedia[3].type, reviewMedia, currentIndex: 3 })}
+                          >
+                            +{reviewMedia.length - 4}
+                          </div>
+                        )}
                       </div>
                     )}
                   </>
@@ -328,9 +419,77 @@ export function TourReview({ reviews, averageRating, totalReviews, onRefreshRevi
                   </Button>
                   <Button variant="ghost" size="sm" className="gap-1.5 h-8 hover:bg-muted/50">
                     <MessageCircle className="h-3.5 w-3.5" />
-                    <span className="text-sm">{review.replies || 0}</span>
+                    <span className="text-sm">{review.adminReply ? 1 : (review.replies || 0)}</span>
                   </Button>
+                  {isAdmin && review.user?.clerkId !== userId && review.adminReply === undefined && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="gap-1.5 h-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-primary/5 text-primary"
+                      onClick={() => {
+                        setReplyingToReviewId(review.id);
+                        setCurrentReplyText(review.adminReply || ''); // Initialize with existing reply
+                      }}
+                    >
+                      <Reply className="h-3.5 w-3.5" />
+                      <span className="text-sm">{t("review.reply")}</span>
+                    </Button>
+                  )}
                 </div>
+
+                {/* Admin Reply Form Inline */}
+                {replyingToReviewId === review.id && (
+                  <div className="mt-4 pt-4 border-t border-border-2">
+                    <div className="grid w-full items-center gap-4">
+                      <Label htmlFor="adminReply" className="text-left">
+                        {t("review.yourReply")}
+                      </Label>
+                      <Textarea
+                        id="adminReply"
+                        placeholder={t("review.replyPlaceholder")}
+                        className="h-24"
+                        value={currentReplyText}
+                        onChange={(e) => setCurrentReplyText(e.target.value)}
+                      />
+                    </div>
+                    <div className="flex justify-end gap-3 mt-4">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setCurrentReplyText(''); // Clear the input
+                          setReplyingToReviewId(null);
+                        }}
+                      >
+                        {t("common.cancel")}
+                      </Button>
+                      <Button
+                        onClick={async () => {
+                          if (currentReplyText) {
+                            const token = await getToken();
+                            const res = await fetch(`http://localhost:5000/api/reviews/${review.id}/admin-reply`, {
+                              method: "POST",
+                              headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${token}`,
+                              },
+                              body: JSON.stringify({ adminReply: currentReplyText }),
+                            });
+                            if (res.ok) {
+                              toast.success(t("review.replySuccess") || "Phản hồi thành công!");
+                              setCurrentReplyText(''); // Clear the input
+                              setReplyingToReviewId(null);
+                              onRefreshReviews?.();
+                            } else {
+                              toast.error(t("review.replyError") || "Phản hồi thất bại!");
+                            }
+                          }
+                        }}
+                      >
+                        {t("common.submit")}
+                      </Button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Admin Reply */}
                 {review.adminReply && (
@@ -377,58 +536,68 @@ export function TourReview({ reviews, averageRating, totalReviews, onRefreshRevi
               </div>
             )
           })}
+
+          {totalReviews > 3 && !showAllReviews && (
+            <div className="text-center mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setShowAllReviews(true)}
+                className="w-fit px-8 py-2 rounded-full border-primary/20 text-primary hover:bg-primary/5"
+              >
+                {t("review.loadMore")}
+              </Button>
+            </div>
+          )}
         </div>
       )}
-      {/* Modal xem ảnh lớn, chuyển trái/phải */}
-      <Dialog open={!!imageModal} onOpenChange={() => setImageModal(null)}>
-        <DialogContent
-          className="max-w-3xl w-auto p-0 flex flex-col items-center justify-center relative bg-transparent shadow-none border-none"
-          style={{ position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', zIndex: 9999 }}
-        >
-          {imageModal && (
-            <>
-              <button
-                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 shadow hover:bg-white z-10"
-                onClick={() => setImageModal(prev => prev && ({
-                  images: prev.images,
-                  index: (prev.index - 1 + prev.images.length) % prev.images.length
-                }))}
-                tabIndex={0}
-                aria-label="Previous image"
-              >
-                <ChevronLeft className="w-7 h-7" />
-              </button>
-              <img
-                src={imageModal.images[imageModal.index]}
-                alt="Ảnh review"
-                className="max-h-[80vh] max-w-full rounded-xl shadow-lg"
-              />
-              <button
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 shadow hover:bg-white z-10"
-                onClick={() => setImageModal(prev => prev && ({
-                  images: prev.images,
-                  index: (prev.index + 1) % prev.images.length
-                }))}
-                tabIndex={0}
-                aria-label="Next image"
-              >
-                <ChevronRight className="w-7 h-7" />
-              </button>
-              <button
-                className="absolute top-2 right-2 bg-white/80 rounded-full p-2 shadow hover:bg-white z-10"
-                onClick={() => setImageModal(null)}
-                tabIndex={0}
-                aria-label="Close"
-              >
-                <X className="w-6 h-6" />
-              </button>
-              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/60 text-white text-xs rounded-full px-3 py-1">
-                {imageModal.index + 1} / {imageModal.images.length}
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+      {/* Media Modal - Hiển thị ảnh hoặc video */}
+      {mediaModal && (
+        <Dialog open={!!mediaModal} onOpenChange={() => setMediaModal(null)}>
+          <DialogContent className="max-w-4xl p-0 overflow-hidden bg-transparent border-none shadow-none z-[9999]">
+            <DialogHeader className="sr-only">Review Media</DialogHeader>
+            <div className="relative w-full aspect-video bg-black flex items-center justify-center">
+              {mediaModal.type === 'image' ? (
+                <img src={mediaModal.url} alt="Review Media" className="w-full h-full object-contain" />
+              ) : (
+                <video src={mediaModal.url} controls className="w-full h-full object-contain" autoPlay />
+              )}
+
+              {mediaModal.reviewMedia.length > 1 && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white hover:text-white"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const { reviewMedia, currentIndex } = mediaModal;
+                      const newIndex = (currentIndex - 1 + reviewMedia.length) % reviewMedia.length;
+                      const nextMedia = reviewMedia[newIndex];
+                      setMediaModal({ ...mediaModal, url: nextMedia.url, type: nextMedia.type, currentIndex: newIndex });
+                    }}
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white hover:text-white"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const { reviewMedia, currentIndex } = mediaModal;
+                      const newIndex = (currentIndex + 1) % reviewMedia.length;
+                      const nextMedia = reviewMedia[newIndex];
+                      setMediaModal({ ...mediaModal, url: nextMedia.url, type: nextMedia.type, currentIndex: newIndex });
+                    }}
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </Button>
+                </>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   )
 } 

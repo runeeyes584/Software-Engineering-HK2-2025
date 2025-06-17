@@ -131,7 +131,7 @@ export function ReviewForm({ tourId, bookingId, onReviewSubmitted, initialRating
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto bg-white rounded-2xl shadow-md border border-gray-100 p-0 sm:p-0 overflow-hidden">
+    <div className="w-full max-w-2xl mx-auto bg-white rounded-2xl shadow-md border border-gray-100 p-0 sm:p-0 overflow-hidden mt-8">
       <form
         onSubmit={handleSubmit}
         className="flex flex-col sm:flex-row gap-0"

@@ -369,6 +369,13 @@ const translations: Record<string, Record<string, string>> = {
     "tour.unsaved": "Tour removed from favorites!",
     "tour.saveButton": "Save",
     "tour.savedButton": "Saved",
+    "review.loadMore": "Load More",
+    "review.reply": "Reply",
+    "review.replyToReview": "Reply to Review",
+    "review.yourReply": "Your Reply",
+    "review.replyPlaceholder": "Enter your reply here...",
+    "review.replySuccess": "Reply sent successfully!",
+    "review.replyError": "Failed to send reply!",
 
     // Home CTA (phẳng)
     "home.cta.title": "Ready for your next adventure?",
@@ -731,6 +738,13 @@ const translations: Record<string, Record<string, string>> = {
     "tour.unsaved": "Đã bỏ lưu tour!",
     "tour.saveButton": "Lưu",
     "tour.savedButton": "Đã lưu",
+    "review.loadMore": "Xem thêm",
+    "review.reply": "Phản hồi",
+    "review.replyToReview": "Phản hồi đánh giá",
+    "review.yourReply": "Phản hồi của bạn",
+    "review.replyPlaceholder": "Nhập phản hồi của bạn vào đây...",
+    "review.replySuccess": "Phản hồi đã được gửi thành công!",
+    "review.replyError": "Gửi phản hồi thất bại!",
 
     // Home CTA (phẳng)
     "home.cta.title": "Sẵn sàng cho cuộc phiêu lưu tiếp theo?",

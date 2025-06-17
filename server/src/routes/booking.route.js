@@ -27,6 +27,6 @@ router.post('/', requireAuth, findOrCreateUser, createBooking);
 router.put('/:id', requireAuth, updateBooking);
 
 // Lấy booking completed của user cho 1 tour
-router.get('/completed/:tourId', requireAuth, getCompletedBookingByUserAndTour);
+router.get('/completed/:tourId', requireAuth, findOrCreateUser, getCompletedBookingByUserAndTour);
 
 module.exports = router;

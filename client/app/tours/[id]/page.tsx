@@ -47,6 +47,7 @@ export default function TourDetailPage() {
   const [hasReviewed, setHasReviewed] = useState(false);
   const [isSaved, setIsSaved] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [lastManualChangeTime, setLastManualChangeTime] = useState(0);
 
   useEffect(() => {
     const fetchTourData = async () => {
@@ -88,19 +89,14 @@ export default function TourDetailPage() {
     const fetchBookings = async () => {
       setBookingLoading(true)
       const token = await getToken()
-      const res = await fetch("http://localhost:5000/api/bookings", {
+      const res = await fetch(`http://localhost:5000/api/bookings/completed/${params.id}`, {
         headers: {
           "Authorization": `Bearer ${token}`,
         },
       })
       if (res.ok) {
         const data = await res.json()
-        const completed = data.find(
-          (b: any) =>
-            (b.tour === params.id || b.tour?._id === params.id) &&
-            b.status === "completed"
-        )
-        setBookingId(completed?._id || null)
+        setBookingId(data.booking?._id || null)
       } else {
         setBookingId(null)
       }
@@ -139,6 +135,38 @@ export default function TourDetailPage() {
     };
     fetchSavedTours();
   }, [user, params.id]);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout | null = null;
+    let delayTimer: NodeJS.Timeout | null = null;
+
+    const startAutoSlide = () => {
+      timer = setInterval(() => {
+        setSelectedImage(prevIndex => (prevIndex + 1) % tourData?.images.length || 0);
+      }, 4000);
+    };
+
+    if (activeTab === "images" && tourData?.images.length > 1) {
+      const now = Date.now();
+      const timeSinceLastManualChange = now - lastManualChangeTime;
+
+      if (lastManualChangeTime > 0 && timeSinceLastManualChange < 5000) {
+        // If there was a recent manual change, wait for the remaining time
+        const remainingDelay = 5000 - timeSinceLastManualChange;
+        delayTimer = setTimeout(() => {
+          startAutoSlide();
+        }, remainingDelay);
+      } else {
+        // Otherwise, start auto-slide immediately
+        startAutoSlide();
+      }
+    }
+
+    return () => {
+      if (timer) clearInterval(timer);
+      if (delayTimer) clearTimeout(delayTimer);
+    };
+  }, [activeTab, tourData, selectedImage, lastManualChangeTime]);
 
   const mapTourDataToTour = (tourData: any) => {
     return {
@@ -334,14 +362,20 @@ export default function TourDetailPage() {
                   {tour.images.length > 1 && (
                     <>
                       <button
-                        onClick={() => setSelectedImage((selectedImage - 1 + tour.images.length) % tour.images.length)}
+                        onClick={() => {
+                          setSelectedImage((selectedImage - 1 + tour.images.length) % tour.images.length);
+                          setLastManualChangeTime(Date.now());
+                        }}
                         className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/40 hover:bg-black/70 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
                         type="button"
                       >
                         <ChevronLeft className="w-6 h-6" />
                       </button>
                       <button
-                        onClick={() => setSelectedImage((selectedImage + 1) % tour.images.length)}
+                        onClick={() => {
+                          setSelectedImage((selectedImage + 1) % tour.images.length);
+                          setLastManualChangeTime(Date.now());
+                        }}
                         className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/40 hover:bg-black/70 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
                         type="button"
                       >
@@ -399,7 +433,10 @@ export default function TourDetailPage() {
                 {tour.images.map((image: string, index: number) => (
                   <button
                     key={index}
-                    onClick={() => setSelectedImage(index)}
+                    onClick={() => {
+                      setSelectedImage(index);
+                      setLastManualChangeTime(Date.now());
+                    }}
                     className={cn(
                       "relative aspect-video rounded-lg overflow-hidden border-2 transition-all",
                       selectedImage === index
@@ -684,20 +721,11 @@ export default function TourDetailPage() {
           averageRating={Number(averageRating)}
           totalReviews={totalReviews}
           onRefreshReviews={fetchReviews}
+          tourId={String(tour.id)}
+          bookingId={bookingId}
+          hasReviewed={hasReviewed}
+          bookingLoading={bookingLoading}
         />
-        {bookingLoading ? null : bookingId && !hasReviewed && (
-          <ReviewForm
-            tourId={String(tour.id)}
-            bookingId={bookingId}
-            onReviewSubmitted={() => {
-              setReviewLoading(true);
-              fetch(`http://localhost:5000/api/reviews?tour=${params.id}`)
-                .then(res => res.json())
-                .then(data => setReviews(data || []))
-                .finally(() => setReviewLoading(false));
-            }}
-          />
-        )}
       </div>
     </div>
   )

@@ -143,11 +143,50 @@ const unlikeReview = async (req, res) => {
   }
 };
 
+// Admin reply to review
+const adminReplyToReview = async (req, res) => {
+  try {
+    const { id } = req.params; // review ID
+    const { adminReply } = req.body;
+    const userId = req.dbUser?._id; // ID người dùng từ DB, được thêm bởi findOrCreateUser middleware
+    const userRole = req.dbUser?.role; // Vai trò người dùng từ DB
+
+    if (!userId) {
+      return res.status(401).json({ message: 'Người dùng chưa được xác thực.' });
+    }
+
+    // Chỉ admin mới có quyền phản hồi
+    if (userRole !== 'admin') {
+      return res.status(403).json({ message: 'Bạn không có quyền phản hồi đánh giá này.' });
+    }
+
+    const review = await Review.findById(id);
+    if (!review) {
+      return res.status(404).json({ message: 'Không tìm thấy đánh giá.' });
+    }
+
+    // Cập nhật trường adminReply
+    review.adminReply = adminReply;
+    await review.save();
+
+    // Trả về review đầy đủ với phản hồi của admin để frontend cập nhật UI
+    const updatedReview = await Review.findById(id)
+      .populate('user', 'clerkId username firstname lastname avatar _id')
+      .populate('tour', 'name');
+
+    res.status(200).json(updatedReview);
+  } catch (error) {
+    console.error('Lỗi adminReplyToReview:', error);
+    res.status(500).json({ message: 'Lỗi server khi phản hồi đánh giá.' });
+  }
+};
+
 module.exports = {
   getReviews,
   createReview,
   updateReview,
   deleteReview,
   likeReview,
-  unlikeReview
+  unlikeReview,
+  adminReplyToReview
 };
