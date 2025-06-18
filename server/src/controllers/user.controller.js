@@ -70,7 +70,6 @@ const handleClerkWebhook = async (req, res) => {
 
     // Nếu webhook hoặc request có phone/address thì lưu luôn
     if (evt.data.phone) userData.phone = evt.data.phone;
-    if (evt.data.address) userData.address = evt.data.address;
 
     Object.keys(userData).forEach(key => userData[key] === undefined && delete userData[key]);
 
@@ -108,12 +107,35 @@ const updateUserProfile = async (req, res) => {
       return res.status(401).json({ message: 'Người dùng chưa được xác thực.' });
     }
 
-    const { phone, address } = req.body;
+    const { phone, province, district, ward, detailedAddress, gender, dateOfBirth } = req.body;
     
     // Tạo object chứa các trường cần cập nhật
     const updateFields = {};
     if (phone !== undefined) updateFields.phone = phone;
-    if (address !== undefined) updateFields.address = address;
+    if (gender !== undefined) updateFields.gender = gender;
+    
+    // Cập nhật dateOfBirth nếu có
+    if (dateOfBirth && typeof dateOfBirth === 'object') {
+      const dobFields = {};
+      if (dateOfBirth.day !== undefined) dobFields.day = dateOfBirth.day;
+      if (dateOfBirth.month !== undefined) dobFields.month = dateOfBirth.month;
+      if (dateOfBirth.year !== undefined) dobFields.year = dateOfBirth.year;
+
+      if (Object.keys(dobFields).length > 0) {
+        updateFields.dateOfBirth = dobFields;
+      }
+    }
+
+    // Cập nhật các trường con của address
+    const addressFields = {};
+    if (province !== undefined) addressFields.province = province;
+    if (district !== undefined) addressFields.district = district;
+    if (ward !== undefined) addressFields.ward = ward;
+    if (detailedAddress !== undefined) addressFields.detailedAddress = detailedAddress;
+
+    if (Object.keys(addressFields).length > 0) {
+      updateFields.address = addressFields;
+    }
 
     // Nếu không có trường nào để cập nhật
     if (Object.keys(updateFields).length === 0) {

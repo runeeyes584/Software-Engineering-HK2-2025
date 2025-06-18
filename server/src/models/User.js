@@ -40,9 +40,20 @@ const userSchema = new mongoose.Schema({
     default: ''
   },
   address: {
+    province: { type: String, trim: true, default: '' },
+    district: { type: String, trim: true, default: '' },
+    ward: { type: String, trim: true, default: '' },
+    detailedAddress: { type: String, trim: true, default: '' },
+  },
+  gender: {
     type: String,
-    trim: true,
+    enum: ['male', 'female', 'other', ''],
     default: ''
+  },
+  dateOfBirth: {
+    day: { type: String, trim: true, default: '' },
+    month: { type: String, trim: true, default: '' },
+    year: { type: String, trim: true, default: '' },
   },
   role: {
     type: String,

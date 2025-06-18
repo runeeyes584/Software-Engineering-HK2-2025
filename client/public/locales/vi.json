@@ -7,7 +7,9 @@
     "profile": "Hồ sơ",
     "settings": "Cài đặt",
     "language": "Ngôn ngữ",
-    "submitting": "Đang gửi..."
+    "submitting": "Đang gửi...",
+    "cancel": "Hủy",
+    "delete": "Xóa"
   },
   "home": {
     "hero": {
@@ -309,9 +311,11 @@
     "topRated": "Đánh giá cao nhất",
     "more": "thêm",
     "perPerson": "mỗi người",
-    "adminReply": "Phản hồi từ Admin",
     "viewAll": "Xem tất cả Tour",
-    "tour.saved": "Đã lưu tour vào yêu thích!"
+    "viewDetail": "Xem chi tiết",
+    "duration": "{value} ngày",
+    "saved": "Lưu tour thành công!",
+    "unsaved": "Đã bỏ lưu tour!"
   },
   "review": {
     "leaveReview": "Để lại đánh giá",
@@ -319,7 +323,20 @@
     "submit": "Gửi đánh giá",
     "submitted": "Gửi đánh giá thành công",
     "error": "Lỗi khi gửi đánh giá",
-    "pleaseSelectRating": "Vui lòng chọn đánh giá"
+    "pleaseSelectRating": "Vui lòng chọn đánh giá",
+    "ratingDistribution": "Phân bố đánh giá",
+    "rating": "đánh giá",
+    "like": "Thích",
+    "replyButton": "Phản hồi",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "editReview": "Chỉnh sửa đánh giá",
+    "update": "Cập nhật",
+    "cancel": "Hủy",
+    "uploadFile": "Tải lên tệp",
+    "updated": "Cập nhật đánh giá thành công!",
+    "deleted": "Xóa đánh giá thành công!",
+    "deleteConfirm": "Bạn có chắc muốn xóa đánh giá này không?"
   },
   "booking": {
     "title": "Đặt Tour",
@@ -364,5 +381,80 @@
     "expand": "Mở rộng",
     "close": "Đóng",
     "send": "Gửi"
+  },
+  "account": {
+    "profile": {
+      "title": "Thông tin hồ sơ",
+      "description": "Cập nhật thông tin cá nhân và tùy chọn của bạn",
+      "toast": {
+        "updateSuccess": "Cập nhật hồ sơ thành công!",
+        "updateError": "Cập nhật hồ sơ thất bại!",
+        "connectionError": "Đã xảy ra lỗi khi kết nối server."
+      },
+      "form": {
+        "phone": "Số điện thoại",
+        "phonePlaceholder": "Nhập số điện thoại của bạn",
+        "gender": "Giới tính",
+        "male": "Nam",
+        "female": "Nữ",
+        "dateOfBirth": "Ngày sinh",
+        "select": "Chọn",
+        "province": "Tỉnh/Thành phố",
+        "provincePlaceholder": "Tỉnh/TP",
+        "district": "Quận/Huyện",
+        "districtPlaceholder": "Quận/Huyện",
+        "ward": "Phường/Xã",
+        "wardPlaceholder": "Phường/Xã",
+        "detailedAddress": "Địa chỉ chi tiết",
+        "detailedAddressPlaceholder": "Nhập địa chỉ chi tiết của bạn",
+        "saveButton": "Lưu thông tin",
+        "savingButton": "Đang lưu..."
+      }
+    },
+    "savedTours": {
+      "title": "Tour đã lưu",
+      "description": "Danh sách tour đã lưu của bạn sẽ hiển thị ở đây."
+    }
+  },
+  "tour": {
+    "departureDate": "Ngày đi",
+    "selectDepartureDate": "Chọn ngày đi",
+    "transportation": "Phương tiện",
+    "class": "Hạng vé",
+    "adults": "Người lớn",
+    "children": "Trẻ em",
+    "infants": "Em bé",
+    "perPerson": "mỗi người",
+    "total": "Tổng cộng",
+    "bookNow": "Đặt ngay",
+    "wontBeCharged": "Bạn sẽ không bị trừ tiền ngay",
+    "images": "Hình ảnh",
+    "video": "Video",
+    "savedButton": "Đã lưu",
+    "saveButton": "Lưu",
+    "reviews": "đánh giá",
+    "days": "ngày",
+    "type": "Loại tour",
+    "availableSlots": "Chỗ còn lại",
+    "slots": "chỗ",
+    "adminReply": "Phản hồi từ Admin",
+    "viewDetail": "Xem chi tiết",
+    "duration": "{value} ngày",
+    "saved": "Lưu tour thành công!",
+    "unsaved": "Đã bỏ lưu tour!"
+  },
+  "transport": {
+    "airplane": "Máy bay",
+    "bus": "Xe buýt",
+    "cruiseShip": "Du thuyền",
+    "privateCar": "Xe riêng"
+  },
+  "class": {
+    "economy": "Phổ thông",
+    "economyDesc": "Tiện nghi cơ bản với dịch vụ thiết yếu",
+    "business": "Thương gia",
+    "businessDesc": "Tiện nghi nâng cao với dịch vụ cao cấp",
+    "luxury": "Sang trọng",
+    "luxuryDesc": "Tiện nghi đỉnh cao với trải nghiệm độc quyền"
   }
 } 

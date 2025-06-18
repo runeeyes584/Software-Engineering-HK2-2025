@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useUser, useAuth } from "@clerk/nextjs"
 import TourCard from "@/components/tour-card"
-import { toast } from "react-hot-toast"
+import { toast } from "sonner"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { provinces, districts, wards } from "@/lib/vietnam-administrative-divisions"
@@ -32,7 +32,6 @@ export default function AccountPage() {
 
   // State cho form Profile
   const [userPhone, setUserPhone] = useState('')
-  const [userAddress, setUserAddress] = useState('')
   const [isSavingProfile, setIsSavingProfile] = useState(false)
   const [gender, setGender] = useState<'male' | 'female' | ''>('')
   const [dateOfBirth, setDateOfBirth] = useState<{ day: string, month: string, year: string }>({ day: '', month: '', year: '' })
@@ -40,6 +39,7 @@ export default function AccountPage() {
   const [district, setDistrict] = useState('')
   const [ward, setWard] = useState('')
   const [detailedAddress, setDetailedAddress] = useState('')
+  const [originalProfile, setOriginalProfile] = useState<any>(null)
 
   const { getToken } = useAuth()
 
@@ -59,18 +59,25 @@ export default function AccountPage() {
         if (res.ok) {
           const data = await res.json();
           setUserPhone(data.user?.phone || '');
-          setUserAddress(data.user?.address || '');
           setGender(data.user?.gender || '');
           setDateOfBirth(data.user?.dateOfBirth || { day: '', month: '', year: '' });
 
-          // Parse address if it's a string
-          if (typeof data.user?.address === 'string') {
-            const parts = data.user.address.split(', ').reverse(); // Assuming format: detailed, ward, district, province
-            setProvince(parts[0] || '');
-            setDistrict(parts[1] || '');
-            setWard(parts[2] || '');
-            setDetailedAddress(parts.slice(3).reverse().join(', ') || '');
+          // Parse address if it's an object
+          if (typeof data.user?.address === 'object') {
+            setProvince(data.user.address.province || '');
+            setDistrict(data.user.address.district || '');
+            setWard(data.user.address.ward || '');
+            setDetailedAddress(data.user.address.detailedAddress || '');
           }
+          setOriginalProfile({
+            phone: data.user?.phone || '',
+            gender: data.user?.gender || '',
+            dateOfBirth: data.user?.dateOfBirth || { day: '', month: '', year: '' },
+            province: data.user?.address?.province || '',
+            district: data.user?.address?.district || '',
+            ward: data.user?.address?.ward || '',
+            detailedAddress: data.user?.address?.detailedAddress || '',
+          });
         } else {
           // console.error('Failed to fetch user profile:', await res.json());
         }
@@ -170,13 +177,12 @@ export default function AccountPage() {
       setGender((user.unsafeMetadata as any)?.gender || '');
       setDateOfBirth((user.unsafeMetadata as any)?.dateOfBirth || { day: '', month: '', year: '' });
 
-      const fullAddress = (user.unsafeMetadata as any)?.address || '';
-      if (typeof fullAddress === 'string') {
-        const parts = fullAddress.split(', ').reverse();
-        setProvince(parts[0] || '');
-        setDistrict(parts[1] || '');
-        setWard(parts[2] || '');
-        setDetailedAddress(parts.slice(3).reverse().join(', ') || '');
+      const userAddressData = (user.unsafeMetadata as any)?.address;
+      if (typeof userAddressData === 'object') {
+        setProvince(userAddressData.province || '');
+        setDistrict(userAddressData.district || '');
+        setWard(userAddressData.ward || '');
+        setDetailedAddress(userAddressData.detailedAddress || '');
       }
     }
   }, [user]);
@@ -242,6 +248,19 @@ export default function AccountPage() {
         fetchSavedTours(); // Fetch lại để đồng bộ với BE
       }
     } catch {}
+  };
+
+  const isProfileChanged = () => {
+    if (!originalProfile) return false;
+    return (
+      userPhone !== originalProfile.phone ||
+      gender !== originalProfile.gender ||
+      JSON.stringify(dateOfBirth) !== JSON.stringify(originalProfile.dateOfBirth) ||
+      province !== originalProfile.province ||
+      district !== originalProfile.district ||
+      ward !== originalProfile.ward ||
+      detailedAddress !== originalProfile.detailedAddress
+    );
   };
 
   return (
@@ -320,8 +339,8 @@ export default function AccountPage() {
             <TabsContent value="profile">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-2xl">Profile Information</CardTitle>
-                  <CardDescription>Update your personal information and preferences</CardDescription>
+                  <CardTitle className="text-2xl">{t('account.profile.title')}</CardTitle>
+                  <CardDescription>{t('account.profile.description')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <form className="space-y-6"
@@ -343,11 +362,14 @@ export default function AccountPage() {
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${token}`
                           },
-                          body: JSON.stringify({ 
-                            phone: userPhone, 
-                            address: fullAddress,
-                            gender,
-                            dateOfBirth
+                          body: JSON.stringify({
+                            phone: userPhone,
+                            province: province,
+                            district: district,
+                            ward: ward,
+                            detailedAddress: detailedAddress,
+                            gender: gender,
+                            dateOfBirth: dateOfBirth
                           })
                         });
 
@@ -356,26 +378,34 @@ export default function AccountPage() {
                         // console.log('Response data:', data);
 
                         if (res.ok) {
-                          toast.success('Cập nhật profile thành công!');
+                          toast.success(t('account.profile.toast.updateSuccess'));
                           // Cập nhật state với dữ liệu mới từ backend
                           setUserPhone(data.user?.phone || '');
                           // setUserAddress(data.user?.address || ''); // This will be parsed later
                           setGender(data.user?.gender || '');
                           setDateOfBirth(data.user?.dateOfBirth || { day: '', month: '', year: '' });
                           
-                          if (typeof data.user?.address === 'string') {
-                            const parts = data.user.address.split(', ').reverse();
-                            setProvince(parts[0] || '');
-                            setDistrict(parts[1] || '');
-                            setWard(parts[2] || '');
-                            setDetailedAddress(parts.slice(3).reverse().join(', ') || '');
+                          if (typeof data.user?.address === 'object') {
+                            setProvince(data.user.address.province || '');
+                            setDistrict(data.user.address.district || '');
+                            setWard(data.user.address.ward || '');
+                            setDetailedAddress(data.user.address.detailedAddress || '');
                           }
+                          setOriginalProfile({
+                            phone: data.user?.phone || '',
+                            gender: data.user?.gender || '',
+                            dateOfBirth: data.user?.dateOfBirth || { day: '', month: '', year: '' },
+                            province: data.user?.address?.province || '',
+                            district: data.user?.address?.district || '',
+                            ward: data.user?.address?.ward || '',
+                            detailedAddress: data.user?.address?.detailedAddress || '',
+                          });
                         } else {
-                          toast.error(data.message || 'Cập nhật profile thất bại!');
+                          toast.error(data.message || t('account.profile.toast.updateError'));
                         }
                       } catch (error) {
                         // console.error('Lỗi khi cập nhật profile:', error);
-                        toast.error('Đã xảy ra lỗi khi kết nối server.');
+                        toast.error(t('account.profile.toast.connectionError'));
                       } finally {
                         setIsSavingProfile(false);
                       }
@@ -383,35 +413,35 @@ export default function AccountPage() {
                   >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <Label htmlFor="phone" className="text-sm font-medium">Số điện thoại <span className="text-red-500">*</span></Label>
+                        <Label htmlFor="phone" className="text-sm font-medium">{t('account.profile.form.phone')} <span className="text-red-500">*</span></Label>
                         <Input
                           id="phone"
                           className="h-11 rounded-md focus:ring-2 focus:ring-primary/20"
-                          placeholder="Nhập số điện thoại của bạn"
+                          placeholder={t('account.profile.form.phonePlaceholder')}
                           value={userPhone}
                           onChange={(e) => setUserPhone(e.target.value)}
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-sm font-medium">Giới tính <span className="text-red-500">*</span></Label>
-                        <RadioGroup defaultValue={gender} onValueChange={(value: 'male' | 'female') => setGender(value)} className="flex h-11 items-center space-x-4">
+                        <Label className="text-sm font-medium">{t('account.profile.form.gender')} <span className="text-red-500">*</span></Label>
+                        <RadioGroup value={gender} onValueChange={(value: 'male' | 'female') => setGender(value)} className="flex h-11 items-center space-x-4">
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="male" id="gender-male" />
-                            <Label htmlFor="gender-male">Nam</Label>
+                            <Label htmlFor="gender-male">{t('account.profile.form.male')}</Label>
                           </div>
                           <div className="flex items-center space-x-2">
                             <RadioGroupItem value="female" id="gender-female" />
-                            <Label htmlFor="gender-female">Nữ</Label>
+                            <Label htmlFor="gender-female">{t('account.profile.form.female')}</Label>
                           </div>
                         </RadioGroup>
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-sm font-medium">Ngày sinh <span className="text-red-500">*</span></Label>
+                      <Label className="text-sm font-medium">{t('account.profile.form.dateOfBirth')} <span className="text-red-500">*</span></Label>
                       <div className="flex gap-4">
                         <Select value={dateOfBirth.day} onValueChange={(value) => setDateOfBirth(prev => ({ ...prev, day: value }))}>
                           <SelectTrigger className="h-11 w-[80px] rounded-md focus:ring-2 focus:ring-primary/20">
-                            <SelectValue placeholder="Chọn" />
+                            <SelectValue placeholder={t('account.profile.form.select')} />
                           </SelectTrigger>
                           <SelectContent>
                             {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
@@ -421,7 +451,7 @@ export default function AccountPage() {
                         </Select>
                         <Select value={dateOfBirth.month} onValueChange={(value) => setDateOfBirth(prev => ({ ...prev, month: value }))}>
                           <SelectTrigger className="h-11 w-[80px] rounded-md focus:ring-2 focus:ring-primary/20">
-                            <SelectValue placeholder="Chọn" />
+                            <SelectValue placeholder={t('account.profile.form.select')} />
                           </SelectTrigger>
                           <SelectContent>
                             {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
@@ -431,7 +461,7 @@ export default function AccountPage() {
                         </Select>
                         <Select value={dateOfBirth.year} onValueChange={(value) => setDateOfBirth(prev => ({ ...prev, year: value }))}>
                           <SelectTrigger className="h-11 w-[90px] rounded-md focus:ring-2 focus:ring-primary/20">
-                            <SelectValue placeholder="Chọn" />
+                            <SelectValue placeholder={t('account.profile.form.select')} />
                           </SelectTrigger>
                           <SelectContent>
                             {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i).map(year => (
@@ -443,14 +473,12 @@ export default function AccountPage() {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div className="space-y-2">
-                        <Label htmlFor="province" className="text-sm font-medium">Tỉnh/Thành phố</Label>
+                        <Label htmlFor="province" className="text-sm font-medium">{t('account.profile.form.province')}</Label>
                         <Select value={province} onValueChange={(value) => {
                           setProvince(value);
-                          setDistrict(''); // Reset district when province changes
-                          setWard(''); // Reset ward when province changes
                         }}>
                           <SelectTrigger className="h-11 rounded-md focus:ring-2 focus:ring-primary/20">
-                            <SelectValue placeholder="Tỉnh/TP" />
+                            <SelectValue placeholder={t('account.profile.form.provincePlaceholder')} />
                           </SelectTrigger>
                           <SelectContent>
                             {provinces.map((p) => (
@@ -460,48 +488,39 @@ export default function AccountPage() {
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="district" className="text-sm font-medium">Quận/Huyện</Label>
-                        <Select value={district} onValueChange={(value) => {
-                          setDistrict(value);
-                          setWard(''); // Reset ward when district changes
-                        }} disabled={!province}>
-                          <SelectTrigger className="h-11 rounded-md focus:ring-2 focus:ring-primary/20">
-                            <SelectValue placeholder="Quận/Huyện" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {districts.filter(d => d.province === province).map((d) => (
-                              <SelectItem key={d.code} value={d.name}>{d.name}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <Label htmlFor="district" className="text-sm font-medium">{t('account.profile.form.district')}</Label>
+                        <Input
+                          id="district"
+                          className="h-11 rounded-md focus:ring-2 focus:ring-primary/20"
+                          placeholder={t('account.profile.form.districtPlaceholder')}
+                          value={district}
+                          onChange={(e) => setDistrict(e.target.value)}
+                        />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="ward" className="text-sm font-medium">Phường/Xã</Label>
-                        <Select value={ward} onValueChange={setWard} disabled={!district}>
-                          <SelectTrigger className="h-11 rounded-md focus:ring-2 focus:ring-primary/20">
-                            <SelectValue placeholder="Phường/Xã" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {wards.filter(w => w.district === district).map((w) => (
-                              <SelectItem key={w.code} value={w.name}>{w.name}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <Label htmlFor="ward" className="text-sm font-medium">{t('account.profile.form.ward')}</Label>
+                        <Input
+                          id="ward"
+                          className="h-11 rounded-md focus:ring-2 focus:ring-primary/20"
+                          placeholder={t('account.profile.form.wardPlaceholder')}
+                          value={ward}
+                          onChange={(e) => setWard(e.target.value)}
+                        />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="detailedAddress" className="text-sm font-medium">Địa chỉ chi tiết</Label>
+                      <Label htmlFor="detailedAddress" className="text-sm font-medium">{t('account.profile.form.detailedAddress')}</Label>
                       <Input
                         id="detailedAddress"
                         className="h-11 rounded-md focus:ring-2 focus:ring-primary/20"
-                        placeholder="Nhập địa chỉ chi tiết của bạn"
+                        placeholder={t('account.profile.form.detailedAddressPlaceholder')}
                         value={detailedAddress}
                         onChange={(e) => setDetailedAddress(e.target.value)}
                       />
                     </div>
                     <div className="flex justify-end">
-                      <Button type="submit" className="h-11 px-6 font-medium" disabled={isSavingProfile}>
-                        {isSavingProfile ? 'Đang lưu...' : 'Lưu thông tin'}
+                      <Button type="submit" className="h-11 px-6 font-medium" disabled={isSavingProfile || !isProfileChanged()}>
+                        {isSavingProfile ? t('account.profile.form.savingButton') : t('account.profile.form.saveButton')}
                       </Button>
                     </div>
                   </form>
@@ -618,8 +637,8 @@ export default function AccountPage() {
             <TabsContent value="saved-tours">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-2xl">Saved Tours</CardTitle>
-                  <CardDescription>Danh sách tour đã lưu của bạn sẽ hiển thị ở đây.</CardDescription>
+                  <CardTitle className="text-2xl">{t('account.savedTours.title')}</CardTitle>
+                  <CardDescription>{t('account.savedTours.description')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {loadingSaved ? (

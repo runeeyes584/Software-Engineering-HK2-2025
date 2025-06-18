@@ -95,6 +95,10 @@ export default function TourCard({
     }
   };
 
+  const dayNumber = typeof duration === "string"
+    ? (duration.match(/\d+/)?.[0] || duration)
+    : duration;
+
   return (
     <Card className="overflow-hidden border border-border rounded-2xl shadow-md transition-transform duration-200 bg-white group relative">
       {/* Nút trái tim lưu tour ở góc trên bên phải card */}
@@ -158,7 +162,7 @@ export default function TourCard({
         {/* Duration dưới tiêu đề, trên rating */}
         <div className="flex items-center gap-1 text-sm text-muted-foreground mb-1">
           <Clock className="h-4 w-4" />
-          <span>{/\bngày\b/i.test(duration) ? duration : `${duration} ngày`}</span>
+          <span>{t('tours.duration', { value: dayNumber })}</span>
         </div>
         <div className="flex items-center gap-2 text-sm mt-1">
           <Star className="h-4 w-4 text-yellow-500" />
@@ -169,7 +173,7 @@ export default function TourCard({
       <CardContent className="flex items-center justify-between px-5 pb-5">
         <span className="text-lg font-bold text-primary">${price.toLocaleString()}</span>
         <Button size="sm" className="rounded-full px-4" onClick={onViewDetail}>
-          Xem chi tiết
+          {t('tours.viewDetails')}
         </Button>
       </CardContent>
     </Card>

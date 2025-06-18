@@ -7,7 +7,9 @@
     "profile": "Profile",
     "settings": "Settings",
     "language": "Language",
-    "submitting": "Submitting..."
+    "submitting": "Submitting...",
+    "cancel": "Cancel",
+    "delete": "Delete"
   },
   "home": {
     "hero": {
@@ -308,7 +310,8 @@
     "more": "more",
     "perPerson": "per person",
     "adminReply": "Admin Reply",
-    "viewAll": "View All Tours"
+    "viewAll": "View All Tours",
+    "duration": "{value} days"
   },
   "review": {
     "leaveReview": "Leave a Review",
@@ -316,7 +319,20 @@
     "submit": "Submit Review",
     "submitted": "Review submitted successfully",
     "error": "Error submitting review",
-    "pleaseSelectRating": "Please select a rating"
+    "pleaseSelectRating": "Please select a rating",
+    "ratingDistribution": "Rating Distribution",
+    "rating": "rating(s)",
+    "like": "Like",
+    "replyButton": "Reply",
+    "edit": "Edit",
+    "delete": "Delete",
+    "editReview": "Edit Review",
+    "update": "Update",
+    "cancel": "Cancel",
+    "uploadFile": "Upload file",
+    "updated": "Review updated successfully!",
+    "deleted": "Review deleted successfully!",
+    "deleteConfirm": "Are you sure you want to delete this review?"
   },
   "booking": {
     "title": "Book Your Tour",
@@ -362,5 +378,79 @@
     "close": "Close",
     "send": "Send"
   },
-  "tour.saved": "Tour saved to favorites!"
+  "account": {
+    "profile": {
+      "title": "Profile Information",
+      "description": "Update your personal information and preferences",
+      "toast": {
+        "updateSuccess": "Profile updated successfully!",
+        "updateError": "Failed to update profile!",
+        "connectionError": "An error occurred while connecting to server."
+      },
+      "form": {
+        "phone": "Phone Number",
+        "phonePlaceholder": "Enter your phone number",
+        "gender": "Gender",
+        "male": "Male",
+        "female": "Female",
+        "dateOfBirth": "Date of Birth",
+        "select": "Select",
+        "province": "Province/City",
+        "provincePlaceholder": "Province/City",
+        "district": "District",
+        "districtPlaceholder": "District",
+        "ward": "Ward",
+        "wardPlaceholder": "Ward",
+        "detailedAddress": "Detailed Address",
+        "detailedAddressPlaceholder": "Enter your detailed address",
+        "saveButton": "Save Information",
+        "savingButton": "Saving..."
+      }
+    },
+    "savedTours": {
+      "title": "Saved Tours",
+      "description": "Your saved tours will appear here."
+    }
+  },
+  "tour": {
+    "viewDetail": "View Details",
+    "duration": "{value} days",
+    "departureDate": "Departure Date",
+    "selectDepartureDate": "Select departure date",
+    "transportation": "Transportation",
+    "class": "Class",
+    "adults": "Adults",
+    "children": "Children",
+    "infants": "Infants",
+    "perPerson": "per person",
+    "total": "Total",
+    "bookNow": "Book Now",
+    "wontBeCharged": "You won't be charged yet",
+    "images": "Images",
+    "video": "Video",
+    "savedButton": "Saved",
+    "saveButton": "Save",
+    "reviews": "reviews",
+    "days": "days",
+    "type": "Tour Type",
+    "availableSlots": "Available Slots",
+    "slots": "slots",
+    "adminReply": "Admin Reply",
+    "unsaved": "Tour removed from saved list!",
+    "saved": "Tour saved successfully!"
+  },
+  "transport": {
+    "airplane": "Airplane",
+    "bus": "Bus",
+    "cruiseShip": "Cruise Ship",
+    "privateCar": "Private Car"
+  },
+  "class": {
+    "economy": "Economy",
+    "economyDesc": "Standard comfort with essential amenities",
+    "business": "Business",
+    "businessDesc": "Enhanced comfort with premium services",
+    "luxury": "Luxury",
+    "luxuryDesc": "Ultimate comfort with exclusive experiences"
+  }
 } 
