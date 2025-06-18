@@ -339,7 +339,18 @@
     "personalInfo": "Personal Information",
     "paymentInfo": "Payment Information",
     "confirm": "Confirm Booking",
-    "success": "Booking Successful"
+    "success": "Booking Successful",
+    "departure": "Departure",
+    "return": "Return",
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "yourBookingsTitle": "Your Bookings",
+    "yourBookingsDesc": "View and manage your travel bookings",
+    "bookingId": "Booking ID"
   },
   "admin": {
     "dashboard": "Dashboard",
@@ -417,6 +428,7 @@
     "duration": "{value} days",
     "departureDate": "Departure Date",
     "selectDepartureDate": "Select departure date",
+    "selectDepartureDateRequired": "Please select a departure date",
     "transportation": "Transportation",
     "class": "Class",
     "adults": "Adults",
@@ -452,5 +464,8 @@
     "businessDesc": "Enhanced comfort with premium services",
     "luxury": "Luxury",
     "luxuryDesc": "Ultimate comfort with exclusive experiences"
+  },
+  "tourCard": {
+    "viewDetails": "View Details"
   }
 } 

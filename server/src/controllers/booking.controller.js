@@ -8,11 +8,37 @@ const getAllBookings = async (req, res) => {
   try {
     const bookings = await Booking.find()
       .populate('user', 'username email')
-      .populate('tour', 'name price')
+      .populate('tour', 'name price departureOptions')
       .populate('promotion')
       .populate('review')
       .populate('payment');
-    res.status(200).json(bookings);
+    // Đảm bảo duration, departureDate, returnDate có trong tour hoặc booking
+    const bookingsWithDetails = bookings.map(b => {
+      let tour = b.tour && typeof b.tour.toObject === 'function' ? b.tour.toObject() : b.tour;
+      // Duration
+      if (tour && !tour.duration) {
+        if (tour.departureOptions && tour.departureOptions.length > 0) {
+          const { departureDate, returnDate } = tour.departureOptions[0];
+          if (departureDate && returnDate) {
+            const start = new Date(departureDate);
+            const end = new Date(returnDate);
+            const diffTime = Math.abs(end - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            tour.duration = diffDays;
+          }
+        }
+      }
+      // Departure/Return date ưu tiên lấy từ booking, fallback sang tour
+      let departureDate = b.departureDate || (tour?.departureOptions?.[0]?.departureDate ?? null);
+      let returnDate = b.returnDate || (tour?.departureOptions?.[0]?.returnDate ?? null);
+      return {
+        ...b.toObject(),
+        tour,
+        departureDate,
+        returnDate,
+      };
+    });
+    res.status(200).json(bookingsWithDetails);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

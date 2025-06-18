@@ -19,6 +19,7 @@ import { toast } from "sonner"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { provinces, districts, wards } from "@/lib/vietnam-administrative-divisions"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog"
 
 export default function AccountPage() {
   const { t } = useLanguage()
@@ -29,6 +30,8 @@ export default function AccountPage() {
   const [savedTours, setSavedTours] = useState<any[]>([])
   const [loadingSaved, setLoadingSaved] = useState(false)
   const [imageIndexes, setImageIndexes] = useState<{ [tourId: string]: number }>({})
+  const [bookings, setBookings] = useState<any[]>([])
+  const [loadingBookings, setLoadingBookings] = useState(false)
 
   // State cho form Profile
   const [userPhone, setUserPhone] = useState('')
@@ -42,6 +45,9 @@ export default function AccountPage() {
   const [originalProfile, setOriginalProfile] = useState<any>(null)
 
   const { getToken } = useAuth()
+
+  const [selectedBooking, setSelectedBooking] = useState<any | null>(null)
+  const [showModal, setShowModal] = useState(false)
 
   // Lấy thông tin phone và address từ backend khi component mount hoặc user thay đổi
   useEffect(() => {
@@ -97,41 +103,32 @@ export default function AccountPage() {
   const email = user?.primaryEmailAddress?.emailAddress || user?.emailAddresses?.[0]?.emailAddress || "";
   const phone = user?.primaryPhoneNumber?.phoneNumber || "";
 
-  // Mock booking data
-  const bookings = [
-    {
-      id: "B-12345",
-      tourName: "Halong Bay Cruise",
-      date: "2023-12-15",
-      status: "Confirmed",
-      price: 299,
-    },
-    {
-      id: "B-12346",
-      tourName: "Bangkok City Tour",
-      date: "2024-01-20",
-      status: "Pending",
-      price: 199,
-    },
-    {
-      id: "B-12347",
-      tourName: "Tokyo Explorer",
-      date: "2024-02-10",
-      status: "Completed",
-      price: 499,
-    },
-  ]
-
-  // Hàm fetch chi tiết 1 tour
-  async function fetchTourDetail(id: string) {
-    try {
-      const res = await fetch(`http://localhost:5000/api/tours/${id}`)
-      if (res.ok) {
-        return await res.json()
+  useEffect(() => {
+    const fetchBookings = async () => {
+      if (!user?.id) return;
+      setLoadingBookings(true);
+      try {
+        const token = await getToken();
+        const res = await fetch("http://localhost:5000/api/bookings", {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+          credentials: "include",
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setBookings(data);
+        } else {
+          setBookings([]);
+        }
+      } catch {
+        setBookings([]);
+      } finally {
+        setLoadingBookings(false);
       }
-    } catch {}
-    return null
-  }
+    };
+    fetchBookings();
+  }, [user, getToken]);
 
   // Đưa fetchSavedTours ra ngoài để có thể gọi lại sau khi unsave
   const fetchSavedTours = async () => {
@@ -262,6 +259,17 @@ export default function AccountPage() {
       detailedAddress !== originalProfile.detailedAddress
     );
   };
+
+  // Hàm fetch chi tiết 1 tour
+  async function fetchTourDetail(id: string) {
+    try {
+      const res = await fetch(`http://localhost:5000/api/tours/${id}`)
+      if (res.ok) {
+        return await res.json()
+      }
+    } catch {}
+    return null
+  }
 
   return (
     <div className="container w-full px-10 py-10">
@@ -531,60 +539,90 @@ export default function AccountPage() {
             <TabsContent value="bookings">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-2xl">Your Bookings</CardTitle>
-                  <CardDescription>View and manage your travel bookings</CardDescription>
+                  <CardTitle className="text-2xl">{t('booking.yourBookingsTitle')}</CardTitle>
+                  <CardDescription>{t('booking.yourBookingsDesc')}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {bookings.length > 0 ? (
-                    <div className="space-y-4">
-                      {bookings.map((booking) => (
-                        <Card key={booking.id} className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
-                          <CardContent className="p-6">
-                            <div className="flex flex-col md:flex-row justify-between gap-4">
-                              <div className="space-y-1">
-                                <h3 className="text-lg font-semibold">{booking.tourName}</h3>
-                                <div className="flex items-center text-sm text-muted-foreground">
-                                  <CalendarIcon className="mr-2 h-4 w-4" />
-                                  {new Date(booking.date).toLocaleDateString()}
-                                </div>
-                                <div className="text-sm text-muted-foreground">Booking ID: {booking.id}</div>
-                              </div>
-                              <div className="flex flex-col items-end gap-2">
-                                <div className="text-lg font-semibold">{formatPrice(booking.price)}</div>
-                                <div className="flex items-center gap-2">
-                                  {getStatusIcon(booking.status)}
-                                  <span
-                                    className={cn(
-                                      "text-sm font-medium",
-                                      booking.status === "Confirmed" && "text-green-600",
-                                      booking.status === "Pending" && "text-amber-600",
-                                      booking.status === "Completed" && "text-muted-foreground"
-                                    )}
-                                  >
-                                    {booking.status}
-                                  </span>
-                                </div>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="mt-2 group"
-                                >
-                                  View Details
-                                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                                </Button>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  ) : (
+                  {loadingBookings ? (
+                    <div className="text-center text-muted-foreground py-10">Đang tải...</div>
+                  ) : bookings.length === 0 ? (
                     <Alert>
                       <AlertCircle className="h-4 w-4" />
                       <AlertDescription>
                         You haven't made any bookings yet.
                       </AlertDescription>
                     </Alert>
+                  ) : (
+                    <div className="space-y-4">
+                      {bookings.map((booking) => {
+                        const depStr = booking.departureDate ? new Date(booking.departureDate).toLocaleDateString('vi-VN') : '';
+                        const retStr = booking.returnDate ? new Date(booking.returnDate).toLocaleDateString('vi-VN') : '';
+                        return (
+                          <Card key={booking._id} className="mb-6 border-none shadow-sm transition-shadow rounded-2xl">
+                            <CardContent className="p-6">
+                              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
+                                <div className="font-bold text-lg md:text-xl text-foreground">{booking.tour?.name || "Tour"}</div>
+                                <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 min-w-[180px] md:min-w-[220px] md:justify-end">
+                                  <div className="text-2xl font-bold text-primary">${booking.totalPrice?.toFixed(2) || "0.00"}</div>
+                                  <span
+                                    className="inline-block px-3 py-1 rounded-full text-xs font-bold shadow-sm border"
+                                    style={
+                                      booking.status === 'Confirmed'
+                                        ? { background: '#d1fae5', color: '#047857', border: '1px solid #047857' }
+                                        : booking.status === 'Pending'
+                                        ? { background: '#fef9c3', color: '#b45309', border: '1px solid #fde047' }
+                                        : booking.status === 'Completed'
+                                        ? { background: '#ede9fe', color: '#7c3aed', border: '1px solid #a78bfa' }
+                                        : booking.status === 'Cancelled'
+                                        ? { background: '#fee2e2', color: '#b91c1c', border: '1px solid #f87171' }
+                                        : { background: '#f3f4f6', color: '#6b7280', border: '1px solid #d1d5db' }
+                                    }
+                                  >
+                                    {t(`booking.status.${booking.status?.toLowerCase()}`) || booking.status}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="flex flex-wrap items-center gap-4 text-muted-foreground text-sm mb-2">
+                                <div className="flex items-center gap-1">
+                                  <CalendarIcon className="w-4 h-4" />
+                                  <span className="font-medium text-foreground">
+                                    {t('booking.departure')}: {depStr || '--'}
+                                  </span>
+                                </div>
+                                {retStr && (
+                                  <div className="flex items-center gap-1">
+                                    <CalendarIcon className="w-4 h-4" />
+                                    <span className="font-medium text-foreground">
+                                      {t('booking.return')}: {retStr}
+                                    </span>
+                                  </div>
+                                )}
+                                {booking.tour?.duration && (
+                                  <span className="ml-2">• {t('tours.duration', { value: booking.tour.duration })}</span>
+                                )}
+                              </div>
+                              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                                <div className="text-xs text-muted-foreground mb-1 md:mb-0">
+                                  {t('booking.bookingId')}: {booking.bookingCode || booking._id}
+                                </div>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="mt-2 md:mt-0 md:w-auto w-full font-semibold shadow-sm"
+                                  onClick={() => {
+                                    setSelectedBooking(booking);
+                                    setShowModal(true);
+                                  }}
+                                >
+                                  {t("tourCard.viewDetails")}
+                                  <ArrowRight className="w-4 h-4 ml-1" />
+                                </Button>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                    </div>
                   )}
                 </CardContent>
               </Card>
@@ -655,8 +693,7 @@ export default function AccountPage() {
                         const durationStr = typeof tour.duration === "string"
                           ? tour.duration
                           : (typeof tour.duration === "number"
-                            ? `${tour.duration} ngày`
-                            : (typeof tour.days === "number" ? `${tour.days} ngày` : ""));
+                            ? `${tour.duration} ngày`                            : (typeof tour.days === "number" ? `${tour.days} ngày` : ""));
                         return (
                           <TourCard
                             key={id}
@@ -687,7 +724,62 @@ export default function AccountPage() {
           </Tabs>
         </main>
       </div>
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent className="max-w-lg w-full">
+          <DialogHeader>
+            <DialogTitle>{selectedBooking?.tour?.name || "Tour"}</DialogTitle>
+            <DialogDescription>
+              {t('booking.bookingId')}: {selectedBooking?.bookingCode || selectedBooking?._id}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 text-sm">
+            <div className="flex items-center gap-2">
+              <CalendarIcon className="w-4 h-4" />
+              <span>{t('booking.departure')}: {selectedBooking?.departureDate ? new Date(selectedBooking.departureDate).toLocaleDateString('vi-VN') : '--'}</span>
+            </div>
+            {selectedBooking?.returnDate && (
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="w-4 h-4" />
+                <span>{t('booking.return')}: {new Date(selectedBooking.returnDate).toLocaleDateString('vi-VN')}</span>
+              </div>
+            )}
+            {selectedBooking?.tour?.duration && (
+              <div>
+                {t('tours.duration', { value: selectedBooking.tour.duration })}
+              </div>
+            )}
+            <div>
+              {t('booking.status.' + selectedBooking?.status?.toLowerCase())}
+            </div>
+            <div>
+              {t('tour.total')}: <span className="font-bold text-primary">${selectedBooking?.totalPrice?.toFixed(2) || '0.00'}</span>
+            </div>
+            <div>
+              {t('tour.adults')}: {selectedBooking?.adults} | {t('tour.children')}: {selectedBooking?.children} | {t('tour.infants')}: {selectedBooking?.infants}
+            </div>
+            {selectedBooking?.note && (
+              <div>
+                {t('booking.note') || 'Note'}: {selectedBooking.note}
+              </div>
+            )}
+            {selectedBooking?.transportType && (
+              <div>
+                {t('tour.transportation')}: {t('transport.' + selectedBooking.transportType)}
+              </div>
+            )}
+            {selectedBooking?.ticketClass && (
+              <div>
+                {t('tour.class')}: {t('class.' + selectedBooking.ticketClass)}
+              </div>
+            )}
+          </div>
+          <DialogClose asChild>
+            <Button variant="outline" className="mt-4 w-full">{t('common.close') || 'Close'}</Button>
+          </DialogClose>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
+
 

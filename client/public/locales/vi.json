@@ -343,7 +343,18 @@
     "personalInfo": "Thông tin cá nhân",
     "paymentInfo": "Thông tin thanh toán",
     "confirm": "Xác nhận đặt tour",
-    "success": "Đặt tour thành công"
+    "success": "Đặt tour thành công",
+    "departure": "Ngày đi",
+    "return": "Ngày về",
+    "status": {
+      "pending": "Chờ xác nhận",
+      "confirmed": "Đã xác nhận",
+      "completed": "Hoàn thành",
+      "cancelled": "Đã hủy"
+    },
+    "yourBookingsTitle": "Đơn đặt tour của bạn",
+    "yourBookingsDesc": "Xem và quản lý các đơn đặt tour của bạn",
+    "bookingId": "Mã đơn đặt tour"
   },
   "admin": {
     "dashboard": "Bảng điều khiển",
@@ -441,7 +452,8 @@
     "viewDetail": "Xem chi tiết",
     "duration": "{value} ngày",
     "saved": "Lưu tour thành công!",
-    "unsaved": "Đã bỏ lưu tour!"
+    "unsaved": "Đã bỏ lưu tour!",
+    "selectDepartureDateRequired": "Vui lòng chọn ngày khởi hành."
   },
   "transport": {
     "airplane": "Máy bay",
@@ -456,5 +468,8 @@
     "businessDesc": "Tiện nghi nâng cao với dịch vụ cao cấp",
     "luxury": "Sang trọng",
     "luxuryDesc": "Tiện nghi đỉnh cao với trải nghiệm độc quyền"
+  },
+  "tourCard": {
+    "viewDetails": "Xem chi tiết"
   }
 } 
