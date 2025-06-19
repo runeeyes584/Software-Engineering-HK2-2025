@@ -13,6 +13,7 @@ const getSavedToursByUser = async (req, res) => {
         userId = user._id;
       }
       let savedTours = await SavedTour.find({ user: userId })
+        .sort({ createdAt: -1 })
         .populate('tour');
 
       // Tính rating và reviewCount cho từng tour

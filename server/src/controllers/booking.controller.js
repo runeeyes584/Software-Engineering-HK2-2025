@@ -7,6 +7,7 @@ const Payment = require('../models/Payment.js');
 const getAllBookings = async (req, res) => {
   try {
     const bookings = await Booking.find()
+      .sort({ createdAt: -1 })
       .populate('user', 'username email')
       .populate('tour', 'name price departureOptions')
       .populate('promotion')
@@ -66,7 +67,7 @@ const createBooking = async (req, res) => {
   try {
     // Nhận các trường cần thiết từ FE (không nhận user)
     const {
-      tour, guests, totalPrice, note,
+      tour, totalPrice, note,
       departureDate, returnDate, transportType, ticketClass, adults, children, infants,
       name, phone, email
     } = req.body;
@@ -77,7 +78,6 @@ const createBooking = async (req, res) => {
     const newBooking = new Booking({
       tour,
       user,
-      guests,
       totalPrice,
       note,
       name,

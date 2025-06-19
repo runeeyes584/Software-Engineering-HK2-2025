@@ -9,7 +9,12 @@
     "language": "Language",
     "submitting": "Submitting...",
     "cancel": "Cancel",
-    "delete": "Delete"
+    "delete": "Delete",
+    "sortBy": "Sort by",
+    "newest": "Newest",
+    "oldest": "Oldest",
+    "paginationPrevious": "Previous",
+    "paginationNext": "Next"
   },
   "home": {
     "hero": {
@@ -263,7 +268,10 @@
   },
   "search": {
     "placeholder": "Where do you want to go?",
-    "button": "Search"
+    "button": "Search",
+    "showing": "Showing",
+    "of": "of",
+    "tours": "tours"
   },
   "filters": {
     "title": "Filters",
@@ -346,7 +354,18 @@
     "note": "Note",
     "notePlaceholder": "Additional notes (if any)",
     "submit": "Book Tour",
-    "submitting": "Submitting..."
+    "submitting": "Submitting...",
+    "yourBookingsTitle": "Your Bookings",
+    "yourBookingsDesc": "View and manage your travel bookings",
+    "bookingId": "Booking ID",
+    "departure": "Departure",
+    "return": "Return",
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
   },
   "admin": {
     "dashboard": "Dashboard",
@@ -463,5 +482,30 @@
   },
   "tourCard": {
     "viewDetails": "View Details"
+  },
+  "bookingDetailModal": {
+    "title": "Booking Details",
+    "bookingId": "Booking ID",
+    "departure": "Departure Date",
+    "return": "Return Date",
+    "duration": "Duration",
+    "status": "Status",
+    "total": "Total",
+    "adults": "Adults",
+    "children": "Children",
+    "infants": "Infants",
+    "note": "Note",
+    "transportation": "Transportation",
+    "class": "Class",
+    "close": "Close"
+  },
+  "sort": {
+    "recommended": "Recommended",
+    "priceLowToHigh": "Price: Low to High",
+    "priceHighToLow": "Price: High to Low",
+    "highestRated": "Highest Rated",
+    "durationShortToLong": "Duration: Short to Long",
+    "durationLongToShort": "Duration: Long to Short",
+    "alphabetical": "Alphabetical"
   }
 } 

@@ -16,6 +16,7 @@ import { useOptimizedTourFilters, type TourUI } from "@/hooks/use-optimized-tour
 import { toast } from "sonner"
 import { useAuth, useUser } from "@clerk/nextjs"
 import TourCard from "@/components/tour-card"
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from "@/components/ui/pagination"
 
 export default function ToursPage() {
   const { t } = useLanguage()
@@ -25,6 +26,8 @@ export default function ToursPage() {
   const [savedTourIds, setSavedTourIds] = useState<string[]>([])
   const { getToken } = useAuth()
   const { user } = useUser()
+  const [currentPage, setCurrentPage] = useState(1);
+  const TOURS_PER_PAGE = 6;
 
   useEffect(() => {
     fetch("http://localhost:5000/api/tours")
@@ -78,6 +81,9 @@ export default function ToursPage() {
     addToSearchHistory,
     getPopularSearches,
   } = useOptimizedTourFilters(allTours as any)
+
+  const totalPages = Math.ceil(filteredTours.length / TOURS_PER_PAGE);
+  const paginatedTours = filteredTours.slice((currentPage - 1) * TOURS_PER_PAGE, currentPage * TOURS_PER_PAGE);
 
   const popularSearches = getPopularSearches()
 
@@ -210,39 +216,75 @@ export default function ToursPage() {
           </div>
 
           {filteredTours.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {(filteredTours as TourUI[]).map((tour) => {
-                const id = String(tour._id || tour.id || "");
-                const images = Array.isArray(tour.images) && tour.images.length > 0
-                  ? tour.images
-                  : (tour.image ? [tour.image] : ["/placeholder.svg"]);
-                const durationStr = typeof tour.duration === "string"
-                  ? tour.duration
-                  : (typeof tour.duration === "number"
-                    ? `${tour.duration} ngày`
-                    : (typeof tour.days === "number" ? `${tour.days} ngày` : ""));
-                return (
-                  <TourCard
-                    key={id}
-                    id={id}
-                    name={tour.name || tour.title || ""}
-                    destination={tour.destination || tour.location || ""}
-                    price={tour.price ?? 0}
-                    averageRating={typeof tour.averageRating === "number" && !isNaN(tour.averageRating)
-                      ? tour.averageRating
-                      : (typeof tour.rating === "number" && !isNaN(tour.rating) ? tour.rating : 0)}
-                    reviewCount={tour.reviewCount ?? 0}
-                    images={images}
-                    duration={durationStr}
-                    currentIndex={0}
-                    isSaved={savedTourIds.map(String).includes(id)}
-                    onPrev={() => {}}
-                    onNext={() => {}}
-                    onViewDetail={() => window.location.href = `/tours/${id}`}
-                  />
-                );
-              })}
-            </div>
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {paginatedTours.map((tour) => {
+                  const tItem = tour as any;
+                  const id = String(tItem._id || tItem.id || "");
+                  const images = Array.isArray(tItem.images) && tItem.images.length > 0
+                    ? tItem.images
+                    : (tItem.image ? [tItem.image] : ["/placeholder.svg"]);
+                  const durationStr = typeof tItem.duration === "string"
+                    ? tItem.duration
+                    : (typeof tItem.duration === "number"
+                      ? `${tItem.duration} ngày`
+                      : (typeof tItem.days === "number" ? `${tItem.days} ngày` : ""));
+                  return (
+                    <TourCard
+                      key={id}
+                      id={id}
+                      name={tItem.name || tItem.title || ""}
+                      destination={tItem.destination || tItem.location || ""}
+                      price={tItem.price ?? 0}
+                      averageRating={typeof tItem.averageRating === "number" && !isNaN(tItem.averageRating)
+                        ? tItem.averageRating
+                        : (typeof tItem.rating === "number" && !isNaN(tItem.rating) ? tItem.rating : 0)}
+                      reviewCount={tItem.reviewCount ?? 0}
+                      images={images}
+                      duration={durationStr}
+                      currentIndex={0}
+                      isSaved={savedTourIds.map(String).includes(id)}
+                      onPrev={() => {}}
+                      onNext={() => {}}
+                      onViewDetail={() => window.location.href = `/tours/${id}`}
+                    />
+                  );
+                })}
+              </div>
+              <Pagination className="mt-6">
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      href="#"
+                      onClick={e => { e.preventDefault(); setCurrentPage(p => Math.max(1, p - 1)) }}
+                      aria-disabled={currentPage === 1}
+                    >
+                      {t('common.paginationPrevious')}
+                    </PaginationPrevious>
+                  </PaginationItem>
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <PaginationItem key={i}>
+                      <PaginationLink
+                        href="#"
+                        isActive={currentPage === i + 1}
+                        onClick={e => { e.preventDefault(); setCurrentPage(i + 1) }}
+                      >
+                        {i + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  <PaginationItem>
+                    <PaginationNext
+                      href="#"
+                      onClick={e => { e.preventDefault(); setCurrentPage(p => Math.min(totalPages, p + 1)) }}
+                      aria-disabled={currentPage === totalPages}
+                    >
+                      {t('common.paginationNext')}
+                    </PaginationNext>
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </>
           ) : (
               <div className="space-y-4">
                 <div className="text-muted-foreground">

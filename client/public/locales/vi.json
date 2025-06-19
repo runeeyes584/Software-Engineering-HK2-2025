@@ -9,7 +9,12 @@
     "language": "Ngôn ngữ",
     "submitting": "Đang gửi...",
     "cancel": "Hủy",
-    "delete": "Xóa"
+    "delete": "Xóa",
+    "sortBy": "Sắp xếp theo",
+    "newest": "Mới nhất",
+    "oldest": "Cũ nhất",
+    "paginationPrevious": "Trước",
+    "paginationNext": "Sau"
   },
   "home": {
     "hero": {
@@ -265,7 +270,10 @@
   },
   "search": {
     "placeholder": "Bạn muốn đi đâu?",
-    "button": "Tìm kiếm"
+    "button": "Tìm kiếm",
+    "showing": "Hiển thị",
+    "of": "trong tổng số",
+    "tours": "tour"
   },
   "filters": {
     "title": "Bộ lọc",
@@ -350,7 +358,18 @@
     "note": "Ghi chú",
     "notePlaceholder": "Ghi chú thêm (nếu có)",
     "submit": "Đặt tour",
-    "submitting": "Đang gửi..."
+    "submitting": "Đang gửi...",
+    "yourBookingsTitle": "Đơn đặt tour của bạn",
+    "yourBookingsDesc": "Xem và quản lý các đơn đặt tour của bạn",
+    "bookingId": "Mã đơn đặt tour",
+    "departure": "Ngày đi",
+    "return": "Ngày về",
+    "status": {
+      "pending": "Chờ xác nhận",
+      "confirmed": "Đã xác nhận",
+      "completed": "Hoàn thành",
+      "cancelled": "Đã hủy"
+    }
   },
   "admin": {
     "dashboard": "Bảng điều khiển",
@@ -467,5 +486,30 @@
   },
   "tourCard": {
     "viewDetails": "Xem chi tiết"
+  },
+  "bookingDetailModal": {
+    "title": "Chi tiết đơn đặt tour",
+    "bookingId": "Mã đơn đặt tour",
+    "departure": "Ngày đi",
+    "return": "Ngày về",
+    "duration": "Số ngày",
+    "status": "Trạng thái",
+    "total": "Tổng cộng",
+    "adults": "Người lớn",
+    "children": "Trẻ em",
+    "infants": "Em bé",
+    "note": "Ghi chú",
+    "transportation": "Phương tiện",
+    "class": "Hạng vé",
+    "close": "Đóng"
+  },
+  "sort": {
+    "recommended": "Gợi ý",
+    "priceLowToHigh": "Giá tăng dần",
+    "priceHighToLow": "Giá giảm dần",
+    "highestRated": "Đánh giá cao nhất",
+    "durationShortToLong": "Thời gian: ngắn đến dài",
+    "durationLongToShort": "Thời gian: dài đến ngắn",
+    "alphabetical": "Theo bảng chữ cái"
   }
 } 
