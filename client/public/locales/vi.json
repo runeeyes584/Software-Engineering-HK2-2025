@@ -336,25 +336,21 @@
     "uploadFile": "Tải lên tệp",
     "updated": "Cập nhật đánh giá thành công!",
     "deleted": "Xóa đánh giá thành công!",
-    "deleteConfirm": "Bạn có chắc muốn xóa đánh giá này không?"
+    "deleteConfirm": "Bạn có chắc muốn xóa đánh giá này không?",
+    "noReviews": "Chưa có đánh giá nào. Hãy là người đầu tiên đánh giá!"
   },
   "booking": {
-    "title": "Đặt Tour",
-    "personalInfo": "Thông tin cá nhân",
-    "paymentInfo": "Thông tin thanh toán",
-    "confirm": "Xác nhận đặt tour",
-    "success": "Đặt tour thành công",
-    "departure": "Ngày đi",
-    "return": "Ngày về",
-    "status": {
-      "pending": "Chờ xác nhận",
-      "confirmed": "Đã xác nhận",
-      "completed": "Hoàn thành",
-      "cancelled": "Đã hủy"
-    },
-    "yourBookingsTitle": "Đơn đặt tour của bạn",
-    "yourBookingsDesc": "Xem và quản lý các đơn đặt tour của bạn",
-    "bookingId": "Mã đơn đặt tour"
+    "title": "Đặt tour",
+    "name": "Họ tên",
+    "namePlaceholder": "Nhập họ tên",
+    "phone": "Số điện thoại",
+    "phonePlaceholder": "Nhập số điện thoại",
+    "email": "Email",
+    "emailPlaceholder": "Nhập email (không bắt buộc)",
+    "note": "Ghi chú",
+    "notePlaceholder": "Ghi chú thêm (nếu có)",
+    "submit": "Đặt tour",
+    "submitting": "Đang gửi..."
   },
   "admin": {
     "dashboard": "Bảng điều khiển",

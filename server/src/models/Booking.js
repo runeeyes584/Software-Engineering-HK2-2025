@@ -11,6 +11,9 @@ const bookingSchema = new mongoose.Schema({
   review: { type: mongoose.Schema.Types.ObjectId, ref: 'Review' },
   bookingDate: { type: Date, default: Date.now },
   note: { type: String },
+  name: { type: String },
+  phone: { type: String },
+  email: { type: String },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Booking', bookingSchema); 

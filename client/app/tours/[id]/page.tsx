@@ -19,6 +19,7 @@ import { toast } from "sonner"
 import { ReviewForm } from "@/components/review-form"
 import { useAuth, useUser } from "@clerk/nextjs"
 import SaveButton from "@/components/save-button"
+import { ModalBooking } from "@/components/modal-booking"
 
 export default function TourDetailPage() {
   const { t } = useLanguage()
@@ -48,6 +49,7 @@ export default function TourDetailPage() {
   const [isSaved, setIsSaved] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [lastManualChangeTime, setLastManualChangeTime] = useState(0);
+  const [showBookingModal, setShowBookingModal] = useState(false)
 
   useEffect(() => {
     const fetchTourData = async () => {
@@ -264,15 +266,11 @@ export default function TourDetailPage() {
       toast.error(t("tour.selectDepartureDateRequired"))
       return
     }
-
     if (!returnDate && tour.duration > 1) {
       toast.error(t("tour.selectDepartureDateRequired"))
       return
     }
-
-    router.push(
-      `/booking?tourId=${tour.id}&departureDate=${format(departureDate, "yyyy-MM-dd")}&returnDate=${returnDate ? format(returnDate, "yyyy-MM-dd") : ""}&transportType=${transportType}&ticketClass=${ticketClass}&adults=${adults}&children=${children}&infants=${infants}&totalPrice=${totalPrice}`,
-    )
+    setShowBookingModal(true)
   }
 
   const TransportIcon = getSelectedTransport().icon
@@ -702,8 +700,12 @@ export default function TourDetailPage() {
                 </div>
 
                 {/* Book Button */}
-                <Button className="w-full h-12 text-base font-medium" onClick={handleBookNow}>
-                  {t("tour.bookNow")}
+                <Button
+                  onClick={handleBookNow}
+                  className="w-full h-12 text-lg font-bold"
+                  disabled={isLoading}
+                >
+                  {t("tour.bookNow") || "Book Now"}
                 </Button>
 
                 <p className="text-xs text-center text-muted-foreground">{t("tour.wontBeCharged")}</p>
@@ -727,6 +729,20 @@ export default function TourDetailPage() {
           bookingLoading={bookingLoading}
         />
       </div>
+
+      <ModalBooking
+        open={showBookingModal}
+        onOpenChange={setShowBookingModal}
+        tourId={String(tour.id || "")}
+        departureDate={departureDate ? format(departureDate, "yyyy-MM-dd") : ""}
+        returnDate={returnDate ? format(returnDate, "yyyy-MM-dd") : undefined}
+        transportType={transportType}
+        ticketClass={ticketClass}
+        adults={adults}
+        children={children}
+        infants={infants}
+        totalPrice={totalPrice}
+      />
     </div>
   )
 }

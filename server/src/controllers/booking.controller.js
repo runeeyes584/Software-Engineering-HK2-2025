@@ -67,7 +67,8 @@ const createBooking = async (req, res) => {
     // Nhận các trường cần thiết từ FE (không nhận user)
     const {
       tour, guests, totalPrice, note,
-      departureDate, returnDate, transportType, ticketClass, adults, children, infants
+      departureDate, returnDate, transportType, ticketClass, adults, children, infants,
+      name, phone, email
     } = req.body;
 
     // Lấy user MongoDB từ middleware
@@ -79,6 +80,9 @@ const createBooking = async (req, res) => {
       guests,
       totalPrice,
       note,
+      name,
+      phone,
+      email,
       departureDate,
       returnDate,
       transportType,

@@ -20,6 +20,9 @@ export default function BookingPage() {
   const { user } = useUser()
 
   const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    email: "",
     note: "",
   })
 
@@ -41,7 +44,7 @@ export default function BookingPage() {
   const totalPrice = Number(searchParams.get("totalPrice")) || 0
 
   // Kiểm tra các trường bắt buộc
-  const isBookingReady = !!(user?.id && tourId && guests > 0 && totalPrice > 0)
+  const isBookingReady = !!(user?.id && tourId && guests > 0 && totalPrice > 0 && formData.name.trim() && formData.phone.trim())
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -51,7 +54,7 @@ export default function BookingPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!isBookingReady) {
-      alert("Thiếu thông tin bắt buộc: user, tour, số khách, tổng tiền!")
+      alert("Thiếu thông tin bắt buộc: user, tour, số khách, tổng tiền, họ tên, số điện thoại!")
       return
     }
     setIsLoading(true)
@@ -69,6 +72,9 @@ export default function BookingPage() {
           tour: tourId,
           guests,
           totalPrice,
+          name: formData.name,
+          phone: formData.phone,
+          email: formData.email,
           note: formData.note,
           departureDate,
           returnDate,
@@ -95,6 +101,18 @@ export default function BookingPage() {
       <Card>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-6 py-8">
+            <div className="space-y-2">
+              <Label htmlFor="name">Họ tên <span className="text-red-500">*</span></Label>
+              <Input id="name" name="name" value={formData.name} onChange={handleChange} placeholder="Nhập họ tên" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">Số điện thoại <span className="text-red-500">*</span></Label>
+              <Input id="phone" name="phone" value={formData.phone} onChange={handleChange} placeholder="Nhập số điện thoại" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" name="email" value={formData.email} onChange={handleChange} placeholder="Nhập email (không bắt buộc)" type="email" />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="note">Ghi chú</Label>
               <Textarea id="note" name="note" value={formData.note} onChange={handleChange} placeholder="Ghi chú thêm (nếu có)" />
