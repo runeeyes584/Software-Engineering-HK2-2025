@@ -108,7 +108,7 @@
       "title": "Đối Tác",
       "description": "Chúng tôi hợp tác với các đối tác đáng tin cậy trên toàn thế giới để mang đến những trải nghiệm du lịch tốt nhất."
     },
-    "cta": {
+    "cta2": {
       "title": "Tham Gia Hành Trình",
       "description": "Trở thành một phần của cộng đồng du lịch đang phát triển của chúng tôi",
       "button": "Khám Phá Tour"
@@ -350,6 +350,7 @@
   "booking": {
     "title": "Đặt tour",
     "name": "Họ tên",
+    "noBookings": "Bạn chưa đặt tour nào.",
     "namePlaceholder": "Nhập họ tên",
     "phone": "Số điện thoại",
     "phonePlaceholder": "Nhập số điện thoại",
@@ -364,6 +365,11 @@
     "bookingId": "Mã đơn đặt tour",
     "departure": "Ngày đi",
     "return": "Ngày về",
+    "bookings_of": "Đơn đặt tour của bạn",
+    "manage": "Quản lý",
+    "sort_by": "Sắp xếp theo",
+    "newest": "Mới nhất",
+    "oldest": "Cũ nhất",
     "status": {
       "pending": "Chờ xác nhận",
       "confirmed": "Đã xác nhận",

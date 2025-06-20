@@ -34,6 +34,12 @@
   },
   "about": {
     "title": "About Us",
+    "role":{
+      "ceo": "Chief Executive Officer",
+      "operations": "Operations Manager",
+      "consultant": "Travel Consultant",
+      "marketing": "Marketing Lead"
+    },
     "subtitle": "Your Trusted Travel Partner",
     "mission": {
       "title": "Our Mission",
@@ -120,7 +126,7 @@
       "title": "Our Partners",
       "description": "We work with trusted partners worldwide to provide the best travel experiences."
     },
-    "cta": {
+    "cta2": {
       "title": "Join Our Journey",
       "description": "Be part of our growing community of travelers",
       "button": "Explore Tours"
@@ -346,6 +352,7 @@
   "booking": {
     "title": "Book Tour",
     "name": "Full Name",
+    "noBookings": "You haven't made any bookings yet.",
     "namePlaceholder": "Enter your full name",
     "phone": "Phone Number",
     "phonePlaceholder": "Enter your phone number",
@@ -360,6 +367,11 @@
     "bookingId": "Booking ID",
     "departure": "Departure",
     "return": "Return",
+    "bookings_of": "Your Bookings",
+    "manage": "Manage",
+    "sort_by": "Sort by",
+    "newest": "Newest", 
+    "oldest": "Oldest",
     "status": {
       "pending": "Pending",
       "confirmed": "Confirmed",

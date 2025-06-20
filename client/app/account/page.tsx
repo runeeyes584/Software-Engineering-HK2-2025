@@ -650,7 +650,7 @@ export default function AccountPage() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="desc">{t('booking.newest')}</SelectItem>
-                        <SelectItem value="asc">Cũ nhất</SelectItem>
+                        <SelectItem value="asc">{t('booking.oldest')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -662,7 +662,7 @@ export default function AccountPage() {
                     <Alert>
                       <AlertCircle className="h-4 w-4" />
                       <AlertDescription>
-                        You haven't made any bookings yet.
+                        {t('booking.noBookings')}
                       </AlertDescription>
                     </Alert>
                   ) : (

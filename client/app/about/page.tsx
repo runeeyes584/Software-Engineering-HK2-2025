@@ -59,7 +59,7 @@ export default function AboutPage() {
 
       {/* Hero Section */}
       <div className="relative h-[400px] rounded-lg overflow-hidden mb-12">
-        <Image src="/images/HALH.jpg" alt="Our team exploring" fill className="object-cover" />
+        <Image src="https://images.unsplash.com/photo-1496950866446-3253e1470e8e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Our team exploring" fill className="object-cover" />
         <div className="absolute inset-0 bg-black/40 flex items-center">
           <div className="text-white p-8 max-w-2xl">
             <h2 className="text-3xl font-bold mb-4">{t("about.ourStory")}</h2>
@@ -145,11 +145,11 @@ export default function AboutPage() {
 
       {/* CTA */}
       <div className="bg-primary text-primary-foreground rounded-lg p-8 text-center">
-        <h2 className="text-2xl font-bold mb-4">{t("about.cta")}</h2>
-        <p className="max-w-2xl mx-auto mb-6">{t("about.ctaText")}</p>
+        <h2 className="text-2xl font-bold mb-4">{t("about.cta2.title")}</h2>
+        <p className="max-w-2xl mx-auto mb-6">{t("about.cta2.description")}</p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button size="lg" variant="secondary" asChild>
-            <Link href="/tours">{t("nav.tours")}</Link>
+            <Link href="/tours">{t("about.cta2.button")}</Link>
           </Button>
           <Button
             size="lg"

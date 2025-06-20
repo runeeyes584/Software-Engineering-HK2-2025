@@ -146,13 +146,16 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="relative h-[600px] flex items-center justify-center -mx-4 sm:-mx-6 lg:-mx-8">
         <div className="absolute inset-0 z-0">
-          <Image
-            src="/placeholder.svg?height=600&width=1200"
-            alt="Beautiful travel destination"
-            fill
-            className="object-cover"
-            priority
-          />
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover absolute inset-0"
+          >
+            <source src="https://res.cloudinary.com/kaleidoscop3/video/upload/v1750404464/Banner_y6ni7v.mp4" type="video/mp4" />
+            Trình duyệt của bạn không hỗ trợ video.
+          </video>
           <div className="absolute inset-0 bg-black/40" />
         </div>
 
