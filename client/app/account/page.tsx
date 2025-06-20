@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useLanguage } from "@/components/language-provider-fixed"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -19,8 +19,9 @@ import { toast } from "sonner"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { provinces, districts, wards } from "@/lib/vietnam-administrative-divisions"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose, DialogFooter } from "@/components/ui/dialog"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from "@/components/ui/pagination"
+import BookingDetailModal from "@/components/admin/bookings/BookingDetailModal"
 
 export default function AccountPage() {
   const { t } = useLanguage()
@@ -49,6 +50,8 @@ export default function AccountPage() {
 
   const [selectedBooking, setSelectedBooking] = useState<any | null>(null)
   const [showModal, setShowModal] = useState(false)
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false)
+  const [bookingToCancel, setBookingToCancel] = useState<any | null>(null)
 
   // Thêm state cho filter và phân trang
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc')
@@ -121,11 +124,10 @@ export default function AccountPage() {
       setLoadingBookings(true);
       try {
         const token = await getToken();
-        const res = await fetch("http://localhost:5000/api/bookings", {
+        const res = await fetch(`http://localhost:5000/api/bookings/user/clerk/${user.id}`, {
           headers: {
             "Authorization": `Bearer ${token}`,
           },
-          credentials: "include",
         });
         if (res.ok) {
           const data = await res.json();
@@ -260,16 +262,16 @@ export default function AccountPage() {
   };
 
   const isProfileChanged = () => {
-    if (!originalProfile) return false;
-    return (
-      userPhone !== originalProfile.phone ||
-      gender !== originalProfile.gender ||
-      JSON.stringify(dateOfBirth) !== JSON.stringify(originalProfile.dateOfBirth) ||
-      province !== originalProfile.province ||
-      district !== originalProfile.district ||
-      ward !== originalProfile.ward ||
-      detailedAddress !== originalProfile.detailedAddress
-    );
+    const currentProfile = {
+      phone: userPhone,
+      gender: gender,
+      dateOfBirth: dateOfBirth,
+      province: province,
+      district: district,
+      ward: ward,
+      detailedAddress: detailedAddress,
+    };
+    return JSON.stringify(currentProfile) !== JSON.stringify(originalProfile);
   };
 
   // Hàm fetch chi tiết 1 tour
@@ -291,6 +293,82 @@ export default function AccountPage() {
   })
   const totalPages = Math.ceil(sortedBookings.length / bookingsPerPage)
   const paginatedBookings = sortedBookings.slice((currentPage - 1) * bookingsPerPage, currentPage * bookingsPerPage)
+
+  const handleViewDetails = (booking: any) => {
+    setSelectedBooking(booking)
+    setShowModal(true)
+  }
+
+  const handleOpenCancelDialog = (booking: any) => {
+    setBookingToCancel(booking)
+    setShowCancelConfirm(true)
+  }
+
+  const handleCancelBooking = async () => {
+    if (!bookingToCancel) return;
+
+    try {
+      const token = await getToken();
+      const res = await fetch(`http://localhost:5000/api/bookings/${bookingToCancel._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: 'cancelled' }),
+      });
+
+      if (res.ok) {
+        toast.success(t('cancel_booking_success'));
+        // Cập nhật lại state của booking trong list
+        setBookings(prevBookings =>
+          prevBookings.map(b =>
+            b._id === bookingToCancel._id ? { ...b, status: 'cancelled' } : b
+          )
+        );
+      } else {
+        const errorData = await res.json();
+        toast.error(`${t('cancel_booking_error')}: ${errorData.message}`);
+      }
+    } catch (error) {
+      toast.error(t('cancel_booking_error'));
+      console.error('Error cancelling booking:', error);
+    } finally {
+      // Đóng dialog xác nhận
+      setShowCancelConfirm(false);
+      setBookingToCancel(null);
+    }
+  };
+
+  const getStatusStyle = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "confirmed":
+        return "bg-green-100 text-green-800 border border-green-200"
+      case "pending":
+        return "bg-yellow-100 text-yellow-800 border border-yellow-200"
+      case "completed":
+        return "bg-blue-100 text-blue-800 border border-blue-200"
+      case "cancelled":
+        return "bg-red-100 text-red-800 border border-red-200"
+      default:
+        return "bg-gray-100 text-gray-800 border border-gray-200"
+    }
+  }
+
+  const getStatusText = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "confirmed":
+        return t('confirmed')
+      case "pending":
+        return t('pending')
+      case "completed":
+        return t('completed')
+      case "cancelled":
+        return t('cancelled')
+      default:
+        return status
+    }
+  }
 
   return (
     <div className="container w-full px-10 py-10">
@@ -561,18 +639,18 @@ export default function AccountPage() {
               <Card>
                 <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div>
-                    <CardTitle className="text-2xl">{t('booking.yourBookingsTitle')}</CardTitle>
-                    <CardDescription>{t('booking.yourBookingsDesc')}</CardDescription>
+                    <CardTitle className="text-2xl">{t('booking.bookings_of')}</CardTitle>
+                    <CardDescription>{t('booking.manage')}</CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">{t('common.sortBy') || 'Sort by'}:</span>
-                    <Select value={sortOrder} onValueChange={v => { setSortOrder(v as 'desc' | 'asc'); setCurrentPage(1); }}>
-                      <SelectTrigger className="w-[140px]">
-                        <SelectValue />
+                    <Label htmlFor="sort-bookings" className="text-sm font-medium">{t('booking.sort_by')}:</Label>
+                    <Select value={sortOrder} onValueChange={(value) => setSortOrder(value as 'desc' | 'asc')}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder={t('booking.newest')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="desc">{t('common.newest') || 'Newest'}</SelectItem>
-                        <SelectItem value="asc">{t('common.oldest') || 'Oldest'}</SelectItem>
+                        <SelectItem value="desc">{t('booking.newest')}</SelectItem>
+                        <SelectItem value="asc">Cũ nhất</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -589,129 +667,100 @@ export default function AccountPage() {
                     </Alert>
                   ) : (
                     <div className="space-y-4">
-                      {paginatedBookings.map((booking) => {
-                        const depStr = booking.departureDate ? new Date(booking.departureDate).toLocaleDateString('vi-VN') : '';
-                        const retStr = booking.returnDate ? new Date(booking.returnDate).toLocaleDateString('vi-VN') : '';
-                        const tourId = booking.tour?._id || booking.tour?.id || booking.tour;
-                        return (
-                          <Card
-                            key={booking._id}
-                            className="mb-6 border-2 border-gray-300 shadow-md transition-shadow rounded-2xl cursor-pointer group hover:border-primary hover:shadow-lg"
-                            onClick={() => {
-                              if (tourId) router.push(`/tours/${tourId}`)
-                            }}
-                          >
-                            <CardContent className="p-6">
-                              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
-                                <div
-                                  className="font-bold text-lg md:text-xl text-foreground group-hover:text-primary transition-colors"
-                                  onClick={e => { e.stopPropagation(); if (tourId) router.push(`/tours/${tourId}`) }}
-                                  style={{ cursor: 'pointer' }}
-                                >
-                                  {booking.tour?.name || "Tour"}
-                                </div>
-                                <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-6 min-w-[180px] md:min-w-[220px] md:justify-end">
-                                  <div className="text-2xl font-bold text-primary">${booking.totalPrice?.toFixed(2) || "0.00"}</div>
-                                  <span
-                                    className={
-                                      "inline-block px-3 py-1 rounded-full text-xs font-bold shadow-sm border " +
-                                      (
-                                        booking.status?.toLowerCase() === "pending"
-                                          ? "bg-yellow-100 text-yellow-800 border-yellow-200"
-                                          : booking.status?.toLowerCase() === "confirmed"
-                                          ? "bg-green-100 text-green-800 border-green-200"
-                                          : booking.status?.toLowerCase() === "completed"
-                                          ? "bg-purple-100 text-purple-800 border-purple-200"
-                                          : booking.status?.toLowerCase() === "cancelled"
-                                          ? "bg-red-100 text-red-800 border-red-200"
-                                          : "bg-gray-100 text-gray-800 border-gray-200"
-                                      )
-                                    }
-                                  >
-                                    {(() => {
-                                      const key = `booking.status.${(booking.status || '').toLowerCase()}`;
-                                      const translated = t(key);
-                                      return translated !== key ? translated : (booking.status || '');
-                                    })()}
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="flex flex-wrap items-center gap-4 text-muted-foreground text-sm mb-2">
-                                <div className="flex items-center gap-1">
-                                  <CalendarIcon className="w-4 h-4" />
-                                  <span className="font-medium text-foreground">
-                                    {t('booking.departure')}: {depStr || '--'}
-                                  </span>
-                                </div>
-                                {retStr && (
-                                  <div className="flex items-center gap-1">
-                                    <CalendarIcon className="w-4 h-4" />
-                                    <span className="font-medium text-foreground">
-                                      {t('booking.return')}: {retStr}
-                                    </span>
+                      <div className="flex flex-col space-y-4">
+                        {paginatedBookings.length > 0 ? (
+                          paginatedBookings.map((booking) => (
+                            <Card key={booking._id} className={cn("transition-shadow hover:shadow-md", booking.status === 'cancelled' && 'bg-gray-50')}>
+                              <CardContent className="p-6">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                                  <div className="md:col-span-2">
+                                    <h3 className="font-semibold text-lg">{booking.tour.name}</h3>
+                                    <p className="text-sm text-muted-foreground mt-1">
+                                      <span>
+                                        <CalendarIcon className="inline-block w-4 h-4 mr-1.5" />
+                                        Ngày đi: {booking.departureDate && (typeof booking.departureDate === 'string' || booking.departureDate instanceof Date)
+                                          ? (() => { try { return new Date(booking.departureDate).toLocaleDateString(); } catch { return '--'; } })()
+                                          : '--'}
+                                        &nbsp;-&nbsp;
+                                        Ngày về: {booking.returnDate && (typeof booking.returnDate === 'string' || booking.returnDate instanceof Date)
+                                          ? (() => { try { return new Date(booking.returnDate).toLocaleDateString(); } catch { return '--'; } })()
+                                          : '--'}
+                                        &nbsp;&nbsp;•&nbsp;&nbsp; {booking.tour.duration} ngày
+                                      </span>
+                                    </p>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      Mã đặt tour: {booking._id}
+                                    </p>
                                   </div>
-                                )}
-                                {booking.tour?.duration && (
-                                  <span className="ml-2">• {t('tours.duration', { value: booking.tour.duration })}</span>
-                                )}
-                              </div>
-                              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                                <div className="text-xs text-muted-foreground mb-1 md:mb-0">
-                                  {t('booking.bookingId')}: {booking.bookingCode || booking._id}
+                                  <div className="flex flex-col items-start md:items-end">
+                                    <div className="flex items-center gap-4 w-full md:w-auto">
+                                      <span className="text-xl font-bold">{formatPrice(booking.totalPrice)}</span>
+                                      <span className={cn("px-2.5 py-1 text-xs font-medium rounded-full", getStatusStyle(booking.status))}>
+                                        {getStatusText(booking.status)}
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center mt-2 space-x-2">
+                                      {booking.status === 'pending' && (
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          onClick={() => handleOpenCancelDialog(booking)}
+                                          className="text-red-600 border-red-500 hover:bg-red-50 hover:text-red-700"
+                                        >
+                                          <XCircle className="w-4 h-4 mr-1.5" />
+                                          Hủy đặt
+                                        </Button>
+                                      )}
+                                      <Button variant="outline" size="sm" onClick={() => handleViewDetails(booking)}>
+                                        Xem chi tiết <ArrowRight className="w-4 h-4 ml-1.5" />
+                                      </Button>
+                                    </div>
+                                  </div>
                                 </div>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="mt-2 md:mt-0 md:w-auto w-full font-semibold shadow-sm"
-                                  onClick={e => {
-                                    e.stopPropagation();
-                                    setSelectedBooking(booking);
-                                    setShowModal(true);
-                                  }}
-                                >
-                                  {t("tourCard.viewDetails")}
-                                  <ArrowRight className="w-4 h-4 ml-1" />
-                                </Button>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        );
-                      })}
+                              </CardContent>
+                            </Card>
+                          ))
+                        ) : (
+                          <div className="text-center py-12">
+                            <p className="text-muted-foreground">Bạn chưa đặt tour nào.</p>
+                          </div>
+                        )}
+                      </div>
+                      <Pagination className="mt-6">
+                        <PaginationContent>
+                          <PaginationItem>
+                            <PaginationPrevious
+                              href="#"
+                              onClick={e => { e.preventDefault(); setCurrentPage(p => Math.max(1, p - 1)) }}
+                              aria-disabled={currentPage === 1}
+                            >
+                              {t('common.paginationPrevious')}
+                            </PaginationPrevious>
+                          </PaginationItem>
+                          {Array.from({ length: totalPages }, (_, i) => (
+                            <PaginationItem key={i}>
+                              <PaginationLink
+                                href="#"
+                                isActive={currentPage === i + 1}
+                                onClick={e => { e.preventDefault(); setCurrentPage(i + 1) }}
+                              >
+                                {i + 1}
+                              </PaginationLink>
+                            </PaginationItem>
+                          ))}
+                          <PaginationItem>
+                            <PaginationNext
+                              href="#"
+                              onClick={e => { e.preventDefault(); setCurrentPage(p => Math.min(totalPages, p + 1)) }}
+                              aria-disabled={currentPage === totalPages}
+                            >
+                              {t('common.paginationNext')}
+                            </PaginationNext>
+                          </PaginationItem>
+                        </PaginationContent>
+                      </Pagination>
                     </div>
                   )}
-                  <Pagination className="mt-6">
-                    <PaginationContent>
-                      <PaginationItem>
-                        <PaginationPrevious
-                          href="#"
-                          onClick={e => { e.preventDefault(); setCurrentPage(p => Math.max(1, p - 1)) }}
-                          aria-disabled={currentPage === 1}
-                        >
-                          {t('common.paginationPrevious')}
-                        </PaginationPrevious>
-                      </PaginationItem>
-                      {Array.from({ length: totalPages }, (_, i) => (
-                        <PaginationItem key={i}>
-                          <PaginationLink
-                            href="#"
-                            isActive={currentPage === i + 1}
-                            onClick={e => { e.preventDefault(); setCurrentPage(i + 1) }}
-                          >
-                            {i + 1}
-                          </PaginationLink>
-                        </PaginationItem>
-                      ))}
-                      <PaginationItem>
-                        <PaginationNext
-                          href="#"
-                          onClick={e => { e.preventDefault(); setCurrentPage(p => Math.min(totalPages, p + 1)) }}
-                          aria-disabled={currentPage === totalPages}
-                        >
-                          {t('common.paginationNext')}
-                        </PaginationNext>
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -848,95 +897,29 @@ export default function AccountPage() {
           </Tabs>
         </main>
       </div>
-      <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="max-w-lg w-full rounded-xl p-6 shadow-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold mb-1">{selectedBooking?.tour?.name || t('bookingDetailModal.title')}</DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground mb-2">
-              {t('bookingDetailModal.bookingId')}: {selectedBooking?.bookingCode || selectedBooking?._id}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 text-base">
-            <div className="flex items-center gap-2">
-              <CalendarIcon className="w-5 h-5 text-primary" />
-              <span className="font-medium">{t('bookingDetailModal.departure')}:</span>
-              <span>{selectedBooking?.departureDate ? new Date(selectedBooking.departureDate).toLocaleDateString('vi-VN') : '--'}</span>
-            </div>
-            {selectedBooking?.returnDate && (
-              <div className="flex items-center gap-2">
-                <CalendarIcon className="w-5 h-5 text-primary" />
-                <span className="font-medium">{t('bookingDetailModal.return')}:</span>
-                <span>{new Date(selectedBooking.returnDate).toLocaleDateString('vi-VN')}</span>
-              </div>
-            )}
-            {selectedBooking?.tour?.duration && (
-              <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-primary" />
-                <span className="font-medium">{t('bookingDetailModal.duration')}</span>
-                <span>{selectedBooking.tour.duration} {t('tour.days')}</span>
-              </div>
-            )}
-            <div className="flex items-center gap-2">
-              <BadgeCheck className="w-5 h-5 text-primary" />
-              <span className="font-medium">{t('bookingDetailModal.status')}</span>
-              <span className={
-                'ml-2 px-3 py-1 rounded-full text-xs font-bold ' +
-                (selectedBooking?.status?.toLowerCase() === 'pending'
-                  ? 'bg-yellow-100 text-yellow-800'
-                  : selectedBooking?.status?.toLowerCase() === 'confirmed'
-                  ? 'bg-green-100 text-green-800'
-                  : selectedBooking?.status?.toLowerCase() === 'completed'
-                  ? 'bg-purple-100 text-purple-800'
-                  : selectedBooking?.status?.toLowerCase() === 'cancelled'
-                  ? 'bg-red-100 text-red-800'
-                  : 'bg-gray-100 text-gray-800')
-              }>
-                {t('booking.status.' + selectedBooking?.status?.toLowerCase())}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-primary" />
-              <span className="font-medium">{t('bookingDetailModal.total')}:</span>
-              <span className="font-bold text-primary text-lg">${selectedBooking?.totalPrice?.toFixed(2) || '0.00'}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <User className="w-5 h-5 text-primary" />
-              <span className="font-medium">{t('bookingDetailModal.adults')}:</span>
-              <span>{selectedBooking?.adults ?? 0}</span>
-              <User2 className="w-5 h-5 text-primary ml-3" />
-              <span className="font-medium">{t('bookingDetailModal.children')}:</span>
-              <span>{selectedBooking?.children ?? 0}</span>
-              <Baby className="w-5 h-5 text-primary ml-3" />
-              <span className="font-medium">{t('bookingDetailModal.infants')}:</span>
-              <span>{selectedBooking?.infants ?? 0}</span>
-            </div>
-            {selectedBooking?.note && (
-              <div className="flex items-center gap-2">
-                <StickyNote className="w-5 h-5 text-primary" />
-                <span className="font-medium">{t('bookingDetailModal.note')}:</span>
-                <span>{selectedBooking.note}</span>
-              </div>
-            )}
-            {selectedBooking?.transportType && (
-              <div className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-primary" />
-                <span className="font-medium">{t('bookingDetailModal.transportation')}:</span>
-                <span>{t('transport.' + selectedBooking.transportType)}</span>
-              </div>
-            )}
-            {selectedBooking?.ticketClass && (
-              <div className="flex items-center gap-2">
-                <BadgeCheck className="w-5 h-5 text-primary" />
-                <span className="font-medium">{t('bookingDetailModal.class')}:</span>
-                <span>{t('class.' + selectedBooking.ticketClass)}</span>
-              </div>
-            )}
-          </div>
-          <DialogClose asChild>
-            <Button variant="outline" className="mt-6 w-full rounded-lg h-11 text-base font-semibold">{t('bookingDetailModal.close')}</Button>
-          </DialogClose>
-        </DialogContent>
-      </Dialog>
+      {showModal && selectedBooking && (
+        <BookingDetailModal
+          booking={selectedBooking}
+          open={showModal}
+          onOpenChange={setShowModal}
+        />
+      )}
+      {showCancelConfirm && (
+        <Dialog open={showCancelConfirm} onOpenChange={setShowCancelConfirm}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Xác nhận hủy đặt tour?</DialogTitle>
+              <DialogDescription>
+                Bạn có chắc chắn muốn hủy đặt tour này không? Hành động này không thể hoàn tác.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowCancelConfirm(false)}>Không</Button>
+              <Button variant="destructive" onClick={handleCancelBooking}>Vâng, hủy đặt</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   )
 }

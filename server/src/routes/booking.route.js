@@ -4,7 +4,8 @@ const {
   getBookingById,
   createBooking,
   updateBooking,
-  getCompletedBookingByUserAndTour
+  getCompletedBookingByUserAndTour,
+  getBookingsByClerkId
 } = require('../controllers/booking.controller.js');
 const requireAuth = require('../middleware/clerk.js');
 const isAdmin = require('../middleware/isAdmin.js');
@@ -24,9 +25,12 @@ router.get('/:id', requireAuth, getBookingById);
 router.post('/', requireAuth, findOrCreateUser, createBooking);
 
 // Cập nhật booking theo ID
-router.put('/:id', requireAuth, updateBooking);
+router.put('/:id', requireAuth, findOrCreateUser, updateBooking);
 
 // Lấy booking completed của user cho 1 tour
 router.get('/completed/:tourId', requireAuth, findOrCreateUser, getCompletedBookingByUserAndTour);
+
+// Lấy booking theo Clerk ID của user (chỉ cho admin hoặc chính user đó)
+router.get('/user/clerk/:clerkId', requireAuth, findOrCreateUser, getBookingsByClerkId);
 
 module.exports = router;

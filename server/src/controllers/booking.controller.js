@@ -2,6 +2,7 @@ const Booking = require('../models/Booking.js');
 const Promotion = require('../models/Promotion.js');
 const Review = require('../models/Review.js');
 const Payment = require('../models/Payment.js');
+const User = require('../models/User.js');
 
 // Lấy tất cả booking
 const getAllBookings = async (req, res) => {
@@ -102,15 +103,26 @@ const createBooking = async (req, res) => {
 // Cập nhật booking theo ID
 const updateBooking = async (req, res) => {
   try {
+    const bookingId = req.params.id;
+    const dbUserId = req.dbUser?._id;
+    const isCurrentUserAdmin = req.dbUser?.role === 'admin';
+
+    const booking = await Booking.findById(bookingId);
+
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    // Security Check: chỉ admin hoặc chủ booking mới có quyền update
+    if (booking.user.toString() !== dbUserId.toString() && !isCurrentUserAdmin) {
+      return res.status(403).json({ message: 'Forbidden: You do not have permission to update this booking.' });
+    }
+
     const updatedBooking = await Booking.findByIdAndUpdate(
-      req.params.id,
+      bookingId,
       req.body,
       { new: true }
     );
-
-    if (!updatedBooking) {
-      return res.status(404).json({ message: 'Booking not found' });
-    }
 
     res.status(200).json(updatedBooking);
   } catch (err) {
@@ -136,10 +148,74 @@ const getCompletedBookingByUserAndTour = async (req, res) => {
   }
 };
 
+// Lấy tất cả booking theo clerkId (chỉ cho admin hoặc chính user đó)
+const getBookingsByClerkId = async (req, res) => {
+  try {
+    const { clerkId } = req.params;
+
+    // Phân quyền: chỉ admin hoặc chính user đó mới có quyền truy cập
+    const isCurrentUserAdmin = req.dbUser?.role === 'admin';
+    const isRequestingSelf = req.dbUser?.clerkId === clerkId;
+
+    if (!isCurrentUserAdmin && !isRequestingSelf) {
+      return res.status(403).json({ message: 'Forbidden: You can only access your own bookings.' });
+    }
+
+    // Tìm user trong DB bằng clerkId để lấy _id
+    const targetUser = await User.findOne({ clerkId: clerkId });
+    console.log('[DEBUG] targetUser:', targetUser ? targetUser._id : null);
+    if (!targetUser) {
+      // Nếu user không tồn tại trong DB, không thể có booking nào
+      return res.status(200).json([]);
+    }
+
+    // Lấy tất cả booking của user đó bằng _id
+    const bookings = await Booking.find({ user: targetUser._id })
+      .sort({ createdAt: -1 })
+      .populate('user', 'username email')
+      .populate('tour', 'name price departureOptions')
+      .populate('promotion')
+      .populate('review')
+      .populate('payment');
+
+    // Đảm bảo duration, departureDate, returnDate có trong tour hoặc booking (giống getAllBookings)
+    const bookingsWithDetails = bookings.map(b => {
+      let tour = b.tour && typeof b.tour.toObject === 'function' ? b.tour.toObject() : b.tour;
+      // Duration
+      if (tour && !tour.duration) {
+        if (tour.departureOptions && tour.departureOptions.length > 0) {
+          const { departureDate, returnDate } = tour.departureOptions[0];
+          if (departureDate && returnDate) {
+            const start = new Date(departureDate);
+            const end = new Date(returnDate);
+            const diffTime = Math.abs(end - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            tour.duration = diffDays;
+          }
+        }
+      }
+      // Departure/Return date ưu tiên lấy từ booking, fallback sang tour
+      let departureDate = b.departureDate || (tour?.departureOptions?.[0]?.departureDate ?? null);
+      let returnDate = b.returnDate || (tour?.departureOptions?.[0]?.returnDate ?? null);
+      
+      return {
+        ...b.toObject(),
+        tour,
+        departureDate,
+        returnDate,
+      };
+    });
+    res.status(200).json(bookingsWithDetails);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 module.exports = {
   getAllBookings,
   getBookingById,
   createBooking,
   updateBooking,
   getCompletedBookingByUserAndTour,
+  getBookingsByClerkId,
 };

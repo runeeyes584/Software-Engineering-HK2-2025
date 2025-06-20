@@ -4,12 +4,9 @@ import "./globals.css"
 import { ThemeProvider } from "../components/theme-provider"
 import { LanguageProvider } from "../components/language-provider-fixed"
 import { AuthProvider } from "@/components/auth-provider"
-import Header from "@/components/header"
-import Footer from "@/components/footer"
-import BackToTop from "@/components/back-to-top"
-import Chatbot from "@/components/chatbot"
 import { ClerkProvider } from "@clerk/nextjs"
 import { Toaster } from "sonner"
+import ConditionalLayoutWrapper from "@/components/conditional-layout-wrapper"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -36,13 +33,7 @@ export default function RootLayout({
             <LanguageProvider>
               <AuthProvider>
                 <Toaster richColors expand={true} position="top-center" closeButton />
-                <div className="min-h-screen flex flex-col">
-                  <Header />
-                  <main className="flex-1 px-4 sm:px-6 lg:px-8 max-w-[1400px] mx-auto w-full">{children}</main>
-                  <Footer />
-                  <BackToTop />
-                  <Chatbot />
-                </div>
+                <ConditionalLayoutWrapper>{children}</ConditionalLayoutWrapper>
               </AuthProvider>
             </LanguageProvider>
           </ThemeProvider>

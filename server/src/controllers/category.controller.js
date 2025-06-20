@@ -4,7 +4,12 @@ const Category = require('../models/Category');
 exports.getAllCategories = async (req, res) => {
   try {
     const categories = await Category.find();
-    res.json(categories);
+    const categoriesWithCount = categories.map(cat => ({
+      ...cat.toObject(),
+      tourCount: 0,
+      status: 'inactive',
+    }));
+    res.json(categoriesWithCount);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching categories' });
   }
@@ -24,7 +29,6 @@ exports.getCategoryById = async (req, res) => {
 // Tạo category (admin only)
 exports.createCategory = async (req, res) => {
   try {
-    if (!req.user?.isAdmin) return res.status(403).json({ message: 'Forbidden' });
     const { name, icon, description } = req.body;
     const category = new Category({ name, icon, description });
     await category.save();
@@ -37,7 +41,6 @@ exports.createCategory = async (req, res) => {
 // Sửa category (admin only)
 exports.updateCategory = async (req, res) => {
   try {
-    if (!req.user?.isAdmin) return res.status(403).json({ message: 'Forbidden' });
     const { name, icon, description } = req.body;
     const category = await Category.findByIdAndUpdate(
       req.params.id,
@@ -54,7 +57,6 @@ exports.updateCategory = async (req, res) => {
 // Xóa category (admin only)
 exports.deleteCategory = async (req, res) => {
   try {
-    if (!req.user?.isAdmin) return res.status(403).json({ message: 'Forbidden' });
     const category = await Category.findByIdAndDelete(req.params.id);
     if (!category) return res.status(404).json({ message: 'Category not found' });
     res.json({ message: 'Category deleted' });
