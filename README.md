@@ -94,7 +94,7 @@ Issues and feedback are also greatly appreciated!
 For support or inquiries, please contact:
 
 * 📧 Email: [anhtienle428@gmail.com](mailto:antienle428@gmail.com)
-* 🧑‍💻 GitHub: [Kaleidoscope Tien](https://github.com/runeeyes584)
+* 🧑‍💻 GitHub: [Kaleidoscope Rhcene (Lê Anh Tiến)](https://github.com/runeeyes584)
 
 ---
 
@@ -106,6 +106,6 @@ See the [LICENSE](./LICENSE) file for full license text.
 ---
 
 ## AUTHOR
-This project was created by [Kaleidoscope Tien](https://github.com/runeeyes584) and [Nguyễn Hùng Sơn](https://github.com/hungson1002)
+This project was created by [Kaleidoscope Rhcene - Lê Anh Tiến](https://github.com/runeeyes584) and [Nguyễn Hùng Sơn](https://github.com/hungson1002)
 
 
