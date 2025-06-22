@@ -3,15 +3,37 @@ const Category = require('../models/Category');
 // Lấy danh sách category
 exports.getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.find();
-    const categoriesWithCount = categories.map(cat => ({
-      ...cat.toObject(),
-      tourCount: 0,
-      status: 'inactive',
-    }));
-    res.json(categoriesWithCount);
+    const categories = await Category.aggregate([
+      {
+        $lookup: {
+          from: 'tours', // The name of the collection to join with
+          localField: '_id',
+          foreignField: 'category',
+          as: 'tours'
+        }
+      },
+      {
+        $addFields: {
+          tourCount: { $size: '$tours' },
+          status: {
+            $cond: {
+              if: { $gt: [{ $size: '$tours' }, 0] },
+              then: 'active',
+              else: 'inactive'
+            }
+          }
+        }
+      },
+      {
+        $project: { // Exclude the 'tours' array from the final output
+          tours: 0,
+          '__v': 0
+        }
+      }
+    ]);
+    res.json(categories);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching categories' });
+    res.status(500).json({ message: 'Error fetching categories', details: error.message });
   }
 };
 

@@ -3,6 +3,8 @@ const Promotion = require('../models/Promotion.js');
 const Review = require('../models/Review.js');
 const Payment = require('../models/Payment.js');
 const User = require('../models/User.js');
+const Tour = require('../models/Tour.js');
+const { createNotification } = require('./notification.controller.js');
 
 // Lấy tất cả booking
 const getAllBookings = async (req, res) => {
@@ -93,6 +95,28 @@ const createBooking = async (req, res) => {
       infants,
     });
     const savedBooking = await newBooking.save();
+
+    // --- BẮT ĐẦU TÍCH HỢP THÔNG BÁO ---
+    try {
+      const admins = await User.find({ role: 'admin' });
+      const bookingUser = req.dbUser;
+      const bookedTour = await Tour.findById(tour);
+
+      if (admins.length > 0 && bookingUser && bookedTour) {
+        const message = `${bookingUser.username || 'Một khách hàng'} vừa đặt tour "${bookedTour.name}".`;
+        const link = `/admin/bookings`; // Link tới trang quản lý booking
+
+        for (const admin of admins) {
+          // Gửi thông báo tới từng admin
+          await createNotification(admin._id.toString(), message, link);
+        }
+      }
+    } catch (notificationError) {
+      console.error("Failed to send booking notification to admins:", notificationError);
+      // Không block response chính nếu gửi noti lỗi
+    }
+    // --- KẾT THÚC TÍCH HỢP THÔNG BÁO ---
+
     // Trả về link thanh toán giả lập
     res.status(201).json({ booking: savedBooking, paymentUrl: `/payment/${savedBooking._id}` });
   } catch (err) {
@@ -163,7 +187,6 @@ const getBookingsByClerkId = async (req, res) => {
 
     // Tìm user trong DB bằng clerkId để lấy _id
     const targetUser = await User.findOne({ clerkId: clerkId });
-    console.log('[DEBUG] targetUser:', targetUser ? targetUser._id : null);
     if (!targetUser) {
       // Nếu user không tồn tại trong DB, không thể có booking nào
       return res.status(200).json([]);

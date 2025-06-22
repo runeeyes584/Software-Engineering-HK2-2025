@@ -182,9 +182,45 @@ const getUserProfile = async (req, res) => {
   }
 };
 
+// Cập nhật avatar của user
+const updateUserAvatar = async (req, res) => {
+  try {
+    const userId = req.dbUser?._id; 
+    if (!userId) {
+      return res.status(401).json({ message: 'Người dùng chưa được xác thực.' });
+    }
+
+    const { avatar } = req.body;
+    
+    if (!avatar) {
+      return res.status(400).json({ message: 'Avatar URL không được để trống.' });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { avatar },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'Không tìm thấy người dùng.' });
+    }
+
+    res.status(200).json({ 
+      message: 'Cập nhật avatar thành công!', 
+      user: updatedUser.toObject({ getters: true, virtuals: false }) 
+    });
+
+  } catch (error) {
+    console.error('Lỗi khi cập nhật avatar:', error);
+    res.status(500).json({ message: 'Lỗi server khi cập nhật avatar.' });
+  }
+};
+
 module.exports = {
   handleClerkWebhook,
   getAllUsers,
   updateUserProfile,
-  getUserProfile
+  getUserProfile,
+  updateUserAvatar
 };

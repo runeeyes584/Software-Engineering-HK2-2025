@@ -1,27 +1,27 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import BookingDetailModal from "@/components/admin/bookings/BookingDetailModal"
 import { useLanguage } from "@/components/language-provider-fixed"
+import TourCard from "@/components/tour-card"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { CalendarIcon, CreditCard, LogOut, User, CheckCircle2, Clock, Plus, ArrowRight, AlertCircle, Heart, Users, BadgeCheck, DollarSign, StickyNote, Baby, User2, XCircle } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { useUser, useAuth } from "@clerk/nextjs"
-import TourCard from "@/components/tour-card"
-import { toast } from "sonner"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { provinces, districts, wards } from "@/lib/vietnam-administrative-divisions"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose, DialogFooter } from "@/components/ui/dialog"
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from "@/components/ui/pagination"
-import BookingDetailModal from "@/components/admin/bookings/BookingDetailModal"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Separator } from "@/components/ui/separator"
+import { Tabs, TabsContent } from "@/components/ui/tabs"
+import { cn } from "@/lib/utils"
+import { provinces } from "@/lib/vietnam-administrative-divisions"
+import { useAuth, useUser } from "@clerk/nextjs"
+import { AlertCircle, ArrowRight, CalendarIcon, CheckCircle2, Clock, CreditCard, Heart, Plus, User, XCircle } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
 
 export default function AccountPage() {
   const { t } = useLanguage()
@@ -45,6 +45,7 @@ export default function AccountPage() {
   const [ward, setWard] = useState('')
   const [detailedAddress, setDetailedAddress] = useState('')
   const [originalProfile, setOriginalProfile] = useState<any>(null)
+  const [userProfileData, setUserProfileData] = useState<any>(null)
 
   const { getToken } = useAuth()
 
@@ -99,6 +100,7 @@ export default function AccountPage() {
             ward: data.user?.address?.ward || '',
             detailedAddress: data.user?.address?.detailedAddress || '',
           });
+          setUserProfileData(data.user);
         } else {
           // console.error('Failed to fetch user profile:', await res.json());
         }
@@ -358,13 +360,13 @@ export default function AccountPage() {
   const getStatusText = (status: string) => {
     switch (status.toLowerCase()) {
       case "confirmed":
-        return t('confirmed')
+        return t('booking.status.confirmed')
       case "pending":
-        return t('pending')
+        return t('booking.status.pending')
       case "completed":
-        return t('completed')
+        return t('booking.status.completed')
       case "cancelled":
-        return t('cancelled')
+        return t('booking.status.cancelled')
       default:
         return status
     }
@@ -379,7 +381,10 @@ export default function AccountPage() {
             <CardHeader>
               <div className="flex flex-col items-center">
                 <Avatar className="h-24 w-24 mb-4 ring-2 ring-primary/10 shadow-md">
-                  <AvatarImage src={user?.imageUrl || "/placeholder.svg?height=96&width=96"} alt={displayName} />
+                  <AvatarImage 
+                    src={user?.imageUrl || userProfileData?.avatar || "/placeholder.svg?height=96&width=96"} 
+                    alt={displayName} 
+                  />
                   <AvatarFallback className="text-lg">
                     {displayName.split(" ").map((s) => s[0]).join("")}
                   </AvatarFallback>
@@ -507,6 +512,7 @@ export default function AccountPage() {
                             ward: data.user?.address?.ward || '',
                             detailedAddress: data.user?.address?.detailedAddress || '',
                           });
+                          setUserProfileData(data.user);
                         } else {
                           toast.error(data.message || t('account.profile.toast.updateError'));
                         }
@@ -678,18 +684,18 @@ export default function AccountPage() {
                                     <p className="text-sm text-muted-foreground mt-1">
                                       <span>
                                         <CalendarIcon className="inline-block w-4 h-4 mr-1.5" />
-                                        Ngày đi: {booking.departureDate && (typeof booking.departureDate === 'string' || booking.departureDate instanceof Date)
+                                        {t('booking.departure')}: {booking.departureDate && (typeof booking.departureDate === 'string' || booking.departureDate instanceof Date)
                                           ? (() => { try { return new Date(booking.departureDate).toLocaleDateString(); } catch { return '--'; } })()
                                           : '--'}
                                         &nbsp;-&nbsp;
-                                        Ngày về: {booking.returnDate && (typeof booking.returnDate === 'string' || booking.returnDate instanceof Date)
+                                        {t('booking.return')}: {booking.returnDate && (typeof booking.returnDate === 'string' || booking.returnDate instanceof Date)
                                           ? (() => { try { return new Date(booking.returnDate).toLocaleDateString(); } catch { return '--'; } })()
                                           : '--'}
-                                        &nbsp;&nbsp;•&nbsp;&nbsp; {booking.tour.duration} ngày
+                                        &nbsp;&nbsp;•&nbsp;&nbsp; {booking.tour.duration} {t('tour.days')}
                                       </span>
                                     </p>
                                     <p className="text-xs text-muted-foreground mt-1">
-                                      Mã đặt tour: {booking._id}
+                                      {t('booking.bookingId')}: {booking._id}
                                     </p>
                                   </div>
                                   <div className="flex flex-col items-start md:items-end">
@@ -708,11 +714,11 @@ export default function AccountPage() {
                                           className="text-red-600 border-red-500 hover:bg-red-50 hover:text-red-700"
                                         >
                                           <XCircle className="w-4 h-4 mr-1.5" />
-                                          Hủy đặt
+                                          {t('booking.cancelBooking')}
                                         </Button>
                                       )}
                                       <Button variant="outline" size="sm" onClick={() => handleViewDetails(booking)}>
-                                        Xem chi tiết <ArrowRight className="w-4 h-4 ml-1.5" />
+                                        {t('booking.viewDetail')} <ArrowRight className="w-4 h-4 ml-1.5" />
                                       </Button>
                                     </div>
                                   </div>
@@ -908,14 +914,12 @@ export default function AccountPage() {
         <Dialog open={showCancelConfirm} onOpenChange={setShowCancelConfirm}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Xác nhận hủy đặt tour?</DialogTitle>
-              <DialogDescription>
-                Bạn có chắc chắn muốn hủy đặt tour này không? Hành động này không thể hoàn tác.
-              </DialogDescription>
+              <DialogTitle>{t('booking.cancelConfirmTitle')}</DialogTitle>
+              <DialogDescription>{t('booking.cancelConfirmText')}</DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setShowCancelConfirm(false)}>Không</Button>
-              <Button variant="destructive" onClick={handleCancelBooking}>Vâng, hủy đặt</Button>
+              <Button variant="outline" onClick={() => setShowCancelConfirm(false)}>{t('booking.cancelNo')}</Button>
+              <Button variant="destructive" onClick={handleCancelBooking}>{t('booking.cancelYes')}</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

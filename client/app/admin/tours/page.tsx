@@ -1,151 +1,160 @@
 "use client"
 
-import { PlusCircle, ListFilter, File } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { columns, Tour } from '@/components/admin/tours/columns'
-import { DataTable } from '@/components/admin/tours/data-table'
+import { columns, Tour } from "@/components/admin/tours/columns"
+import { DataTable } from "@/components/admin/tours/data-table"
+import { TourDetailModal } from "@/components/admin/tours/TourDetailModal"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { PlusCircle } from "lucide-react"
 import Link from 'next/link'
-
-const sampleTours: Tour[] = [
-  {
-    id: 'TOUR001',
-    name: 'Khám phá Vịnh Hạ Long',
-    category: 'Biển',
-    price: 2500000,
-    duration: '2 ngày 1 đêm',
-    status: 'active',
-    bookings: 120,
-    rating: 4.8,
-    image: 'https://images.unsplash.com/photo-1543862415-961d157a43f2?q=80&w=2942&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  },
-  {
-    id: 'TOUR002',
-    name: 'Chinh phục Fansipan',
-    category: 'Leo núi',
-    price: 3200000,
-    duration: '3 ngày 2 đêm',
-    status: 'active',
-    bookings: 85,
-    rating: 4.9,
-    image: 'https://images.unsplash.com/photo-1590664287413-53d99a9a0f78?q=80&w=2832&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  },
-  {
-    id: 'TOUR003',
-    name: 'Nghỉ dưỡng tại Phú Quốc',
-    category: 'Biển',
-    price: 4500000,
-    duration: '4 ngày 3 đêm',
-    status: 'inactive',
-    bookings: 210,
-    rating: 4.7,
-    image: 'https://images.unsplash.com/photo-1616767597590-584c833a69a2?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  },
-  {
-    id: 'TOUR004',
-    name: 'City tour Hà Nội',
-    category: 'Thành phố',
-    price: 1200000,
-    duration: '1 ngày',
-    status: 'draft',
-    bookings: 350,
-    rating: 4.6,
-    image: 'https://images.unsplash.com/photo-1596395984235-908a8a4f91be?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  },
-]
+import { useEffect, useMemo, useState } from 'react'
+import { toast } from "sonner"
 
 export default function ToursPage() {
+  const [tours, setTours] = useState<Tour[]>([])
+  const [loading, setLoading] = useState(true)
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest')
+  
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedTour, setSelectedTour] = useState<Tour | null>(null)
+
+  useEffect(() => {
+    const fetchTours = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/tours')
+        const data = await res.json()
+        setTours(data)
+      } catch (error) {
+        console.error('Failed to fetch tours', error)
+        toast.error("Không thể tải danh sách tour.")
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchTours()
+  }, [])
+
+  const handleStatusChange = async (tourId: string, currentStatus: 'active' | 'inactive' | undefined) => {
+    if (!currentStatus) return;
+
+    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+    
+    const originalTours = [...tours];
+    const updatedTours = tours.map(t => 
+      t.id === tourId ? { ...t, status: newStatus } : t
+    ) as Tour[];
+    setTours(updatedTours);
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/tours/status/${tourId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Cập nhật trạng thái thất bại");
+      }
+      
+      toast.success(`Đã thay đổi trạng thái tour thành công.`);
+
+    } catch (error) {
+      setTours(originalTours);
+      toast.error((error as Error).message);
+    }
+  };
+
+  const handleDelete = (tourId: string) => {
+    setTours(prevTours => prevTours.filter(t => t.id !== tourId));
+  }
+
+  const handleViewDetails = (tour: Tour) => {
+    setSelectedTour(tour)
+    setIsModalOpen(true)
+  }
+
+  const filteredAndSortedTours = useMemo(() => {
+    let result = [...tours];
+
+    if (statusFilter !== 'all') {
+      result = result.filter(tour => tour.status === statusFilter);
+    }
+
+    result.sort((a, b) => {
+      const dateA = new Date(a.createdAt || 0).getTime();
+      const dateB = new Date(b.createdAt || 0).getTime();
+      return sortBy === 'newest' ? dateB - dateA : dateA - dateB;
+    });
+
+    return result;
+  }, [tours, statusFilter, sortBy]);
+
   return (
-    <Tabs defaultValue="all">
-      <div className="flex items-center">
-        <TabsList>
-          <TabsTrigger value="all">Tất cả</TabsTrigger>
-          <TabsTrigger value="active">Đang hoạt động</TabsTrigger>
-          <TabsTrigger value="draft">Bản nháp</TabsTrigger>
-          <TabsTrigger value="archived" className="hidden sm:flex">
-            Đã lưu trữ
-          </TabsTrigger>
-        </TabsList>
-        <div className="ml-auto flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-8 gap-1">
-                <ListFilter className="h-3.5 w-3.5" />
-                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                  Lọc
-                </span>
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Quản lý Tour</CardTitle>
+          <CardDescription>Xem, tạo mới, chỉnh sửa và quản lý tất cả các tour trong hệ thống của bạn.</CardDescription>
+          <div className="flex justify-between items-center pt-4">
+              <div className="flex gap-4">
+                  <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as any)}>
+                      <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Lọc theo trạng thái" />
+                      </SelectTrigger>
+                      <SelectContent>
+                          <SelectItem value="all">Tất cả trạng thái</SelectItem>
+                          <SelectItem value="active">Hoạt động</SelectItem>
+                          <SelectItem value="inactive">Không hoạt động</SelectItem>
+                      </SelectContent>
+                  </Select>
+                   <Select value={sortBy} onValueChange={(value) => setSortBy(value as any)}>
+                      <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Sắp xếp theo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                          <SelectItem value="newest">Mới nhất</SelectItem>
+                          <SelectItem value="oldest">Cũ nhất</SelectItem>
+                      </SelectContent>
+                  </Select>
+              </div>
+              <Button asChild>
+                  <Link href="/admin/tours/new">
+                      <PlusCircle className="mr-2 h-4 w-4" /> Thêm tour mới
+                  </Link>
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Lọc theo</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem checked>
-                Đang hoạt động
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem>Bản nháp</DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem>
-                Đã lưu trữ
-              </DropdownMenuCheckboxItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Button size="sm" variant="outline" className="h-8 gap-1">
-            <File className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              Xuất file
-            </span>
-          </Button>
-          <Link href="/admin/tours/new">
-            <Button size="sm" className="h-8 gap-1">
-              <PlusCircle className="h-3.5 w-3.5" />
-              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                Thêm tour
-              </span>
-            </Button>
-          </Link>
-        </div>
-      </div>
-      <TabsContent value="all">
-        <Card>
-          <CardHeader>
-            <CardTitle>Danh sách tour</CardTitle>
-            <CardDescription>
-              Quản lý tất cả các tour trong hệ thống của bạn.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <DataTable columns={columns} data={sampleTours} />
-          </CardContent>
-          <CardFooter>
-            <div className="text-xs text-muted-foreground">
-              Hiển thị <strong>1-10</strong> trên <strong>32</strong> sản phẩm
-            </div>
-          </CardFooter>
-        </Card>
-      </TabsContent>
-    </Tabs>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="text-center py-10 text-muted-foreground">Đang tải...</div>
+          ) : (
+            <DataTable 
+              columns={columns({ 
+                onStatusChange: handleStatusChange,
+                onDelete: handleDelete,
+                onViewDetails: handleViewDetails,
+              })} 
+              data={filteredAndSortedTours} 
+            />
+          )}
+        </CardContent>
+        <CardFooter>
+          <div className="text-xs text-muted-foreground">
+            Hiện có <strong>{filteredAndSortedTours.length}</strong> tour.
+          </div>
+        </CardFooter>
+      </Card>
+      
+      <TourDetailModal 
+        tour={selectedTour}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
+    </>
   )
 }

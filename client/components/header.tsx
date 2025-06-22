@@ -1,44 +1,45 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { useTheme } from "next-themes"
 import { useLanguage } from "@/components/language-provider-fixed"
 import { Button } from "@/components/ui/button"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuGroup,
-  DropdownMenuLabel,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import {
-  Globe,
-  Menu,
-  Moon,
-  Sun,
-  User,
-  ChevronDown,
-  Compass,
-  Palmtree,
-  Mountain,
-  Building,
-  Waves,
-  Tent,
-  Monitor,
-} from "lucide-react"
+import { useAdminRole } from "@/hooks/use-admin-role"
 import { cn } from "@/lib/utils"
-import { usePathname } from "next/navigation"
 import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import {
+    Building,
+    ChevronDown,
+    Compass,
+    Globe,
+    Menu,
+    Monitor,
+    Moon,
+    Mountain,
+    Palmtree,
+    Shield,
+    Sun,
+    Tent,
+    User,
+    Waves
+} from "lucide-react"
+import { useTheme } from "next-themes"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 export default function Header() {
   const { theme, setTheme } = useTheme()
   const { t, language, setLanguage } = useLanguage()
   const { user, isSignedIn } = useUser()
+  const { isAdmin } = useAdminRole()
   const pathname = usePathname()
 
   const tourCategories = [
@@ -341,7 +342,17 @@ export default function Header() {
             </Link>
 
             {isSignedIn ? (
-              <UserButton afterSignOutUrl="/" />
+              <div className="flex items-center gap-2">
+                {isAdmin && (
+                  <Link href="/admin">
+                    <Button variant="outline" size="sm" className="flex items-center gap-2">
+                      <Shield className="h-4 w-4" />
+                      Admin
+                    </Button>
+                  </Link>
+                )}
+                <UserButton afterSignOutUrl="/" />
+              </div>
             ) : (
               <>
                 <SignInButton mode="modal">

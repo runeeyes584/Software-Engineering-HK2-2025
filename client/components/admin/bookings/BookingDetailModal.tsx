@@ -1,9 +1,9 @@
-import { CalendarIcon, Clock, BadgeCheck, DollarSign, User, User2, Baby, StickyNote, Users, ArrowRight } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/components/language-provider-fixed";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@clerk/nextjs";
-import { useState, useEffect } from "react";
+import { Baby, BadgeCheck, CalendarIcon, Clock, DollarSign, Mail, StickyNote, User, User2, Users } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface BookingDetailModalProps {
   booking: any | null;
@@ -75,6 +75,27 @@ export default function BookingDetailModal({ booking, open, onOpenChange, t: tPr
           <DialogDescription className="text-xs text-muted-foreground mb-2">
             {t('bookingDetailModal.bookingId')}: {booking?.bookingCode || booking?._id}
           </DialogDescription>
+          {booking?.name && (
+            <div className="flex items-center gap-2 text-base">
+              <User className="w-5 h-5 text-primary" />
+              <span className=" text-black">{t('booking.customer')}:</span>
+              <span className="text-black">{booking.name}</span>
+            </div>
+          )}
+          {booking?.phone && (
+            <div className="flex items-center gap-2 text-base">
+              <User2 className="w-5 h-5 text-primary" />
+              <span className="text-black">{t('booking.phone')}:</span>
+              <span className="text-black">{booking.phone}</span>
+            </div>
+          )}
+          {booking?.email && (
+            <div className="flex items-center gap-2 text-base">
+              <Mail className="w-5 h-5 text-primary" />
+              <span className="text-black">Email:</span>
+              <span className="text-black">{booking.email}</span>
+            </div>
+          )}
         </DialogHeader>
         <div className="space-y-4 text-base">
           <div className="flex items-center gap-2">

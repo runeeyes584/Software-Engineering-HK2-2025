@@ -1,22 +1,19 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { useLanguage } from "@/components/language-provider-fixed"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { CalendarIcon, MapPin, Star, Zap, TrendingUp, Filter, Search } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import TourFilters from "@/components/tour-filters"
 import OptimizedSearch from "@/components/optimized-search"
 import PerformanceMonitor from "@/components/performance-monitor"
-import { useOptimizedTourFilters, type TourUI } from "@/hooks/use-optimized-tour-filters"
-import { toast } from "sonner"
-import { useAuth, useUser } from "@clerk/nextjs"
 import TourCard from "@/components/tour-card"
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from "@/components/ui/pagination"
+import TourFilters from "@/components/tour-filters"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useOptimizedTourFilters, type TourUI } from "@/hooks/use-optimized-tour-filters"
+import { useAuth, useUser } from "@clerk/nextjs"
+import { Filter, Search, Zap } from "lucide-react"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
 
 export default function ToursPage() {
   const { t } = useLanguage()
@@ -28,18 +25,27 @@ export default function ToursPage() {
   const { user } = useUser()
   const [currentPage, setCurrentPage] = useState(1);
   const TOURS_PER_PAGE = 6;
+  const [tourImageIndexes, setTourImageIndexes] = useState<Record<string, number>>({});
 
   useEffect(() => {
     fetch("http://localhost:5000/api/tours")
       .then((res) => res.json())
-      .then((data) => setAllTours(
-        data.map((tour: any) => ({
-          ...tour,
-          id: tour._id && typeof tour._id === 'object' && tour._id.toString
-            ? tour._id.toString()
-            : String(tour._id || tour.id)
-        }))
-      ))
+      .then((data) => {
+        setAllTours(
+          data.map((tour: any) => ({
+            ...tour,
+            id: tour._id && typeof tour._id === 'object' && tour._id.toString
+              ? tour._id.toString()
+              : String(tour._id || tour.id)
+          }))
+        )
+        const initialIndexes: Record<string, number> = {};
+        data.forEach((tour: any) => {
+          const id = tour._id && typeof tour._id === 'object' ? tour._id.toString() : String(tour._id || tour.id);
+          initialIndexes[id] = 0;
+        });
+        setTourImageIndexes(initialIndexes);
+      })
       .catch(() => setAllTours([]))
   }, [])
 
@@ -121,6 +127,20 @@ export default function ToursPage() {
       toast.error("Có lỗi xảy ra, vui lòng thử lại!")
     }
   }
+
+  const handleNextImage = (tourId: string, imageCount: number) => {
+    setTourImageIndexes(prev => ({
+      ...prev,
+      [tourId]: (prev[tourId] + 1) % imageCount,
+    }));
+  };
+
+  const handlePrevImage = (tourId: string, imageCount: number) => {
+    setTourImageIndexes(prev => ({
+      ...prev,
+      [tourId]: (prev[tourId] - 1 + imageCount) % imageCount,
+    }));
+  };
 
   return (
     <div className="py-8">
@@ -242,10 +262,10 @@ export default function ToursPage() {
                       reviewCount={tItem.reviewCount ?? 0}
                       images={images}
                       duration={durationStr}
-                      currentIndex={0}
+                      currentIndex={tourImageIndexes[id] || 0}
                       isSaved={savedTourIds.map(String).includes(id)}
-                      onPrev={() => {}}
-                      onNext={() => {}}
+                      onPrev={() => handlePrevImage(id, images.length)}
+                      onNext={() => handleNextImage(id, images.length)}
                       onViewDetail={() => window.location.href = `/tours/${id}`}
                     />
                   );

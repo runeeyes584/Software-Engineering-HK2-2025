@@ -4,10 +4,12 @@ const {
   getTourById,
   createTour,
   updateTour,
-  deleteTour
+  deleteTour,
+  updateTourStatus
 } = require('../controllers/tour.controller.js');
 const requireAuth = require('../middleware/clerk.js');
 const isAdmin = require('../middleware/isAdmin.js');
+const findOrCreateUser = require('../middleware/findOrCreateUser.js');
 
 const router = express.Router();
 
@@ -19,13 +21,16 @@ router.get('/', getAllTours);
 // Lấy tour theo ID
 router.get('/:id', getTourById);
 
-// Tạo tour mới
-router.post('/', requireAuth, isAdmin, createTour);
+// Tạo tour mới (Cần quyền Admin)
+router.post('/', requireAuth, findOrCreateUser, isAdmin, createTour);
 
-// Cập nhật tour theo ID
-router.put('/:id', requireAuth, isAdmin, updateTour);
+// Cập nhật trạng thái tour
+router.put('/status/:id', updateTourStatus);
 
-// Xóa tour theo ID
-router.delete('/:id', requireAuth, isAdmin, deleteTour);
+// Cập nhật tour
+router.put('/:id', requireAuth, findOrCreateUser, isAdmin, updateTour);
+
+// Xóa tour theo ID (Cần quyền Admin)
+router.delete('/:id', requireAuth, findOrCreateUser, isAdmin, deleteTour);
 
 module.exports = router;

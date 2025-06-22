@@ -24,10 +24,6 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    type: {
-      type: String,
-      required: true, 
-    },
     destination: {
       type: String,
       required: true,
@@ -50,10 +46,16 @@ const tourSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
+    category: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Category',
+      required: true
+    }],
+    status: {
+      type: String,
+      enum: ['active', 'inactive'],
+      default: 'active'
+    }
   },
   {
     timestamps: true,

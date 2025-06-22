@@ -1,14 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useAuth, useUser } from '@clerk/nextjs'
 import BookingDetailModal from '@/components/admin/bookings/BookingDetailModal'
+import { useLanguage } from "@/components/language-provider-fixed"
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
+import { useAuth, useUser } from '@clerk/nextjs'
+import { useEffect, useState } from 'react'
 
 interface Booking {
   _id: string
@@ -41,6 +41,7 @@ export default function BookingsPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [isAdmin, setIsAdmin] = useState(false)
   const { user } = useUser()
+  const { t } = useLanguage()
 
   const handleUpdateStatus = async (bookingId: string, status: string) => {
     setActionLoading(bookingId + status)
@@ -84,13 +85,13 @@ export default function BookingsPage() {
   const getStatusText = (status: string) => {
     switch (status.toLowerCase()) {
       case 'completed':
-        return 'Hoàn thành'
+        return t('booking.status.completed')
       case 'pending':
-        return 'Chờ xác nhận'
+        return t('booking.status.pending')
       case 'confirmed':
-        return 'Đã xác nhận'
+        return t('booking.status.confirmed')
       case 'cancelled':
-        return 'Đã hủy'
+        return t('booking.status.cancelled')
       default:
         return status
     }

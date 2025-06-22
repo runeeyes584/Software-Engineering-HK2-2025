@@ -1,7 +1,10 @@
 "use client"
 
+import { useSyncAvatar } from "@/hooks/use-sync-avatar"
+import { useAuth as useClerkAuth, useUser } from "@clerk/nextjs"
+import { useRouter } from "next/navigation"
 import type React from "react"
-import { createContext, useContext, useState, useEffect } from "react"
+import { createContext, useContext, useEffect, useState } from "react"
 
 interface User {
   id: string
@@ -42,15 +45,57 @@ const mockUsers = {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter()
+  const { user: clerkUser, isSignedIn } = useUser()
+  const { getToken } = useClerkAuth()
+  
+  // Auto sync avatar from Clerk to database
+  useSyncAvatar()
 
   useEffect(() => {
-    // Check for saved user in localStorage
-    const savedUser = localStorage.getItem("user")
-    if (savedUser) {
-      setUser(JSON.parse(savedUser))
+    const checkUserFromDatabase = async () => {
+      if (!isSignedIn || !clerkUser?.id) {
+        setIsLoading(false)
+        return
+      }
+
+      try {
+        const token = await getToken()
+        const res = await fetch("http://localhost:5000/api/users/profile", {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        })
+
+        if (res.ok) {
+          const data = await res.json()
+          const dbUser = data.user
+          
+          if (dbUser) {
+            const userData: User = {
+              id: dbUser._id,
+              name: dbUser.username || `${dbUser.firstname || ''} ${dbUser.lastname || ''}`.trim(),
+              email: dbUser.email,
+              role: dbUser.role,
+              avatar: dbUser.avatar,
+            }
+            setUser(userData)
+            
+            // Auto redirect admin to admin page if on home page
+            if (dbUser.role === "admin" && window.location.pathname === "/") {
+              router.push("/admin")
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user from database:", error)
+      } finally {
+        setIsLoading(false)
+      }
     }
-    setIsLoading(false)
-  }, [])
+
+    checkUserFromDatabase()
+  }, [isSignedIn, clerkUser?.id, getToken, router])
 
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true)
@@ -63,6 +108,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(adminUser)
       localStorage.setItem("user", JSON.stringify(adminUser))
       setIsLoading(false)
+      
+      // Auto redirect admin to admin page
+      router.push("/admin")
       return true
     } else if (email === "user@example.com" && password === "user123") {
       const regularUser = mockUsers.user
@@ -80,11 +128,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const demoUser = mockUsers[role]
     setUser(demoUser)
     localStorage.setItem("user", JSON.stringify(demoUser))
+    
+    // Auto redirect admin to admin page
+    if (role === "admin") {
+      router.push("/admin")
+    }
   }
 
   const logout = () => {
     setUser(null)
     localStorage.removeItem("user")
+    router.push("/")
   }
 
   return <AuthContext.Provider value={{ user, login, logout, isLoading, loginAsDemo }}>{children}</AuthContext.Provider>

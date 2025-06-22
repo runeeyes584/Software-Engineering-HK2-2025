@@ -1,12 +1,14 @@
+import { AuthProvider } from "@/components/auth-provider"
+import { AutoRedirectAdmin } from "@/components/auto-redirect-admin"
+import ConditionalLayoutWrapper from "@/components/conditional-layout-wrapper"
+import { SocketProvider } from "@/components/socket-provider"
+import { ClerkProvider } from "@clerk/nextjs"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
-import "./globals.css"
-import { ThemeProvider } from "../components/theme-provider"
-import { LanguageProvider } from "../components/language-provider-fixed"
-import { AuthProvider } from "@/components/auth-provider"
-import { ClerkProvider } from "@clerk/nextjs"
 import { Toaster } from "sonner"
-import ConditionalLayoutWrapper from "@/components/conditional-layout-wrapper"
+import { LanguageProvider } from "../components/language-provider-fixed"
+import { ThemeProvider } from "../components/theme-provider"
+import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -32,8 +34,12 @@ export default function RootLayout({
           >
             <LanguageProvider>
               <AuthProvider>
-                <Toaster richColors expand={true} position="top-center" closeButton />
-                <ConditionalLayoutWrapper>{children}</ConditionalLayoutWrapper>
+                <SocketProvider>
+                  <AutoRedirectAdmin>
+                    <Toaster richColors expand={true} position="top-center" closeButton />
+                    <ConditionalLayoutWrapper>{children}</ConditionalLayoutWrapper>
+                  </AutoRedirectAdmin>
+                </SocketProvider>
               </AuthProvider>
             </LanguageProvider>
           </ThemeProvider>

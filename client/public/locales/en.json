@@ -10,7 +10,7 @@
     "submitting": "Submitting...",
     "cancel": "Cancel",
     "delete": "Delete",
-    "sortBy": "Sort by",
+    "sortBy": "Sort By",
     "newest": "Newest",
     "oldest": "Oldest",
     "paginationPrevious": "Previous",
@@ -24,33 +24,27 @@
     },
     "popular": "Popular Destinations",
     "featured": "Featured Tours",
-    "testimonials": "What Our Travelers Say",
+    "testimonials": "What Our Customers Say",
     "cta": {
       "title": "Ready for your next adventure?",
       "subtitle": "Join thousands of satisfied travelers who have experienced the world with us",
-      "button": "Browse Tours"
+      "button": "View Tours"
     },
     "noTours": "No tours available"
   },
   "about": {
     "title": "About Us",
-    "role":{
-      "ceo": "Chief Executive Officer",
-      "operations": "Operations Manager",
-      "consultant": "Travel Consultant",
-      "marketing": "Marketing Lead"
-    },
     "subtitle": "Your Trusted Travel Partner",
     "mission": {
       "title": "Our Mission",
-      "description": "To provide exceptional travel experiences that inspire and connect people with the world's most beautiful destinations."
+      "description": "To provide amazing travel experiences that inspire and connect people with the world's most beautiful destinations."
     },
     "vision": {
       "title": "Our Vision",
-      "description": "To be the leading travel platform that makes extraordinary adventures accessible to everyone."
+      "description": "To be the leading travel platform, offering extraordinary adventures for everyone."
     },
     "values": {
-      "title": "Our Values",
+      "title": "Our Core Values",
       "excellence": {
         "title": "Excellence",
         "description": "We strive for excellence in every aspect of our service."
@@ -61,7 +55,7 @@
       },
       "innovation": {
         "title": "Innovation",
-        "description": "We continuously innovate to enhance the travel experience."
+        "description": "We constantly innovate to enhance the travel experience."
       },
       "integrity": {
         "title": "Integrity",
@@ -72,7 +66,7 @@
         "description": "We put our customers at the heart of everything we do."
       },
       "authentic": {
-        "title": "Authentic",
+        "title": "Authenticity",
         "description": "We are committed to providing the most authentic travel experiences."
       },
       "sustainable": {
@@ -86,35 +80,23 @@
     },
     "team": {
       "title": "Our Team",
-      "subtitle": "Meet the passionate individuals behind our success",
+      "subtitle": "Meet the passionate people behind our success",
       "description": "Our diverse team of travel experts and professionals is dedicated to creating unforgettable experiences for our customers.",
       "roles": {
-        "leadership": "Leadership Team",
+        "leadership": "Leadership",
         "operations": "Operations Team",
         "customerService": "Customer Service Team",
         "marketing": "Marketing Team",
         "technology": "Technology Team"
-      },
-      "role": {
-        "ceo": "Chief Executive Officer",
-        "operations": "Operations Manager",
-        "consultant": "Travel Consultant",
-        "marketing": "Marketing Lead"
-      },
-      "bio": {
-        "sarah": "Sarah is the founder and visionary leader of TravelVista.",
-        "david": "David oversees operations and ensures every tour runs smoothly.",
-        "maria": "Maria is a travel consultant with years of international experience.",
-        "james": "James leads marketing and brand development for TravelVista."
       }
     },
     "history": {
       "title": "Our History",
-      "description": "Founded in 2024, we have grown from a small local tour operator to a global travel platform, serving thousands of happy travelers worldwide."
+      "description": "Founded in 2024, we have grown from a small local travel agency to a global travel platform, serving thousands of satisfied travelers worldwide."
     },
     "achievements": {
       "title": "Our Achievements",
-      "description": "We are proud of our accomplishments and continue to strive for excellence in the travel industry.",
+      "description": "We are proud of our achievements and continue to strive for excellence in the travel industry.",
       "stats": {
         "tours": "Tours",
         "destinations": "Destinations",
@@ -124,36 +106,49 @@
     },
     "partners": {
       "title": "Our Partners",
-      "description": "We work with trusted partners worldwide to provide the best travel experiences."
+      "description": "We partner with trusted companies worldwide to provide the best travel experiences."
     },
     "cta2": {
-      "title": "Join Our Journey",
+      "title": "Join the Journey",
       "description": "Be part of our growing community of travelers",
       "button": "Explore Tours"
     },
     "ourStory": "Our Story",
-    "storyText": "TravelVista was founded to bring authentic and memorable travel experiences to everyone.",
+    "storyText": "TravelVista was founded with the mission to bring authentic and memorable travel experiences to everyone.",
     "getInTouch": "Get in Touch",
     "ourMission": "Our Mission",
-    "missionText": "To provide exceptional travel experiences that inspire and connect people with the world's most beautiful destinations.",
+    "missionText": "To provide amazing travel experiences that inspire and connect people with the world's most beautiful destinations.",
     "ourVision": "Our Vision",
-    "visionText": "To be the leading travel platform that makes extraordinary adventures accessible to everyone.",
+    "visionText": "To be the leading travel platform, offering extraordinary adventures for everyone.",
     "ourValues": "Our Values",
     "ourTeam": "Our Team",
-    "locations": "Locations"
+    "locations": "Our Offices & Locations",
+    "cta": "Join Us on the Journey",
+    "ctaText": "Be part of our growing community of travelers.",
+    "role": {
+      "ceo": "CEO",
+      "operations": "Operations Manager",
+      "consultant": "Travel Consultant",
+      "marketing": "Marketing Lead"
+    },
+    "bio": {
+      "sarah": "Sarah is the founder and leads TravelVista with a global vision.",
+      "david": "David is responsible for operations and ensures every tour runs smoothly.",
+      "maria": "Maria is a travel consultant with years of international experience.",
+      "james": "James is in charge of marketing and brand development for TravelVista."
+    }
   },
   "contact": {
     "title": "Contact Us",
-    "getInTouch": "Contact Us Now",
     "subtitle": "We'd love to hear from you",
-    "description": "Have questions or need assistance? Our team is here to help.",
+    "description": "Have a question or need assistance? Our team is here to help.",
     "form": {
       "title": "Send us a message",
-      "name": "Your Name",
-      "email": "Your Email",
-      "phone": "Your Phone",
+      "name": "Full Name",
+      "email": "Email",
+      "phone": "Phone Number",
       "subject": "Subject",
-      "message": "Your Message",
+      "message": "Message",
       "submit": "Send Message",
       "success": "Message sent successfully!",
       "error": "Error sending message. Please try again.",
@@ -161,7 +156,7 @@
       "privacy": "By submitting this form, you agree to our privacy policy."
     },
     "info": {
-      "title": "Get in Touch",
+      "title": "Contact Information",
       "address": {
         "title": "Address",
         "line1": "123 Travel Street",
@@ -178,13 +173,13 @@
         "title": "Email",
         "info": "General Inquiries",
         "support": "Customer Support",
-        "partners": "Partnership Inquiries"
+        "partners": "Partnerships"
       },
       "hours": {
-        "title": "Business Hours",
+        "title": "Office Hours",
         "weekdays": "Monday - Friday",
         "weekend": "Saturday - Sunday",
-        "holidays": "Public Holidays"
+        "holidays": "Holidays"
       },
       "social": {
         "title": "Follow Us",
@@ -195,7 +190,7 @@
       }
     },
     "map": {
-      "title": "Find Us",
+      "title": "Find Us on the Map",
       "description": "Visit our office",
       "directions": "Get Directions"
     },
@@ -203,30 +198,31 @@
       "title": "Frequently Asked Questions",
       "q1": "How do I book a tour?",
       "a1": "You can book a tour directly on our website or contact us via email/phone.",
-      "q2": "Can I cancel my tour?",
-      "a2": "You can cancel your tour according to our refund policy. Please contact us for more details.",
-      "q3": "Is customer support available 24/7?",
-      "a3": "We provide 24/7 customer support via hotline and email.",
-      "q4": "What payment methods are accepted?",
-      "a4": "We accept bank transfer, credit cards, and popular e-wallets."
+      "q2": "Can I cancel a tour?",
+      "a2": "You can cancel a tour according to our refund policy. Please contact us for more details.",
+      "q3": "Is there 24/7 customer support?",
+      "a3": "We offer 24/7 customer support via our hotline and email.",
+      "q4": "What payment methods do you accept?",
+      "a4": "We accept bank transfers, credit cards, and popular e-wallets."
     },
     "emergency": {
       "title": "Emergency Contact",
       "description": "For urgent assistance during your trip",
-      "phone": "24/7 Emergency Hotline"
+      "phone": "24/7 Hotline"
     },
+    "getInTouch": "Get in Touch",
     "contactInfo": "Contact Information",
     "officeHours": "Office Hours",
-    "name": "Your Name",
-    "email": "Your Email",
+    "name": "Full Name",
+    "email": "Email",
     "subject": "Subject",
-    "selectSubject": "Select subject",
-    "message": "Your Message",
+    "selectSubject": "Select a subject",
+    "message": "Message",
     "send": "Send",
     "sending": "Sending...",
     "sent": "Sent successfully!",
     "subjects": {
-      "general": "General",
+      "general": "General Inquiry",
       "booking": "Booking",
       "support": "Support",
       "feedback": "Feedback",
@@ -238,7 +234,7 @@
     "saturday": "Saturday",
     "sunday": "Sunday",
     "closed": "Closed",
-    "timeZoneNote": "Office hours are in Vietnam time zone (GMT+7)"
+    "timeZoneNote": "Office hours are in Vietnam time (GMT+7)"
   },
   "nav": {
     "home": "Home",
@@ -252,6 +248,190 @@
     "regions": "Regions",
     "popular": "Popular"
   },
+  "tour": {
+    "duration": "Duration",
+    "availableSlots": "Available Slots",
+    "rating": "Rating",
+    "reviews": "reviews",
+    "days": "days",
+    "category": "Category",
+    "status": "Status",
+    "slots": "slots",
+    "perPerson": "per person",
+    "departureDate": "Departure Date",
+    "selectDepartureDate": "Select departure date",
+    "transportation": "Transportation",
+    "class": "Class",
+    "images": "Images",
+    "video": "Video",
+    "type": "Tour Type",
+    "wontBeCharged": "You won't be charged yet",
+    "savedButton": "Saved",
+    "saveButton": "Save",
+    "adminReply": "Admin Reply",
+    "unsaved": "Tour removed from saved list!",
+    "saved": "Tour saved successfully!",
+    "adults": "Adults",
+    "children": "Children",
+    "infants": "Infants",
+    "total": "Total",
+    "bookNow": "Book Now"
+  },
+  "tourDetailPage": {
+    "priceTitle": "Price Details",
+    "bookNow": "Book Now",
+    "selectDeparture": "Select Departure Date",
+    "guests": "Guests",
+    "adults": "Adults",
+    "children": "Children",
+    "infants": "Infants",
+    "transport": "Transport",
+    "ticketClass": "Ticket Class",
+    "totalPrice": "Total Price",
+    "availableSlots": "Available Slots"
+  },
+  "class": {
+      "economy": "Economy",
+      "business": "Business",
+      "luxury": "Luxury",
+      "economyDesc": "Standard seating with basic amenities.",
+      "businessDesc": "More legroom, better meals, and priority boarding.",
+      "luxuryDesc": "Private cabin, gourmet dining, and exclusive services."
+  },
+  "transport": {
+      "airplane": "Airplane",
+      "bus": "Bus",
+      "cruiseShip": "Cruise Ship",
+      "privateCar": "Private Car"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "revenue": "Revenue",
+    "bookings": "Bookings",
+    "users": "Users",
+    "tours": "Tours",
+    "categories": "Categories",
+    "feedback": "Feedback",
+    "settings": "Settings",
+    "chat": "Chat",
+    "header": {
+        "title": "Admin Dashboard",
+        "search": "Search...",
+        "viewSite": "View Site",
+        "notifications": "Notifications"
+    },
+    "sidebar": {
+        "dashboard": "Dashboard",
+        "tours": "Tours",
+        "bookings": "Bookings",
+        "users": "Users",
+        "categories": "Categories",
+        "reviews": "Reviews",
+        "promotions": "Promotions",
+        "settings": "Settings",
+        "logout": "Logout"
+    },
+    "tourDetailModal": {
+      "title": "Tour Details",
+      "maxGuests": "Max Guests",
+      "availableSlots": "Available Slots",
+      "departureOptions": "Departure Options",
+      "imagesAndVideo": "Images & Video",
+      "details": "Details",
+      "price": "Price",
+      "duration": "Duration",
+      "rating": "Rating",
+      "bookings": "Bookings",
+      "status": "Status",
+      "categories": "Categories",
+      "description": "Description",
+      "close": "Close",
+      "departure": "Departure",
+      "return": "Return",
+      "noDepartureInfo": "No departure information available.",
+      "noMedia": "No images or video available.",
+      "guests": "guests",
+      "slot": "slot"
+    }
+  },
+  "review": {
+    "ratingDistribution": "Rating Distribution",
+    "noReviews": "No reviews yet. Be the first to review!",
+    "leaveReview": "Leave a Review",
+    "commentPlaceholder": "Write your review here...",
+    "submit": "Submit Review",
+    "submitted": "Review submitted successfully",
+    "error": "Error submitting review",
+    "pleaseSelectRating": "Please select a rating",
+    "rating": "rating(s)",
+    "like": "Like",
+    "replyButton": "Reply",
+    "edit": "Edit",
+    "delete": "Delete",
+    "editReview": "Edit Review",
+    "update": "Update",
+    "cancel": "Cancel",
+    "uploadFile": "Upload file",
+    "updated": "Review updated successfully!",
+    "deleted": "Review deleted successfully!",
+    "deleteConfirm": "Are you sure you want to delete this review?"
+  },
+  "alert": {
+    "notificationTitle": "Notification",
+    "inactiveTourMessage": "This tour is currently inactive. Please come back later.",
+    "understood": "Understood"
+  },
+  "booking": {
+    "title": "Book Tour",
+    "name": "Full Name",
+    "namePlaceholder": "Enter your full name",
+    "phone": "Phone Number",
+    "phonePlaceholder": "Enter your phone number",
+    "email": "Email (Optional)",
+    "emailPlaceholder": "Enter your email",
+    "note": "Note",
+    "notePlaceholder": "Any special requests or notes...",
+    "submit": "Submit Booking",
+    "submitting": "Submitting...",
+    "bookings_of": "Your Bookings",
+    "manage": "Manage your bookings",
+    "sort_by": "Sort By",
+    "newest": "Newest",
+    "oldest": "Oldest",
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "cancelBooking": "Cancel Booking",
+    "viewDetail": "View Detail",
+    "departure": "Departure date",
+    "return": "Return date",
+    "bookingId": "Booking ID",
+    "customer": "Customer",
+    "phone": "Phone",
+    "cancelConfirmTitle": "Cancel booking confirmation?",
+    "cancelConfirmText": "Are you sure you want to cancel this booking? This action cannot be undone.",
+    "cancelNo": "No",
+    "cancelYes": "Yes, cancel booking"
+  },
+  "bookingDetailModal": {
+    "title": "Booking Details",
+    "bookingId": "Booking ID",
+    "departure": "Departure date",
+    "return": "Return date",
+    "duration": "Duration",
+    "status": "Status",
+    "total": "Total",
+    "adults": "Adults",
+    "children": "Children",
+    "infants": "Infants",
+    "note": "Note",
+    "transportation": "Transportation",
+    "class": "Class",
+    "close": "Close"
+  },
   "categories": {
     "adventure": "Adventure",
     "cultural": "Cultural",
@@ -263,7 +443,7 @@
   "regions": {
     "asia": "Asia",
     "europe": "Europe",
-    "americas": "Americas",
+    "americas": "The Americas",
     "africa": "Africa",
     "oceania": "Oceania"
   },
@@ -303,10 +483,10 @@
     "tourLanguages": "Tour Languages",
     "minimumRating": "Minimum Rating",
     "stars": "stars",
-    "maxGroupSize": "Maximum Group Size",
+    "maxGroupSize": "Max Group Size",
     "person": "person",
     "people": "people",
-    "maximum": "Max",
+    "maximum": "Maximum",
     "activityLevel": "Activity Level"
   },
   "tours": {
@@ -314,210 +494,97 @@
     "filter": "Filter Tours",
     "sort": "Sort By",
     "price": "Price",
-    "duration": "Duration",
+    "duration": "{value} days",
     "rating": "Rating",
     "bookNow": "Book Now",
     "viewDetails": "View Details",
-    "addToWishlist": "Add to wishlist",
+    "addToWishlist": "Add to Wishlist",
     "share": "Share",
     "topRated": "Top Rated",
     "more": "more",
     "perPerson": "per person",
-    "adminReply": "Admin Reply",
     "viewAll": "View All Tours",
-    "duration": "{value} days"
-  },
-  "review": {
-    "leaveReview": "Leave a Review",
-    "commentPlaceholder": "Write your review here...",
-    "submit": "Submit Review",
-    "submitted": "Review submitted successfully",
-    "error": "Error submitting review",
-    "pleaseSelectRating": "Please select a rating",
-    "ratingDistribution": "Rating Distribution",
-    "rating": "rating(s)",
-    "like": "Like",
-    "replyButton": "Reply",
-    "edit": "Edit",
-    "delete": "Delete",
-    "editReview": "Edit Review",
-    "update": "Update",
-    "cancel": "Cancel",
-    "uploadFile": "Upload file",
-    "updated": "Review updated successfully!",
-    "deleted": "Review deleted successfully!",
-    "deleteConfirm": "Are you sure you want to delete this review?",
-    "noReviews": "No reviews yet. Be the first to review!"
-  },
-  "booking": {
-    "title": "Book Tour",
-    "name": "Full Name",
-    "noBookings": "You haven't made any bookings yet.",
-    "namePlaceholder": "Enter your full name",
-    "phone": "Phone Number",
-    "phonePlaceholder": "Enter your phone number",
-    "email": "Email",
-    "emailPlaceholder": "Enter email (optional)",
-    "note": "Note",
-    "notePlaceholder": "Additional notes (if any)",
-    "submit": "Book Tour",
-    "submitting": "Submitting...",
-    "yourBookingsTitle": "Your Bookings",
-    "yourBookingsDesc": "View and manage your travel bookings",
-    "bookingId": "Booking ID",
-    "departure": "Departure",
-    "return": "Return",
-    "bookings_of": "Your Bookings",
-    "manage": "Manage",
-    "sort_by": "Sort by",
-    "newest": "Newest", 
-    "oldest": "Oldest",
-    "status": {
-      "pending": "Pending",
-      "confirmed": "Confirmed",
-      "completed": "Completed",
-      "cancelled": "Cancelled"
-    }
-  },
-  "admin": {
-    "dashboard": "Dashboard",
-    "tours": "Manage Tours",
-    "bookings": "Manage Bookings",
-    "users": "Manage Users",
-    "settings": "Admin Settings"
+    "viewDetail": "View Detail",
+    "saved": "Tour saved successfully!",
+    "unsaved": "Tour removed from saved list!"
   },
   "footer": {
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
     "rights": "All rights reserved."
   },
-  "chatbot": {
-    "title": "Travel Assistant Bot",
-    "welcome": "Hello! How can I assist you today?",
-    "placeholder": "Type your question...",
-    "suggestions": "Quick Suggestions",
-    "suggestion": {
-      "beaches": "Beautiful Beaches",
-      "booking": "How to book a tour",
-      "cancellation": "Cancellation policy",
-      "discounts": "Discounts & offers",
-      "bestTime": "Best time to travel"
-    },
-    "response": {
-      "beaches": "Some famous beautiful beaches: Nha Trang, Phu Quoc, Da Nang, Vung Tau... Would you like to know more about a specific beach?",
-      "booking": "You can book a tour directly on our website or contact us for assistance.",
-      "cancellation": "Cancellation policy: you can cancel before the departure date and get a refund according to our policy. Please contact us for details.",
-      "discounts": "We regularly have promotions and discounts for groups and loyal customers.",
-      "bestTime": "The best time to travel depends on the destination. Which place would you like to ask about?",
-      "default": "Sorry, I didn't understand. You can ask about tours, destinations, offers, or any travel-related questions."
-    },
-    "minimize": "Minimize",
-    "expand": "Expand",
-    "close": "Close",
-    "send": "Send"
-  },
   "account": {
+    "title": "My Account",
+    "sidebar": {
+      "profile": "Profile",
+      "bookings": "My Bookings",
+      "payment": "Payment",
+      "savedTours": "Saved Tours",
+      "settings": "Settings",
+      "logout": "Logout"
+    },
     "profile": {
-      "title": "Profile Information",
+      "title": "Personal Information",
       "description": "Update your personal information and preferences",
-      "toast": {
-        "updateSuccess": "Profile updated successfully!",
-        "updateError": "Failed to update profile!",
-        "connectionError": "An error occurred while connecting to server."
-      },
+      "avatar": "Avatar",
+      "name": "Full Name",
+      "email": "Email",
       "form": {
         "phone": "Phone Number",
-        "phonePlaceholder": "Enter your phone number",
+        "phonePlaceholder": "Enter phone number",
         "gender": "Gender",
         "male": "Male",
         "female": "Female",
-        "dateOfBirth": "Date of Birth",
         "select": "Select",
+        "dateOfBirth": "Date of Birth",
+        "day": "Day",
+        "month": "Month",
+        "year": "Year",
         "province": "Province/City",
-        "provincePlaceholder": "Province/City",
+        "provincePlaceholder": "Select Province/City",
         "district": "District",
-        "districtPlaceholder": "District",
-        "ward": "Ward",
-        "wardPlaceholder": "Ward",
+        "districtPlaceholder": "Select District",
+        "ward": "Ward/Commune",
+        "wardPlaceholder": "Select Ward/Commune",
         "detailedAddress": "Detailed Address",
-        "detailedAddressPlaceholder": "Enter your detailed address",
-        "saveButton": "Save Information",
-        "savingButton": "Saving..."
+        "detailedAddressPlaceholder": "Enter street name, house number...",
+        "saveButton": "Save Changes",
+        "saving": "Saving...",
+        "success": "Profile updated successfully!",
+        "error": "Error updating profile."
+      },
+      "toast": {
+        "updateSuccess": "Profile updated successfully!",
+        "updateError": "Failed to update profile!",
+        "connectionError": "A server connection error occurred."
       }
+      }
+    },
+    "bookings": {
+      "title": "My Bookings",
+      "description": "Manage your booked tours.",
+      "noBookings": "You have no bookings yet.",
+      "total": "Total",
+      "sortBy": "Sort By",
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "status": {
+        "title": "Status",
+        "pending": "Pending",
+        "confirmed": "Confirmed",
+        "cancelled": "Cancelled",
+        "completed": "Completed"
+      },
+      "details": "View Details",
+      "cancelBooking": "Cancel Booking",
+      "cancelConfirmTitle": "Are you sure you want to cancel?",
+      "cancelConfirmText": "This action cannot be undone.",
+      "cancelSuccess": "Booking cancelled successfully!",
+      "cancelError": "Error cancelling booking."
     },
     "savedTours": {
       "title": "Saved Tours",
-      "description": "Your saved tours will appear here."
+      "description": "Your list of favorite tours.",
+      "noSavedTours": "You have no saved tours."
     }
-  },
-  "tour": {
-    "viewDetail": "View Details",
-    "duration": "{value} days",
-    "departureDate": "Departure Date",
-    "selectDepartureDate": "Select departure date",
-    "selectDepartureDateRequired": "Please select a departure date",
-    "transportation": "Transportation",
-    "class": "Class",
-    "adults": "Adults",
-    "children": "Children",
-    "infants": "Infants",
-    "perPerson": "per person",
-    "total": "Total",
-    "bookNow": "Book Now",
-    "wontBeCharged": "You won't be charged yet",
-    "images": "Images",
-    "video": "Video",
-    "savedButton": "Saved",
-    "saveButton": "Save",
-    "reviews": "reviews",
-    "days": "days",
-    "type": "Tour Type",
-    "availableSlots": "Available Slots",
-    "slots": "slots",
-    "adminReply": "Admin Reply",
-    "unsaved": "Tour removed from saved list!",
-    "saved": "Tour saved successfully!"
-  },
-  "transport": {
-    "airplane": "Airplane",
-    "bus": "Bus",
-    "cruiseShip": "Cruise Ship",
-    "privateCar": "Private Car"
-  },
-  "class": {
-    "economy": "Economy",
-    "economyDesc": "Standard comfort with essential amenities",
-    "business": "Business",
-    "businessDesc": "Enhanced comfort with premium services",
-    "luxury": "Luxury",
-    "luxuryDesc": "Ultimate comfort with exclusive experiences"
-  },
-  "tourCard": {
-    "viewDetails": "View Details"
-  },
-  "bookingDetailModal": {
-    "title": "Booking Details",
-    "bookingId": "Booking ID",
-    "departure": "Departure Date",
-    "return": "Return Date",
-    "duration": "Duration",
-    "status": "Status",
-    "total": "Total",
-    "adults": "Adults",
-    "children": "Children",
-    "infants": "Infants",
-    "note": "Note",
-    "transportation": "Transportation",
-    "class": "Class",
-    "close": "Close"
-  },
-  "sort": {
-    "recommended": "Recommended",
-    "priceLowToHigh": "Price: Low to High",
-    "priceHighToLow": "Price: High to Low",
-    "highestRated": "Highest Rated",
-    "durationShortToLong": "Duration: Short to Long",
-    "durationLongToShort": "Duration: Long to Short",
-    "alphabetical": "Alphabetical"
-  }
-} 
+  } 
