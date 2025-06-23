@@ -1,12 +1,38 @@
 const Tour = require('../models/Tour.js');
 const Review = require('../models/Review.js');
+const Booking = require('../models/Booking');
 
 // Lấy danh sách tất cả tour
 const getAllTours = async (req, res) => {
   try {
-    // Tạm thời chỉ populate và trả về tours để kiểm tra
-    const tours = await Tour.find().populate('category', 'name'); 
-    res.status(200).json(tours);
+    // Lấy tất cả tour
+    const tours = await Tour.find().populate('category', 'name');
+
+    // Lấy số lượng booking và review cho từng tour
+    const reviewCount = await Review.countDocuments({ tour: { $in: tours.map(tour => tour._id) } });
+    const bookingCount = await Booking.countDocuments({ tour: { $in: tours.map(tour => tour._id) } });
+
+    // Duyệt từng tour và đếm booking/review
+    const toursWithCounts = await Promise.all(
+      tours.map(async (tour) => {
+        const bookingCount = await Booking.countDocuments({ tour: tour._id });
+        const reviewCount = await Review.countDocuments({ tour: tour._id });
+        // Tính rating trung bình
+        const reviews = await Review.find({ tour: tour._id });
+        let rating = 0;
+        if (reviews.length > 0) {
+          rating = reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length;
+        }
+        return {
+          ...tour.toObject(),
+          bookingCount,
+          reviewCount,
+          rating: Math.round(rating * 10) / 10,
+        };
+      })
+    );
+
+    res.status(200).json(toursWithCounts);
 
     /*
     // Lấy rating trung bình cho từng tour - Sẽ được kích hoạt lại sau
@@ -111,13 +137,21 @@ const updateTourStatus = async (req, res) => {
 const updateTour = async (req, res) => {
     try {
         const { id } = req.params;
-        // Loại bỏ 'status' khỏi các trường có thể cập nhật trong hàm này
-        const { name, description, price, duration, category, images, maxGroupSize, locations, departure, returnDate } = req.body;
+        // Lấy tất cả dữ liệu từ body mà không chỉ định từng trường
+        // Điều này linh hoạt hơn khi form thay đổi
+        const updateData = req.body;
 
+        // Xóa trường _id và các trường không thể thay đổi khác nếu có
+        delete updateData._id;
+        
+        // Không cho phép cập nhật status qua endpoint này để đảm bảo logic
+        // Nếu muốn, có thể dùng một endpoint riêng như updateTourStatus
+        delete updateData.status; 
+        
         const updatedTour = await Tour.findByIdAndUpdate(
             id,
-            { name, description, price, duration, category, images, maxGroupSize, locations, departure, returnDate },
-            { new: true }
+            updateData, // Truyền cả object dữ liệu cập nhật
+            { new: true } // Trả về document đã được cập nhật
         );
 
         if (!updatedTour) {

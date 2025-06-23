@@ -1,6 +1,7 @@
 import { AuthProvider } from "@/components/auth-provider"
 import { AutoRedirectAdmin } from "@/components/auto-redirect-admin"
 import ConditionalLayoutWrapper from "@/components/conditional-layout-wrapper"
+import { NotificationProvider } from "@/components/NotificationProvider"
 import { SocketProvider } from "@/components/socket-provider"
 import { ClerkProvider } from "@clerk/nextjs"
 import type { Metadata } from "next"
@@ -25,23 +26,27 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
-        <body className={inter.className}>
+        <body>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
           >
-            <LanguageProvider>
-              <AuthProvider>
-                <SocketProvider>
-                  <AutoRedirectAdmin>
-                    <Toaster richColors expand={true} position="top-center" closeButton />
-                    <ConditionalLayoutWrapper>{children}</ConditionalLayoutWrapper>
-                  </AutoRedirectAdmin>
-                </SocketProvider>
-              </AuthProvider>
-            </LanguageProvider>
+            <div className={inter.className}>
+              <LanguageProvider>
+                <AuthProvider>
+                  <SocketProvider>
+                    <NotificationProvider>
+                      <AutoRedirectAdmin>
+                        <Toaster richColors expand={true} position="top-center" closeButton />
+                        <ConditionalLayoutWrapper>{children}</ConditionalLayoutWrapper>
+                      </AutoRedirectAdmin>
+                    </NotificationProvider>
+                  </SocketProvider>
+                </AuthProvider>
+              </LanguageProvider>
+            </div>
           </ThemeProvider>
         </body>
       </html>

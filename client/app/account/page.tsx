@@ -680,7 +680,12 @@ export default function AccountPage() {
                               <CardContent className="p-6">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                                   <div className="md:col-span-2">
-                                    <h3 className="font-semibold text-lg">{booking.tour.name}</h3>
+                                    <h3 
+                                      className="font-semibold text-lg cursor-pointer"
+                                      onClick={() => router.push(`/tours/${booking.tour._id}`)}
+                                    >
+                                      {booking.tour.name}
+                                    </h3>
                                     <p className="text-sm text-muted-foreground mt-1">
                                       <span>
                                         <CalendarIcon className="inline-block w-4 h-4 mr-1.5" />

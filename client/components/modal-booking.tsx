@@ -1,42 +1,28 @@
 "use client"
 
-import { useState } from "react"
 import { useLanguage } from "@/components/language-provider-fixed"
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog"
 import { useAuth, useUser } from "@clerk/nextjs"
+import { Loader2, Mail, Phone, StickyNote, User } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { User, Phone, Mail, StickyNote, Loader2 } from "lucide-react"
+import { useState } from "react"
 
 interface ModalBookingProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  tourId: string
-  departureDate: string
-  returnDate?: string
-  transportType: string
-  ticketClass: string
-  adults: number
-  children: number
-  infants: number
-  totalPrice: number
+  tour: any // Thay vì các props riêng lẻ, ta truyền cả object tour
+  onSuccess: (bookingDetails: any) => void
 }
 
 export function ModalBooking({
   open,
   onOpenChange,
-  tourId,
-  departureDate,
-  returnDate,
-  transportType,
-  ticketClass,
-  adults,
-  children,
-  infants,
-  totalPrice,
+  tour,
+  onSuccess
 }: ModalBookingProps) {
   const { t } = useLanguage()
   const router = useRouter()
@@ -44,16 +30,15 @@ export function ModalBooking({
   const { user } = useUser()
 
   const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    email: "",
+    name: user?.fullName || user?.username || "",
+    phone: user?.primaryPhoneNumber?.phoneNumber || "",
+    email: user?.primaryEmailAddress?.emailAddress || "",
     note: "",
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
 
-  const guests = adults + children + infants
-  const isBookingReady = !!(user?.id && tourId && guests > 0 && totalPrice > 0 && formData.name.trim() && formData.phone.trim())
+  const isBookingReady = !!(user?.id && tour?._id && formData.name.trim() && formData.phone.trim())
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -76,31 +61,27 @@ export function ModalBooking({
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
         },
-        credentials: "include",
         body: JSON.stringify({
-          user: user.id,
-          tour: tourId,
-          guests,
-          totalPrice,
+          tour: tour._id,
+          totalPrice: tour.price, // Lấy giá từ tour object
           name: formData.name,
           phone: formData.phone,
           email: formData.email,
           note: formData.note,
-          departureDate,
-          returnDate,
-          transportType,
-          ticketClass,
-          adults,
-          children,
-          infants,
+          // Các thông tin khác có thể lấy từ tour nếu cần
+          departureDate: tour.departureOptions?.[0]?.departureDate,
+          returnDate: tour.departureOptions?.[0]?.returnDate,
         }),
       })
-      if (!res.ok) throw new Error("Đặt tour thất bại")
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Đặt tour thất bại");
+      }
       const data = await res.json()
-      onOpenChange(false)
-      router.push(data.paymentUrl)
-    } catch (error) {
-      setError("Có lỗi khi đặt tour!")
+      // Gọi callback onSuccess thay vì điều hướng trực tiếp
+      onSuccess(data.booking); 
+    } catch (error: any) {
+      setError(error.message || "Có lỗi khi đặt tour!")
     } finally {
       setIsLoading(false)
     }

@@ -2,6 +2,16 @@
 
 import BookingDetailModal from '@/components/admin/bookings/BookingDetailModal'
 import { useLanguage } from "@/components/language-provider-fixed"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -9,6 +19,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 import { useAuth, useUser } from '@clerk/nextjs'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 interface Booking {
   _id: string
@@ -42,6 +53,11 @@ export default function BookingsPage() {
   const [isAdmin, setIsAdmin] = useState(false)
   const { user } = useUser()
   const { t } = useLanguage()
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [pendingAction, setPendingAction] = useState<{
+    bookingId: string
+    status: string
+  } | null>(null)
 
   const handleUpdateStatus = async (bookingId: string, status: string) => {
     setActionLoading(bookingId + status)
@@ -57,13 +73,26 @@ export default function BookingsPage() {
       });
       if (res.ok) {
         setBookings(prev => prev.map(b => b._id === bookingId ? { ...b, status } : b));
+        if (status === 'confirmed') {
+          toast.success('Xác nhận đặt tour thành công!')
+        } else if (status === 'completed') {
+          toast.success('Đã xác nhận hoàn thành tour thành công!')
+        }
       } else {
-        alert('Cập nhật trạng thái thất bại!');
+        if (status === 'confirmed') {
+          toast.error('Xác nhận đặt tour thất bại. Vui lòng thử lại.')
+        } else if (status === 'completed') {
+          toast.error('Hoàn thành đặt tour thất bại. Vui lòng thử lại.')
+        } else {
+          toast.error('Cập nhật trạng thái thất bại!');
+        }
       }
     } catch {
-      alert('Có lỗi khi cập nhật trạng thái!');
+      toast.error('Có lỗi khi cập nhật trạng thái!')
     } finally {
       setActionLoading(null)
+      setDialogOpen(false)
+      setPendingAction(null)
     }
   }
 
@@ -96,6 +125,33 @@ export default function BookingsPage() {
         return status
     }
   }
+
+  const handleActionButtonClick = (bookingId: string, status: string) => {
+    setPendingAction({ bookingId, status })
+    setDialogOpen(true)
+  }
+
+  const getDialogTexts = () => {
+    if (!pendingAction) return { title: '', description: '', confirm: '' }
+    switch (pendingAction.status) {
+      case 'confirmed':
+        return {
+          title: 'Xác nhận đặt tour?',
+          description: 'Bạn có chắc chắn muốn xác nhận đặt tour này không?',
+          confirm: 'Xác nhận',
+        }
+      case 'completed':
+        return {
+          title: 'Hoàn thành đặt tour?',
+          description: 'Bạn có chắc chắn muốn đánh dấu đặt tour này là đã hoàn thành không?',
+          confirm: 'Hoàn thành',
+        }
+      default:
+        return { title: '', description: '', confirm: '' }
+    }
+  }
+
+  const dialogTexts = getDialogTexts()
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -175,11 +231,11 @@ export default function BookingsPage() {
                 ) : (
                   bookings.map(booking => (
                     <tr key={booking._id} className="hover:bg-gray-50 transition">
-                      <td className="px-4 py-3 font-medium text-gray-900">{
-                        booking.user && (booking.user.firstname || booking.user.lastname)
-                          ? `${booking.user.firstname || ''} ${booking.user.lastname || ''}`.trim()
-                          : booking.user?.username || '(trống)'
-                      }</td>
+                      <td className="px-4 py-3 font-medium text-gray-900">
+                        {booking.user
+                          ? [booking.user.firstname, booking.user.lastname].filter(Boolean).join(' ') || booking.user.username || '(trống)'
+                          : '(trống)'}
+                      </td>
                       <td className="px-4 py-3 text-gray-700">{booking.tour?.name || booking.tourName || '(trống)'}</td>
                       <td className="px-4 py-3 text-center text-gray-700">{formatDate(booking.bookingDate)}</td>
                       <td className="px-4 py-3 text-center">
@@ -193,8 +249,8 @@ export default function BookingsPage() {
                           size="sm"
                           className="text-blue-600 border-blue-200 hover:bg-blue-50"
                           onClick={() => {
-                            setSelectedBooking(booking);
-                            setShowModal(true);
+                            setSelectedBooking(booking)
+                            setShowModal(true)
                           }}
                         >
                           Xem
@@ -204,10 +260,10 @@ export default function BookingsPage() {
                             variant="outline"
                             size="sm"
                             className="ml-2 border-green-500 text-green-600 bg-white hover:bg-green-50"
-                            disabled={actionLoading === booking._id + 'confirmed'}
-                            onClick={() => handleUpdateStatus(booking._id, 'confirmed')}
+                            disabled={!!actionLoading}
+                            onClick={() => handleActionButtonClick(booking._id, 'confirmed')}
                           >
-                            {actionLoading === booking._id + 'confirmed' ? 'Đang xác nhận...' : 'Xác nhận'}
+                            Xác nhận
                           </Button>
                         )}
                         {isAdmin && booking.status === 'confirmed' && (
@@ -215,10 +271,10 @@ export default function BookingsPage() {
                             variant="outline"
                             size="sm"
                             className="ml-2 border-green-500 text-green-600 bg-white hover:bg-green-50"
-                            disabled={actionLoading === booking._id + 'completed'}
-                            onClick={() => handleUpdateStatus(booking._id, 'completed')}
+                            disabled={!!actionLoading}
+                            onClick={() => handleActionButtonClick(booking._id, 'completed')}
                           >
-                            {actionLoading === booking._id + 'completed' ? 'Đang hoàn thành...' : 'Hoàn thành'}
+                            Hoàn thành
                           </Button>
                         )}
                       </td>
@@ -230,6 +286,27 @@ export default function BookingsPage() {
           </div>
         </CardContent>
       </Card>
+      <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{dialogTexts.title}</AlertDialogTitle>
+            <AlertDialogDescription>{dialogTexts.description}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setPendingAction(null)}>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={!!actionLoading}
+              onClick={() => {
+                if (pendingAction) {
+                  handleUpdateStatus(pendingAction.bookingId, pendingAction.status)
+                }
+              }}
+            >
+              {actionLoading ? 'Đang xử lý...' : dialogTexts.confirm}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <BookingDetailModal
         booking={selectedBooking}
         open={showModal}

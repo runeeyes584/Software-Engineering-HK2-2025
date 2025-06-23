@@ -4,7 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const http = require('http');
-const { Server } = require("socket.io");
+const { initSocket } = require('./socket'); // Import initSocket
 
 // Import routes
 const tourRoutes = require('./routes/tour.route.js');
@@ -24,42 +24,9 @@ const requireAuth = require('./middleware/clerk');
 // Khởi tạo Express app
 const app = express();
 const httpServer = http.createServer(app);
-const io = new Server(httpServer, {
-    cors: {
-        origin: "http://localhost:3000",
-        methods: ["GET", "POST"]
-    }
-});
 
-// Quản lý người dùng đang online
-let onlineUsers = [];
-
-const addUser = (userId, socketId) => {
-    !onlineUsers.some((user) => user.userId === userId) &&
-        onlineUsers.push({ userId, socketId });
-};
-
-const removeUser = (socketId) => {
-    onlineUsers = onlineUsers.filter((user) => user.socketId !== socketId);
-};
-
-io.on("connection", (socket) => {
-    console.log(`A user connected: ${socket.id}`);
-
-    // Lắng nghe sự kiện join_room từ client
-    socket.on("join_room", (userId) => {
-        if (userId) {
-            socket.join(userId);
-            addUser(userId, socket.id);
-            console.log(`User ${userId} with socket ${socket.id} joined room ${userId}`);
-        }
-    });
-
-    socket.on("disconnect", () => {
-        console.log(`A user disconnected: ${socket.id}`);
-        removeUser(socket.id);
-    });
-});
+// Khởi tạo Socket.IO
+initSocket(httpServer);
 
 // Kết nối đến Database
 connectDB();
@@ -108,6 +75,3 @@ const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
-
-// Export io để các modules khác có thể sử dụng
-module.exports.io = io;

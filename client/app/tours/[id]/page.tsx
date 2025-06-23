@@ -57,6 +57,7 @@ export default function TourDetailPage() {
   const [lastManualChangeTime, setLastManualChangeTime] = useState(0);
   const [showBookingModal, setShowBookingModal] = useState(false)
   const [showInactiveAlert, setShowInactiveAlert] = useState(false)
+  const [showOutOfStockDialog, setShowOutOfStockDialog] = useState(false);
 
   useEffect(() => {
     const fetchTourData = async () => {
@@ -270,12 +271,18 @@ export default function TourDetailPage() {
   const totalPrice = adults * adultPrice + children * childPrice + infants * infantPrice
 
   const handleBookNow = () => {
-    if (tourData.status === 'inactive') {
+    // Kiểm tra tour có active không
+    if (tourData?.status !== 'active') {
       setShowInactiveAlert(true);
-    } else {
-      setShowBookingModal(true);
+      return;
     }
-  };
+    // Kiểm tra tour có còn slot không
+    if (tourData?.availableSlots <= 0) {
+      setShowOutOfStockDialog(true);
+      return;
+    }
+    setShowBookingModal(true)
+  }
 
   const TransportIcon = getSelectedTransport().icon
 
@@ -749,17 +756,31 @@ export default function TourDetailPage() {
         <ModalBooking
           open={showBookingModal}
           onOpenChange={setShowBookingModal}
-          tourId={String(tour.id || "")}
-          departureDate={departureDate ? format(departureDate, "yyyy-MM-dd") : ""}
-          returnDate={returnDate ? format(returnDate, "yyyy-MM-dd") : undefined}
-          transportType={transportType}
-          ticketClass={ticketClass}
-          adults={adults}
-          children={children}
-          infants={infants}
-          totalPrice={totalPrice}
+          tour={tourData}
+          onSuccess={(bookingDetails) => {
+            setShowBookingModal(false);
+            router.push(`/payment/${bookingDetails._id}`);
+          }}
         />
       </div>
+
+      <Dialog open={showOutOfStockDialog} onOpenChange={setShowOutOfStockDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('tour.outOfStock.title')}</DialogTitle>
+            <DialogDescription>
+              {t('tour.outOfStock.description')}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button">
+                {t('tour.outOfStock.confirmButton')}
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={showInactiveAlert} onOpenChange={setShowInactiveAlert}>
         <DialogContent>

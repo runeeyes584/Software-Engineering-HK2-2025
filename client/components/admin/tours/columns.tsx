@@ -45,7 +45,8 @@ export interface Tour {
   }[]
   price: number
   duration: number
-  bookings?: number
+  bookingCount?: number
+  reviewCount?: number
   rating?: number
   images?: string[]
   videos?: string[]
@@ -204,14 +205,10 @@ export const columns = ({ onStatusChange, onDelete, onViewDetails }: ColumnsProp
   },
   {
     accessorKey: "price",
-    header: () => <div className="text-center">Giá</div>,
+    header: "Giá",
     cell: ({ row }) => {
-      const price = parseFloat(row.getValue("price"))
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(price)
-      return <span className="text-green-600 font-bold text-center block">{formatted}</span>
+      const price = parseFloat(row.original.price as any);
+      return <span className="text-muted-foreground">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price)}</span>
     },
   },
   {
@@ -223,10 +220,10 @@ export const columns = ({ onStatusChange, onDelete, onViewDetails }: ColumnsProp
     },
   },
   {
-    accessorKey: "bookings",
+    accessorKey: "bookingCount",
     header: () => <div className="text-center">Đặt chỗ</div>,
     cell: ({ row }) => {
-      const value = row.getValue("bookings")
+      const value = row.getValue("bookingCount")
       return <span className="font-semibold text-center block">{value === undefined || value === null || value === '' ? 0 : String(value)}</span>
     },
   },
@@ -246,18 +243,18 @@ export const columns = ({ onStatusChange, onDelete, onViewDetails }: ColumnsProp
     },
   },
   {
-    accessorKey: "rating",
-    header: () => <div className="text-center">Đánh giá</div>,
+    accessorKey: "reviewCount",
+    header: "Đánh giá",
     cell: ({ row }) => {
-      let value = row.getValue("rating")
-      if (value === undefined || value === null || value === "") value = 0
+      const reviewCount = row.original.reviewCount ?? 0;
+      const rating = row.original.rating ?? 0;
       return (
-        <div className="flex items-center justify-center gap-1">
+        <div className="flex items-center gap-1">
           <span className="text-yellow-500">★</span>
-          <span className="font-semibold">{String(value)}</span>
+          <span>{rating.toFixed(1)} ({reviewCount})</span>
         </div>
       )
-    },
+    }
   },
   {
     id: "actions",

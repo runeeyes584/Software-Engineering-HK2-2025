@@ -1,22 +1,19 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
+import { useClerk } from "@clerk/nextjs"
+import {
+    Calendar,
+    ChevronLeft,
+    DollarSign,
+    LayoutDashboard,
+    LayoutGrid,
+    LogOut,
+    Package,
+    Users
+} from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import {
-  LayoutDashboard,
-  Users,
-  Calendar,
-  Settings,
-  LogOut,
-  Package,
-  DollarSign,
-  MessageSquare,
-  FileText,
-  ChevronLeft,
-  LayoutGrid,
-} from "lucide-react"
-import { useClerk } from "@clerk/nextjs"
 
 const menuItems = [
   { title: "Dashboard", icon: LayoutDashboard, href: "/admin" },
@@ -25,9 +22,6 @@ const menuItems = [
   { title: "Quản lý người dùng", icon: Users, href: "/admin/users" },
   { title: "Đặt chỗ", icon: Calendar, href: "/admin/bookings" },
   { title: "Doanh thu", icon: DollarSign, href: "/admin/revenue" },
-  { title: "Blog", icon: FileText, href: "/admin/blogs" },
-  { title: "Phản hồi", icon: MessageSquare, href: "/admin/feedback" },
-  { title: "Cài đặt", icon: Settings, href: "/admin/settings" },
 ]
 
 interface AdminSidebarProps {

@@ -329,7 +329,13 @@
     "viewAll": "Xem tất cả Tour",
     "viewDetail": "Xem chi tiết",
     "saved": "Lưu tour thành công!",
-    "unsaved": "Đã bỏ lưu tour!"
+    "unsaved": "Đã bỏ lưu tour!",
+    "totalPrice": "Tổng cộng",
+    "outOfStock": {
+      "title": "Thông báo",
+      "description": "Tour đã hết chỗ, mong quý khách thông cảm.",
+      "confirmButton": "Đã hiểu"
+    }
   },
   "review": {
     "ratingDistribution": "Phân phối đánh giá",
@@ -351,7 +357,16 @@
     "uploadFile": "Tải tệp lên",
     "updated": "Cập nhật đánh giá thành công!",
     "deleted": "Xóa đánh giá thành công!",
-    "deleteConfirm": "Bạn có chắc chắn muốn xóa đánh giá này không?"
+    "deleteConfirm": "Bạn có chắc chắn muốn xóa đánh giá này không?",
+    "toast": {
+      "cancelSuccess": "Hủy đánh giá thành công!",
+      "cancelError": "Hủy đánh giá thất bại. Vui lòng thử lại.",
+      "confirmSuccess": "Xác nhận đánh giá thành công!",
+      "confirmError": "Xác nhận đánh giá thất bại. Vui lòng thử lại.",
+      "completeSuccess": "Hoàn thành đánh giá thành công!",
+      "completeError": "Hoàn thành đánh giá thất bại. Vui lòng thử lại."
+    },
+    "title": "Đánh giá"
   },
   "booking": {
     "title": "Đặt Tour",
@@ -386,7 +401,15 @@
     "cancelConfirmTitle": "Xác nhận hủy đặt tour?",
     "cancelConfirmText": "Bạn có chắc chắn muốn hủy đặt tour này không? Hành động này không thể hoàn tác.",
     "cancelNo": "Không",
-    "cancelYes": "Vâng, hủy đặt"
+    "cancelYes": "Vâng, hủy đặt",
+    "toast": {
+      "cancelSuccess": "Hủy đặt tour thành công!",
+      "cancelError": "Hủy đặt tour thất bại. Vui lòng thử lại.",
+      "confirmSuccess": "Xác nhận đặt tour thành công!",
+      "confirmError": "Xác nhận đặt tour thất bại. Vui lòng thử lại.",
+      "completeSuccess": "Hoàn thành đặt tour thành công!",
+      "completeError": "Hoàn thành đặt tour thất bại. Vui lòng thử lại."
+    }
   },
   "admin": {
     "dashboard": "Bảng điều khiển",
@@ -478,7 +501,8 @@
     },
     "savedTours": {
       "title": "Tour đã lưu",
-      "description": "Danh sách tour đã lưu của bạn sẽ hiển thị ở đây."
+      "description": "Danh sách tour đã lưu của bạn sẽ hiển thị ở đây.",
+      "noSavedTours": "Bạn chưa có tour nào đã lưu."
     }
   },
   "tour": {
@@ -486,6 +510,8 @@
     "category": "Danh mục",
     "duration": "Thời lượng",
     "days": "ngày",
+    "availableSlots": "Chỗ còn lại",
+    "status": "Trạng thái",
     "maxGuests": "Số khách tối đa",
     "destination": "Điểm đến",
     "bookNow": "Đặt ngay",
@@ -507,7 +533,12 @@
     "adults": "Người lớn",
     "children": "Trẻ em",
     "infants": "Em bé",
-    "total": "Tổng cộng"
+    "total": "Tổng cộng",
+    "outOfStock": {
+      "title": "Thông báo",
+      "description": "Tour đã hết chỗ, mong quý khách thông cảm.",
+      "confirmButton": "Đã hiểu"
+    }
   },
   "transport": {
     "airplane": "Máy bay",
@@ -555,5 +586,6 @@
     "notificationTitle": "Thông báo",
     "inactiveTourMessage": "Tour này hiện không hoạt động. Quý khách vui lòng quay lại sau.",
     "understood": "Đã hiểu"
-  }
+  },
+  "cancel_booking_success": "Hủy đặt tour thành công!"
 }

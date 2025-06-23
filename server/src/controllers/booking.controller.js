@@ -11,7 +11,7 @@ const getAllBookings = async (req, res) => {
   try {
     const bookings = await Booking.find()
       .sort({ createdAt: -1 })
-      .populate('user', 'username email')
+      .populate('user', 'firstname lastname username email')
       .populate('tour', 'name price departureOptions')
       .populate('promotion')
       .populate('review')
@@ -52,7 +52,7 @@ const getAllBookings = async (req, res) => {
 const getBookingById = async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id)
-      .populate('user', 'username email')
+      .populate('user', 'firstname lastname username email')
       .populate('tour', 'name price')
       .populate('promotion')
       .populate('review')
@@ -127,26 +127,64 @@ const createBooking = async (req, res) => {
 // Cập nhật booking theo ID
 const updateBooking = async (req, res) => {
   try {
-    const bookingId = req.params.id;
-    const dbUserId = req.dbUser?._id;
-    const isCurrentUserAdmin = req.dbUser?.role === 'admin';
+    const { id } = req.params;
+    const { status } = req.body; // Lấy status từ body
 
-    const booking = await Booking.findById(bookingId);
+    const bookingToUpdate = await Booking.findById(id);
 
-    if (!booking) {
+    if (!bookingToUpdate) {
       return res.status(404).json({ message: 'Booking not found' });
     }
 
-    // Security Check: chỉ admin hoặc chủ booking mới có quyền update
-    if (booking.user.toString() !== dbUserId.toString() && !isCurrentUserAdmin) {
-      return res.status(403).json({ message: 'Forbidden: You do not have permission to update this booking.' });
-    }
+    // --- LOGIC MỚI: CẬP NHẬT AVAILABLE SLOTS ---
+    const isMovingToReserved = (status === 'confirmed' || status === 'completed');
+    const wasAlreadyReserved = (bookingToUpdate.status === 'confirmed' || bookingToUpdate.status === 'completed');
 
+    // Chỉ trừ slot khi chuyển từ trạng thái chưa đặt chỗ (pending, cancelled) 
+    // sang đã đặt chỗ (confirmed, completed) để tránh trừ lặp.
+    if (status && isMovingToReserved && !wasAlreadyReserved) {
+      const tour = await Tour.findById(bookingToUpdate.tour);
+      if (tour) {
+        if (tour.availableSlots > 0) {
+          tour.availableSlots -= 1;
+          await tour.save();
+        } else {
+          // Nếu không còn slot, không cho confirm/complete
+          return res.status(400).json({ message: 'Không còn chỗ trống cho tour này.' });
+        }
+      }
+    }
+    // --- KẾT THÚC LOGIC MỚI ---
+
+    // Lấy thông tin cần thiết TRƯỚC KHI cập nhật
+    const userIdForNotification = bookingToUpdate.user;
+    const tourIdForNotification = bookingToUpdate.tour;
+
+    // Cập nhật booking như bình thường
     const updatedBooking = await Booking.findByIdAndUpdate(
-      bookingId,
+      id,
       req.body,
       { new: true }
-    );
+    ).populate('user', 'username email').populate('tour', 'name price');
+
+    // Sau khi cập nhật thành công, gửi thông báo
+    if (status === 'confirmed' && updatedBooking) {
+      try {
+        // Lấy lại thông tin tour để có tên
+        const tour = await Tour.findById(tourIdForNotification);
+        // Lấy user để lấy clerkId
+        const user = await User.findById(userIdForNotification);
+        if (tour && user) {
+          const title = "Đặt tour đã được xác nhận";
+          const message = `Đơn đặt tour "${tour.name}" của bạn đã được xác nhận.`;
+          const link = `/account`; // Link tới trang quản lý booking của người dùng
+          await createNotification(user.clerkId, title, message, link);
+        }
+      } catch (notificationError) {
+        console.error("Failed to send confirmation notification:", notificationError);
+      }
+    }
+    // --- KẾT THÚC TÍCH HỢP THÔNG BÁO ---
 
     res.status(200).json(updatedBooking);
   } catch (err) {

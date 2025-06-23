@@ -1,12 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { User as UserIcon, Eye, X } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Eye, User as UserIcon, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 interface User {
   _id: string
@@ -113,7 +113,11 @@ export default function UsersPage() {
                             <UserIcon size={20} />
                           </span>
                         )}
-                        <span className="font-medium text-gray-900">{user.username}</span>
+                        <span className="font-medium text-gray-900">
+                          {user.firstname || user.lastname
+                            ? [user.firstname, user.lastname].filter(Boolean).join(' ')
+                            : user.username || '(trống)'}
+                        </span>
                       </td>
                       <td className="px-4 py-3 text-gray-700">{user.email}</td>
                       <td className="px-4 py-3 text-center">

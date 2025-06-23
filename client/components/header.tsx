@@ -1,6 +1,8 @@
 "use client"
 
 import { useLanguage } from "@/components/language-provider-fixed"
+import { NotificationDropdown } from "@/components/notification-dropdown"
+import { useNotification } from "@/components/NotificationProvider"
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -14,8 +16,9 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useAdminRole } from "@/hooks/use-admin-role"
 import { cn } from "@/lib/utils"
-import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs"
+import { SignInButton, SignUpButton, useAuth, UserButton, useUser } from "@clerk/nextjs"
 import {
+    Bell,
     Building,
     ChevronDown,
     Compass,
@@ -33,7 +36,9 @@ import {
 } from "lucide-react"
 import { useTheme } from "next-themes"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
+import { useEffect, useRef, useState } from "react"
+import { io, Socket } from "socket.io-client"
 
 export default function Header() {
   const { theme, setTheme } = useTheme()
@@ -41,6 +46,14 @@ export default function Header() {
   const { user, isSignedIn } = useUser()
   const { isAdmin } = useAdminRole()
   const pathname = usePathname()
+  const [showNotifications, setShowNotifications] = useState(false)
+  const { unreadCount, resetBadge, refetchUnread } = useNotification()
+  const { getToken, userId } = useAuth()
+  const router = useRouter()
+  const socketRef = useRef<Socket | null>(null)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => { setMounted(true) }, [])
 
   const tourCategories = [
     { href: "/tours/adventure", label: t("categories.adventure"), icon: Mountain },
@@ -65,6 +78,58 @@ export default function Header() {
     { href: "/destinations/thailand", label: "Thailand" },
     { href: "/destinations/indonesia", label: "Indonesia" },
   ]
+
+  // Hàm fetch số thông báo chưa đọc
+  const fetchUnreadCount = async () => {
+    try {
+      const token = await getToken();
+      if (!token || !userId) return;
+      const res = await fetch("http://localhost:5000/api/notifications", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const unread = data.filter((n: any) => !n.isRead).length;
+        refetchUnread();
+      }
+    } catch (e) {
+      // ignore
+    }
+  };
+
+  // Luôn fetch khi mount và khi route thay đổi
+  useEffect(() => {
+    fetchUnreadCount();
+    // eslint-disable-next-line
+  }, [pathname, userId]);
+
+  // Khi đóng dropdown, fetch lại số chưa đọc
+  useEffect(() => {
+    if (showNotifications) {
+      resetBadge(); // Khi mở dropdown, reset badge
+    } else {
+      refetchUnread(); // Khi đóng dropdown, fetch lại số chưa đọc
+    }
+    // eslint-disable-next-line
+  }, [showNotifications]);
+
+  // Kết nối socket để nhận thông báo mới real-time
+  useEffect(() => {
+    if (!userId) return;
+    socketRef.current = io("http://localhost:5000");
+    socketRef.current.emit("join_room", userId);
+    const handleNewNotification = () => {
+      // Nếu dropdown đang đóng, tăng badge ngay
+      if (!showNotifications) refetchUnread();
+    };
+    socketRef.current.on("new_notification", handleNewNotification);
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.off("new_notification", handleNewNotification);
+        socketRef.current.disconnect();
+      }
+    };
+  }, [userId, showNotifications, refetchUnread]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -290,7 +355,7 @@ export default function Header() {
             </Link>
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 relative">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" aria-label="Language">
@@ -310,13 +375,13 @@ export default function Header() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" aria-label="Theme">
-                  {theme === "light" ? (
+                  {mounted && (theme === "light" ? (
                     <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
                   ) : theme === "dark" ? (
                     <Moon className="h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
                   ) : (
                     <Monitor className="h-5 w-5" />
-                  )}
+                  ))}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -334,6 +399,25 @@ export default function Header() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Notifications"
+                className="relative"
+                onClick={() => setShowNotifications((v) => !v)}
+              >
+                <Bell className="h-5 w-5" />
+                {unreadCount > 0 && !showNotifications && (
+                  <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[20px] h-[20px] flex items-center justify-center font-bold border-2 border-white shadow">{unreadCount}</span>
+                )}
+              </Button>
+              <NotificationDropdown
+                open={showNotifications}
+                onClose={() => setShowNotifications(false)}
+              />
+            </div>
 
             <Link href="/account" passHref legacyBehavior>
               <Button variant="ghost" size="icon" aria-label="Account">

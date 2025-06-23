@@ -1,9 +1,11 @@
 import { useLanguage } from "@/components/language-provider-fixed";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@clerk/nextjs";
 import { Baby, BadgeCheck, CalendarIcon, Clock, DollarSign, Mail, StickyNote, User, User2, Users } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface BookingDetailModalProps {
   booking: any | null;
@@ -20,6 +22,7 @@ export default function BookingDetailModal({ booking, open, onOpenChange, t: tPr
   const { getToken } = useAuth();
   const [loading, setLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<null | (() => void)>(null);
 
   useEffect(() => {
     const fetchRole = async () => {
@@ -55,13 +58,12 @@ export default function BookingDetailModal({ booking, open, onOpenChange, t: tPr
       if (res.ok) {
         if (onStatusChange) onStatusChange(status, booking._id);
         onOpenChange(false);
+        toast.success(status === 'confirmed' ? 'Xác nhận đặt chỗ thành công!' : 'Đánh dấu hoàn thành tour thành công!');
       } else {
-        // eslint-disable-next-line no-alert
-        alert('Cập nhật trạng thái thất bại!');
+        toast.error('Cập nhật trạng thái thất bại!');
       }
     } catch (e) {
-      // eslint-disable-next-line no-alert
-      alert('Có lỗi khi cập nhật trạng thái!');
+      toast.error('Cập nhật trạng thái thất bại!');
     } finally {
       setLoading(false);
     }
@@ -176,24 +178,52 @@ export default function BookingDetailModal({ booking, open, onOpenChange, t: tPr
         {isAdmin && (booking?.status === 'pending' || booking?.status === 'confirmed') && (
           <div className="flex gap-3 mt-6">
             {booking.status === 'pending' && (
-              <Button
-                variant="default"
-                className="w-full h-11 font-semibold"
-                disabled={loading}
-                onClick={() => handleUpdateStatus('confirmed')}
-              >
-                {loading ? 'Đang xác nhận...' : 'Xác nhận'}
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="default"
+                    className="w-full h-11 font-semibold"
+                    disabled={loading}
+                    onClick={() => setConfirmAction(() => () => handleUpdateStatus('confirmed'))}
+                  >
+                    {loading ? 'Đang xác nhận...' : 'Xác nhận'}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-2xl font-bold">Xác nhận đặt tour?</AlertDialogTitle>
+                    <DialogDescription className="text-base text-muted-foreground">Bạn có chắc chắn muốn xác nhận đặt tour này không?</DialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Hủy</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => { if (confirmAction) confirmAction(); setConfirmAction(null); }}>Xác nhận</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
             {booking.status === 'confirmed' && (
-              <Button
-                variant="default"
-                className="w-full h-11 font-semibold"
-                disabled={loading}
-                onClick={() => handleUpdateStatus('completed')}
-              >
-                {loading ? 'Đang hoàn thành...' : 'Hoàn thành'}
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="default"
+                    className="w-full h-11 font-semibold"
+                    disabled={loading}
+                    onClick={() => setConfirmAction(() => () => handleUpdateStatus('completed'))}
+                  >
+                    {loading ? 'Đang hoàn thành...' : 'Hoàn thành'}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-2xl font-bold">Hoàn thành đặt tour?</AlertDialogTitle>
+                    <DialogDescription className="text-base text-muted-foreground">Bạn có chắc chắn muốn đánh dấu đặt tour này là đã hoàn thành không?</DialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Hủy</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => { if (confirmAction) confirmAction(); setConfirmAction(null); }}>Hoàn thành</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
           </div>
         )}

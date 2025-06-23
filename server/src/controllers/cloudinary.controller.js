@@ -14,7 +14,9 @@ const uploadMultipleFiles = async (req, res) => {
       return res.status(400).json({ message: 'Vui lòng chọn ít nhất một file để upload' });
     }
 
-    const uploadPromises = req.files.map(file => {
+    const results = [];
+    // Sử dụng vòng lặp for...of để xử lý tuần tự, đảm bảo thứ tự
+    for (const file of req.files) {
       const options = {
         folder: file.mimetype.startsWith('image/') ? 'images' : 'videos',
         resource_type: file.mimetype.startsWith('image/') ? 'image' : 'video'
@@ -25,14 +27,13 @@ const uploadMultipleFiles = async (req, res) => {
         options.eager = [{ format: "mp4", quality: "auto" }];
       }
 
-      return cloudinary.uploader.upload(file.path, options);
-    });
+      // Đợi cho đến khi file hiện tại upload xong
+      const result = await cloudinary.uploader.upload(file.path, options);
+      results.push(result);
 
-    const results = await Promise.all(uploadPromises);
-
-    req.files.forEach(file => {
+      // Xóa file tạm ngay sau khi upload xong
       fs.unlinkSync(file.path);
-    });
+    }
 
     res.json({
       success: true,
@@ -44,6 +45,10 @@ const uploadMultipleFiles = async (req, res) => {
     });
   } catch (error) {
     console.error('Lỗi upload nhiều file:', error);
+    // Cố gắng dọn dẹp các file tạm còn lại nếu có lỗi
+    req.files.forEach(file => {
+      if(fs.existsSync(file.path)) fs.unlinkSync(file.path);
+    });
     res.status(500).json({  message: error.message || 'Lỗi khi upload nhiều file' });
   }
 };
