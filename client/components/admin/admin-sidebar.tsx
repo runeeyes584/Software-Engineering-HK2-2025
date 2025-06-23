@@ -5,7 +5,6 @@ import { useClerk } from "@clerk/nextjs"
 import {
     Calendar,
     ChevronLeft,
-    DollarSign,
     LayoutDashboard,
     LayoutGrid,
     LogOut,
@@ -21,7 +20,6 @@ const menuItems = [
   { title: "Quản lý danh mục", icon: LayoutGrid, href: "/admin/categories" },
   { title: "Quản lý người dùng", icon: Users, href: "/admin/users" },
   { title: "Đặt chỗ", icon: Calendar, href: "/admin/bookings" },
-  { title: "Doanh thu", icon: DollarSign, href: "/admin/revenue" },
 ]
 
 interface AdminSidebarProps {

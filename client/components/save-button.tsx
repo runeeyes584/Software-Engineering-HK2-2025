@@ -1,11 +1,13 @@
-import { useState } from "react";
-import { useLanguage } from "@/components/language-provider-fixed"
+import { useLanguage } from "@/components/language-provider-fixed";
+import { SignInButton, useUser } from "@clerk/nextjs";
 
 export default function SaveButton({ isSaved, onToggle }: { isSaved: boolean, onToggle: () => void }) {
   const { t } = useLanguage();
-  return (
+  const { isSignedIn } = useUser();
+
+  const button = (
     <button
-      onClick={onToggle}
+      onClick={isSignedIn ? onToggle : undefined}
       style={{
         display: "flex",
         alignItems: "center",
@@ -58,4 +60,9 @@ export default function SaveButton({ isSaved, onToggle }: { isSaved: boolean, on
       </span>
     </button>
   );
+
+  if (!isSignedIn) {
+    return <SignInButton mode="modal">{button}</SignInButton>;
+  }
+  return button;
 } 

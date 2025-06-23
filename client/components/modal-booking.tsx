@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { useAuth, useUser } from "@clerk/nextjs"
+import { SignInButton, useAuth, useUser } from "@clerk/nextjs"
 import { Loader2, Mail, Phone, StickyNote, User } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -123,10 +123,18 @@ export function ModalBooking({
             </div>
           </div>
           {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-          <Button type="submit" className="w-full h-12 text-lg font-bold rounded-lg bg-primary hover:bg-primary/90 transition flex items-center justify-center gap-2" disabled={isLoading || !isBookingReady}>
-            {isLoading && <Loader2 className="animate-spin w-5 h-5" />}
-            {isLoading ? t("booking.submitting") : t("booking.submit")}
-          </Button>
+          {user ? (
+            <Button type="submit" className="w-full h-12 text-lg font-bold rounded-lg bg-primary hover:bg-primary/90 transition flex items-center justify-center gap-2" disabled={isLoading || !isBookingReady}>
+              {isLoading && <Loader2 className="animate-spin w-5 h-5" />}
+              {isLoading ? t("booking.submitting") : t("booking.submit")}
+            </Button>
+          ) : (
+            <SignInButton mode="modal">
+              <Button type="button" className="w-full h-12 text-lg font-bold rounded-lg bg-primary hover:bg-primary/90 transition flex items-center justify-center gap-2">
+                {t("booking.submit")}
+              </Button>
+            </SignInButton>
+          )}
         </form>
       </DialogContent>
     </Dialog>

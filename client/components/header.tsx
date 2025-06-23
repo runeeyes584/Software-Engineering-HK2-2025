@@ -5,34 +5,34 @@ import { NotificationDropdown } from "@/components/notification-dropdown"
 import { useNotification } from "@/components/NotificationProvider"
 import { Button } from "@/components/ui/button"
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { useAdminRole } from "@/hooks/use-admin-role"
 import { cn } from "@/lib/utils"
 import { SignInButton, SignUpButton, useAuth, UserButton, useUser } from "@clerk/nextjs"
 import {
-    Bell,
-    Building,
-    ChevronDown,
-    Compass,
-    Globe,
-    Menu,
-    Monitor,
-    Moon,
-    Mountain,
-    Palmtree,
-    Shield,
-    Sun,
-    Tent,
-    User,
-    Waves
+  Bell,
+  Building,
+  ChevronDown,
+  Compass,
+  Globe,
+  Menu,
+  Monitor,
+  Moon,
+  Mountain,
+  Palmtree,
+  Shield,
+  Sun,
+  Tent,
+  User,
+  Waves
 } from "lucide-react"
 import { useTheme } from "next-themes"
 import Link from "next/link"
@@ -400,30 +400,34 @@ export default function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <div className="relative">
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Notifications"
-                className="relative"
-                onClick={() => setShowNotifications((v) => !v)}
-              >
-                <Bell className="h-5 w-5" />
-                {unreadCount > 0 && !showNotifications && (
-                  <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[20px] h-[20px] flex items-center justify-center font-bold border-2 border-white shadow">{unreadCount}</span>
-                )}
-              </Button>
-              <NotificationDropdown
-                open={showNotifications}
-                onClose={() => setShowNotifications(false)}
-              />
-            </div>
+            {isSignedIn && (
+              <>
+                <div className="relative">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Notifications"
+                    className="relative"
+                    onClick={() => setShowNotifications((v) => !v)}
+                  >
+                    <Bell className="h-5 w-5" />
+                    {unreadCount > 0 && !showNotifications && (
+                      <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[20px] h-[20px] flex items-center justify-center font-bold border-2 border-white shadow">{unreadCount}</span>
+                    )}
+                  </Button>
+                  <NotificationDropdown
+                    open={showNotifications}
+                    onClose={() => setShowNotifications(false)}
+                  />
+                </div>
 
-            <Link href="/account" passHref legacyBehavior>
-              <Button variant="ghost" size="icon" aria-label="Account">
-                <User className="h-5 w-5" />
-              </Button>
-            </Link>
+                <Link href="/account" passHref legacyBehavior>
+                  <Button variant="ghost" size="icon" aria-label="Account">
+                    <User className="h-5 w-5" />
+                  </Button>
+                </Link>
+              </>
+            )}
 
             {isSignedIn ? (
               <div className="flex items-center gap-2">
