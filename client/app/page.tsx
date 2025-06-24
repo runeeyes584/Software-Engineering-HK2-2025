@@ -91,19 +91,21 @@ export default function HomePage() {
       location: "Canada",
       rating: 5,
     },
-    {
-      id: 3,
+    {      id: 3,
       name: "Maria Garcia",
       text: "The beach tour in Thailand was the perfect getaway. Everything was well organized and stress-free.",
       location: "Spain",
       rating: 4,
     },
   ]
+
   const handleSearch = (searchFilters: any) => {
     // Redirect to tours page with search parameters
     const params = new URLSearchParams()
 
-    if (searchFilters.destination) {
+    if (searchFilters.searchQuery) {
+      params.set("query", searchFilters.searchQuery)
+    } else if (searchFilters.destination) {
       params.set("query", searchFilters.destination)
     }
     

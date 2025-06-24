@@ -32,11 +32,11 @@ export default function OptimizedSearch({
   onAddToHistory,
   isSearching = false,
   className = "",
-}: OptimizedSearchProps) {
-  const { t } = useLanguage()
+}: OptimizedSearchProps) {  const { t } = useLanguage()
   const [isOpen, setIsOpen] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(-1)
   const inputRef = useRef<HTMLInputElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   const allSuggestions = [
     ...searchSuggestions.map((s) => ({ type: "suggestion", value: s })),
@@ -48,7 +48,6 @@ export default function OptimizedSearch({
 
   // Hiển thị gợi ý về fuzzy search
   const showFuzzyHint = searchQuery.length > 0 && searchSuggestions.length > 0
-
   const handleInputChange = (value: string) => {
     onSearchChange(value)
     setIsOpen(value.length > 0)
@@ -92,12 +91,16 @@ export default function OptimizedSearch({
   const handleClearSearch = () => {
     onSearchChange("")
     setIsOpen(false)
-    inputRef.current?.focus()
-  }
+    inputRef.current?.focus()  }
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
+      if (
+        inputRef.current && 
+        !inputRef.current.contains(event.target as Node) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false)
       }
     }
@@ -127,10 +130,8 @@ export default function OptimizedSearch({
             </Button>
           )}
         </div>
-      </div>
-
-      {isOpen && allSuggestions.length > 0 && (
-        <Card className="absolute top-full left-0 right-0 z-50 mt-1 shadow-lg border">
+      </div>      {isOpen && allSuggestions.length > 0 && (
+        <Card ref={dropdownRef} className="absolute top-full left-0 right-0 z-50 mt-1 shadow-lg border">
           <CardContent className="p-0">
             <div className="max-h-80 overflow-y-auto">
               {/* Fuzzy Search Hint */}
