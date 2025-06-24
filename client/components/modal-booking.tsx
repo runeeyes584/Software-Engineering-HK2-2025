@@ -16,13 +16,19 @@ interface ModalBookingProps {
   onOpenChange: (open: boolean) => void
   tour: any // Thay vì các props riêng lẻ, ta truyền cả object tour
   onSuccess: (bookingDetails: any) => void
+  adults: number
+  children: number
+  infants: number
 }
 
 export function ModalBooking({
   open,
   onOpenChange,
   tour,
-  onSuccess
+  onSuccess,
+  adults,
+  children,
+  infants
 }: ModalBookingProps) {
   const { t } = useLanguage()
   const router = useRouter()
@@ -68,9 +74,11 @@ export function ModalBooking({
           phone: formData.phone,
           email: formData.email,
           note: formData.note,
-          // Các thông tin khác có thể lấy từ tour nếu cần
           departureDate: tour.departureOptions?.[0]?.departureDate,
           returnDate: tour.departureOptions?.[0]?.returnDate,
+          adults,
+          children,
+          infants,
         }),
       })
       if (!res.ok) {

@@ -8,13 +8,13 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -279,6 +279,11 @@ export default function TourDetailPage() {
     // Kiểm tra tour có còn slot không
     if (tourData?.availableSlots <= 0) {
       setShowOutOfStockDialog(true);
+      return;
+    }
+    // Kiểm tra đã chọn ngày khởi hành chưa
+    if (!departureDate || !returnDate) {
+      toast.error(t('booking.toast.selectStartDate'));
       return;
     }
     setShowBookingModal(true)
@@ -757,6 +762,9 @@ export default function TourDetailPage() {
           open={showBookingModal}
           onOpenChange={setShowBookingModal}
           tour={tourData}
+          adults={adults}
+          children={children}
+          infants={infants}
           onSuccess={(bookingDetails) => {
             setShowBookingModal(false);
             router.push(`/payment/${bookingDetails._id}`);

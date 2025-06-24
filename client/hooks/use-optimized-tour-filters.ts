@@ -1,7 +1,7 @@
 "use client"
 
-import React, { useState, useMemo, useCallback, useEffect, useRef } from "react"
 import { TourSearchEngine, type SearchResult, type Tour } from "@/lib/search-engine"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 export interface FilterState {
   searchQuery: string

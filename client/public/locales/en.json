@@ -428,7 +428,8 @@
       "confirmSuccess": "Booking confirmed successfully!",
       "confirmError": "Failed to confirm booking. Please try again.",
       "completeSuccess": "Booking completed successfully!",
-      "completeError": "Failed to complete booking. Please try again."
+      "completeError": "Failed to complete booking. Please try again.",
+      "selectStartDate": "Please select a departure date before booking."
     }
   },
   "bookingDetailModal": {

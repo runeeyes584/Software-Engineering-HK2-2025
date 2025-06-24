@@ -1,16 +1,16 @@
 "use client"
 
-import { useState } from "react"
 import { useLanguage } from "@/components/language-provider-fixed"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { Filter, ChevronDown, ChevronUp, X } from "lucide-react"
+import { Label } from "@/components/ui/label"
+import { Slider } from "@/components/ui/slider"
 import type { FilterState } from "@/hooks/use-optimized-tour-filters"
+import { ChevronDown, ChevronUp, Filter, X } from "lucide-react"
+import { useState } from "react"
 
 interface TourFiltersProps {
   filters: FilterState

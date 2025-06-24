@@ -408,7 +408,8 @@
       "confirmSuccess": "Xác nhận đặt tour thành công!",
       "confirmError": "Xác nhận đặt tour thất bại. Vui lòng thử lại.",
       "completeSuccess": "Hoàn thành đặt tour thành công!",
-      "completeError": "Hoàn thành đặt tour thất bại. Vui lòng thử lại."
+      "completeError": "Hoàn thành đặt tour thất bại. Vui lòng thử lại.",
+      "selectStartDate": "Vui lòng chọn ngày khởi hành trước khi đặt chỗ."
     }
   },
   "admin": {
