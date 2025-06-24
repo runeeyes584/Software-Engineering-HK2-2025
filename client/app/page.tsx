@@ -149,10 +149,6 @@ export default function HomePage() {
       const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
       return dateB - dateA;
     });
-  console.log('DEBUG sortedTours:', sortedTours.map(t => ({ name: t.name, createdAt: t.createdAt })));
-
-  // Log debug cho tour Campuchia lương cao thế
-  console.log('DEBUG Campuchia tour:', featuredTours.find(t => t.name && t.name.includes('Campuchia')));
 
   return (
     <div className="flex flex-col min-h-screen">
