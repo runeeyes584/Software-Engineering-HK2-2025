@@ -1,14 +1,14 @@
 "use client"
 import { useLanguage } from "@/components/language-provider-fixed"
+import TourCard from "@/components/tour-card"
+import TourSearch from "@/components/tour-search"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { CalendarIcon, MapPin, Star, ChevronLeft, ChevronRight } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useUser } from "@clerk/nextjs"
+import { Star } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import TourSearch from "@/components/tour-search"
 import { useEffect, useState } from "react"
-import TourCard from "@/components/tour-card"
-import { useUser } from "@clerk/nextjs"
 
 export default function HomePage() {
   const { t } = useLanguage()
@@ -21,12 +21,14 @@ export default function HomePage() {
     fetch("http://localhost:5000/api/tours")
       .then((res) => res.json())
       .then((data) => {
-        // Nếu có trường isFeatured thì lọc, nếu không lấy 4 tour đầu
+        // Lấy 4 tour mới nhất theo createdAt
         const tours = Array.isArray(data)
-          ? (data.filter((t) => t.isFeatured).length > 0
-              ? data.filter((t) => t.isFeatured)
-              : data.slice(0, 4))
-          : []
+          ? data.sort((a, b) => {
+              const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+              const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+              return dateB - dateA;
+            }).slice(0, 4)
+          : [];
         setFeaturedTours(tours)
       })
       .catch(() => setFeaturedTours([]))
@@ -141,6 +143,17 @@ export default function HomePage() {
     }))
   }
 
+  const sortedTours = [...featuredTours]
+    .sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    });
+  console.log('DEBUG sortedTours:', sortedTours.map(t => ({ name: t.name, createdAt: t.createdAt })));
+
+  // Log debug cho tour Campuchia lương cao thế
+  console.log('DEBUG Campuchia tour:', featuredTours.find(t => t.name && t.name.includes('Campuchia')));
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -207,7 +220,7 @@ export default function HomePage() {
                 Chưa có tour du lịch
               </div>
             ) : (
-              featuredTours.map((tour) => {
+              sortedTours.map((tour) => {
                 const images = Array.isArray(tour.images) && tour.images.length > 0 ? tour.images : ["/placeholder.svg"];
                 const currentIndex = imageIndexes[tour._id || tour.id] || 0;
                 const durationStr = typeof tour.duration === "string" ? tour.duration : `${tour.duration} ngày`
@@ -218,7 +231,7 @@ export default function HomePage() {
                     name={tour.name}
                     destination={tour.destination}
                     price={tour.price}
-                    averageRating={typeof tour.averageRating === "number" && !isNaN(tour.averageRating) ? tour.averageRating : 0}
+                    averageRating={typeof tour.rating === "number" && !isNaN(tour.rating) ? tour.rating : 0}
                     reviewCount={tour.reviewCount || 0}
                     images={images}
                     duration={durationStr}

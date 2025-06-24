@@ -88,8 +88,16 @@ export default function ToursPage() {
     getPopularSearches,
   } = useOptimizedTourFilters(allTours as any)
 
-  const totalPages = Math.ceil(filteredTours.length / TOURS_PER_PAGE);
-  const paginatedTours = filteredTours.slice((currentPage - 1) * TOURS_PER_PAGE, currentPage * TOURS_PER_PAGE);
+  // Sort filteredTours theo createdAt mới nhất lên đầu
+  const sortedFilteredTours = [...filteredTours].sort((a, b) => {
+    const aAny = a as any;
+    const bAny = b as any;
+    const dateA = aAny.createdAt ? new Date(aAny.createdAt).getTime() : (aAny._id ? new Date(parseInt(aAny._id.toString().substring(0,8), 16) * 1000).getTime() : 0);
+    const dateB = bAny.createdAt ? new Date(bAny.createdAt).getTime() : (bAny._id ? new Date(parseInt(bAny._id.toString().substring(0,8), 16) * 1000).getTime() : 0);
+    return dateB - dateA;
+  });
+  const totalPages = Math.ceil(sortedFilteredTours.length / TOURS_PER_PAGE);
+  const paginatedTours = sortedFilteredTours.slice((currentPage - 1) * TOURS_PER_PAGE, currentPage * TOURS_PER_PAGE);
 
   const popularSearches = getPopularSearches()
 

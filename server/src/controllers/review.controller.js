@@ -1,5 +1,6 @@
 const Booking = require('../models/Booking');
 const Review = require('../models/Review');
+const Tour = require('../models/Tour');
 
 // Lấy danh sách tất cả review (có thể lọc theo tour hoặc user)
 const getReviews = async (req, res) => {
@@ -47,6 +48,7 @@ const createReview = async (req, res) => {
     // Gắn review vào booking (nếu muốn)
     booking.review = review._id;
     await booking.save();
+    await updateTourRating(tourId);
 
     res.status(201).json(review);
   } catch (err) {
@@ -69,6 +71,7 @@ const updateReview = async (req, res) => {
 
     if (!updated) return res.status(404).json({ message: 'Review không tồn tại' });
     res.json(updated);
+    if (updated) await updateTourRating(updated.tour);
   } catch (err) {
     console.error('Lỗi updateReview:', err);
     res.status(500).json({ message: 'Lỗi khi cập nhật review' });
@@ -83,6 +86,7 @@ const deleteReview = async (req, res) => {
     if (!deleted) return res.status(404).json({ message: 'Review không tồn tại' });
 
     res.json({ message: 'Xoá review thành công' });
+    if (deleted) await updateTourRating(deleted.tour);
   } catch (err) {
     console.error('Lỗi deleteReview:', err);
     res.status(500).json({ message: 'Lỗi khi xoá review' });
@@ -180,6 +184,19 @@ const adminReplyToReview = async (req, res) => {
     res.status(500).json({ message: 'Lỗi server khi phản hồi đánh giá.' });
   }
 };
+
+// Hàm cập nhật averageRating và reviewCount cho tour
+async function updateTourRating(tourId) {
+  const reviews = await Review.find({ tour: tourId });
+  let averageRating = 0;
+  if (reviews.length > 0) {
+    averageRating = reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length;
+  }
+  await Tour.findByIdAndUpdate(tourId, {
+    averageRating: Math.round(averageRating * 10) / 10,
+    reviewCount: reviews.length,
+  });
+}
 
 module.exports = {
   getReviews,

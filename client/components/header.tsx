@@ -40,6 +40,13 @@ import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import { io, Socket } from "socket.io-client"
 
+interface Category {
+  _id: string;
+  name: string;
+  icon?: string;
+  description?: string;
+}
+
 export default function Header() {
   const { theme, setTheme } = useTheme()
   const { t, language, setLanguage } = useLanguage()
@@ -52,8 +59,16 @@ export default function Header() {
   const router = useRouter()
   const socketRef = useRef<Socket | null>(null)
   const [mounted, setMounted] = useState(false)
+  const [categories, setCategories] = useState<Category[]>([])
 
   useEffect(() => { setMounted(true) }, [])
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/categories")
+      .then(res => res.json())
+      .then(data => setCategories(Array.isArray(data) ? data : []))
+      .catch(() => setCategories([]))
+  }, [])
 
   const tourCategories = [
     { href: "/tours/adventure", label: t("categories.adventure"), icon: Mountain },
@@ -272,11 +287,13 @@ export default function Header() {
                 <DropdownMenuLabel>{t("nav.tourCategories")}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  {tourCategories.map((item) => (
-                    <DropdownMenuItem key={item.href} asChild>
-                      <Link href={item.href} className="flex items-center cursor-pointer">
-                        <item.icon className="mr-2 h-4 w-4" />
-                        {item.label}
+                  {categories.map((cat) => (
+                    <DropdownMenuItem key={cat._id} asChild>
+                      <Link href={`/tours?category=${cat._id}`} className="flex items-center cursor-pointer">
+                        {cat.icon ? (
+                          <span className="mr-2 h-4 w-4" dangerouslySetInnerHTML={{ __html: cat.icon }} />
+                        ) : null}
+                        {cat.name}
                       </Link>
                     </DropdownMenuItem>
                   ))}
