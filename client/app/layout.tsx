@@ -22,11 +22,10 @@ export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
-}) {
-  return (
+}) {  return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
-        <body>
+        <body suppressHydrationWarning>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"

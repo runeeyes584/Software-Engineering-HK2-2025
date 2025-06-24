@@ -1,3 +1,5 @@
+import Fuse from 'fuse.js'
+
 export interface SearchResult {
   tour: Tour
   score: number
@@ -6,123 +8,95 @@ export interface SearchResult {
 
 export interface Tour {
   id: string
-  title: string
-  location: string
-  country: string
-  image: string
-  price: number
-  duration: number
-  rating: number
-  category: string
+  _id?: string
+  name: string
   description: string
-  difficulty?: string
-  activities?: string[]
-  features?: string[]
-  amenities?: string[]
-  activityLevel?: "Low" | "Moderate" | "High" | "Extreme"
-  accommodation?: string
-  transportation?: string[]
-  groupSize?: number
-  languages?: string[]
-  included?: string[]
-  excluded?: string[]
+  images: string[]
+  videos?: string[]
+  price: number
+  duration?: number
+  rating?: number
+  destination: string
+  maxGuests: number
+  availableSlots: number
+  category: string[] | string | any
+  status?: string
+  createdBy?: string
+  departureOptions?: Array<{
+    departureDate: string | Date
+    returnDate: string | Date
+  }>
+  title?: string // For backward compatibility
+  groupSize?: number // For backward compatibility
+  location?: string // For backward compatibility
+  country?: string // For backward compatibility
 }
 
 export class TourSearchEngine {
   private tours: Tour[]
-  private searchIndex: Map<string, Set<number>>
+  private fuse: Fuse<Tour>
   private categoryIndex: Map<string, Set<number>>
   private locationIndex: Map<string, Set<number>>
 
   constructor(tours: Tour[]) {
     this.tours = tours
-    this.searchIndex = new Map()
     this.categoryIndex = new Map()
     this.locationIndex = new Map()
+      // Cấu hình Fuse.js cho tìm kiếm mờ (fuzzy search) - chỉ tìm theo title và description
+    const fuseOptions = {
+      includeScore: true,
+      threshold: 0.4,
+      keys: [
+        { name: 'name', weight: 2.5 },  // Tìm theo name
+        { name: 'title', weight: 2.5 }, // Tìm theo title (backward compatibility)
+        { name: 'description', weight: 1.5 }  // Tìm theo description
+      ]
+    }
+    
+    this.fuse = new Fuse(tours, fuseOptions)
     this.buildIndex()
   }
 
   private buildIndex() {
     this.tours.forEach((tour, index) => {
-      // Build search index
-      const searchableText = [
-        tour.title,
-        tour.location,
-        tour.country,
-        tour.category,
-        tour.description,
-        ...(tour.activities || []),
-        ...(tour.amenities || []),
-        ...(tour.features || []),
-      ]
-        .join(" ")
-        .toLowerCase()
-
-      const words = searchableText.split(/\s+/)
-      words.forEach((word) => {
-        if (word.length > 2) {
-          if (!this.searchIndex.has(word)) {
-            this.searchIndex.set(word, new Set())
+      // Build category index - handle different category types
+      if (Array.isArray(tour.category)) {
+        tour.category.forEach(cat => {
+          const categoryKey = typeof cat === 'string' ? cat : String(cat)
+          if (!this.categoryIndex.has(categoryKey)) {
+            this.categoryIndex.set(categoryKey, new Set())
           }
-          this.searchIndex.get(word)!.add(index)
+          this.categoryIndex.get(categoryKey)!.add(index)
+        })
+      } else if (tour.category) {
+        const categoryKey = typeof tour.category === 'string' ? tour.category : String(tour.category)
+        if (!this.categoryIndex.has(categoryKey)) {
+          this.categoryIndex.set(categoryKey, new Set())
         }
-      })
-
-      // Build category index
-      if (!this.categoryIndex.has(tour.category)) {
-        this.categoryIndex.set(tour.category, new Set())
+        this.categoryIndex.get(categoryKey)!.add(index)
       }
-      this.categoryIndex.get(tour.category)!.add(index)
 
-      // Build location index
-      const locationKey = `${tour.location}, ${tour.country}`
-      if (!this.locationIndex.has(locationKey)) {
+      // Build location index with destination
+      const locationKey = tour.destination || (tour.location ? `${tour.location}${tour.country ? `, ${tour.country}` : ''}` : '')
+      if (locationKey && !this.locationIndex.has(locationKey)) {
         this.locationIndex.set(locationKey, new Set())
       }
-      this.locationIndex.get(locationKey)!.add(index)
+      if (locationKey) {
+        this.locationIndex.get(locationKey)!.add(index)
+      }
     })
   }
 
   search(query: string, limit = 50): SearchResult[] {
     if (!query.trim()) return []
 
-    const queryWords = query.toLowerCase().split(/\s+/)
-    const tourScores = new Map<number, { score: number; matchedFields: Set<string> }>()
-
-    queryWords.forEach((word) => {
-      // Exact matches
-      if (this.searchIndex.has(word)) {
-        this.searchIndex.get(word)!.forEach((tourIndex) => {
-          const existing = tourScores.get(tourIndex) || { score: 0, matchedFields: new Set() }
-          existing.score += 10
-          existing.matchedFields.add("exact")
-          tourScores.set(tourIndex, existing)
-        })
-      }
-
-      // Partial matches
-      this.searchIndex.forEach((tourIndices, indexWord) => {
-        if (indexWord.includes(word) && indexWord !== word) {
-          tourIndices.forEach((tourIndex) => {
-            const existing = tourScores.get(tourIndex) || { score: 0, matchedFields: new Set() }
-            existing.score += 5
-            existing.matchedFields.add("partial")
-            tourScores.set(tourIndex, existing)
-          })
-        }
-      })
-    })
-
-    const results: SearchResult[] = Array.from(tourScores.entries())
-      .map(([tourIndex, { score, matchedFields }]) => ({
-        tour: this.tours[tourIndex],
-        score,
-        matchedFields: Array.from(matchedFields),
-      }))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, limit)
-
-    return results
+    // Sử dụng Fuse.js cho tìm kiếm mờ
+    const fuseResults = this.fuse.search(query)
+      return fuseResults.map(result => ({
+      tour: result.item,
+      score: result.score ? 1 - result.score : 1, // Chuyển đổi điểm từ Fuse.js (thấp hơn = tốt hơn) sang điểm của chúng ta (cao hơn = tốt hơn)
+      matchedFields: result.matches?.map(match => match.key || 'unknown') || ['fuzzy']
+    })).slice(0, limit)
   }
 
   getSearchSuggestions(query: string, limit = 5): string[] {
@@ -145,11 +119,12 @@ export class TourSearchEngine {
       }
     })
 
-    // Add tour title suggestions
-    this.tours.forEach((tour) => {
-      if (tour.title.toLowerCase().includes(queryLower)) {
-        suggestions.add(tour.title)
-      }
+    // Thêm gợi ý từ tìm kiếm Fuse.js
+    const fuseResults = this.fuse.search(query, { limit: 10 })
+    fuseResults.forEach(result => {
+      // Add name/title to suggestions
+      if (result.item.name) suggestions.add(result.item.name)
+      if (result.item.title) suggestions.add(result.item.title)
     })
 
     return Array.from(suggestions).slice(0, limit)

@@ -46,6 +46,9 @@ export default function OptimizedSearch({
     .filter((item, index, self) => self.findIndex((i) => i.value === item.value) === index)
     .slice(0, 8)
 
+  // Hiển thị gợi ý về fuzzy search
+  const showFuzzyHint = searchQuery.length > 0 && searchSuggestions.length > 0
+
   const handleInputChange = (value: string) => {
     onSearchChange(value)
     setIsOpen(value.length > 0)
@@ -130,21 +133,42 @@ export default function OptimizedSearch({
         <Card className="absolute top-full left-0 right-0 z-50 mt-1 shadow-lg border">
           <CardContent className="p-0">
             <div className="max-h-80 overflow-y-auto">
+              {/* Fuzzy Search Hint */}
+              {showFuzzyHint && (
+                <div className="p-2 bg-muted/40 border-b">
+                  <div className="text-xs text-muted-foreground flex items-center gap-2">
+                    <span className="bg-primary/20 text-primary px-2 py-0.5 rounded text-[10px] font-medium">
+                      FUZZY SEARCH
+                    </span>
+                    Tìm kiếm thông minh - Kết quả hiển thị có thể bao gồm các từ gần giống
+                  </div>
+                </div>
+              )}
+
               {searchSuggestions.length > 0 && (
                 <div className="p-2">
-                  <div className="text-xs font-medium text-muted-foreground mb-2 px-2">Suggestions</div>
-                  {searchSuggestions.map((suggestion, index) => (
-                    <button
-                      key={`suggestion-${index}`}
-                      className={`w-full text-left px-3 py-2 rounded-md text-sm hover:bg-muted transition-colors flex items-center gap-2 ${
-                        highlightedIndex === index ? "bg-muted" : ""
-                      }`}
-                      onClick={() => handleSelectSuggestion(suggestion)}
-                    >
-                      <Search className="h-3 w-3 text-muted-foreground" />
-                      <span>{suggestion}</span>
-                    </button>
-                  ))}
+                  <div className="text-xs font-medium text-muted-foreground mb-2 px-2">Suggestions</div>                  {searchSuggestions.map((suggestion, index) => {
+                    // Kiểm tra nếu đây có thể là kết quả fuzzy
+                    const isFuzzy = searchQuery.length > 2 && 
+                                  !suggestion.toLowerCase().includes(searchQuery.toLowerCase()) &&
+                                  suggestion.toLowerCase() !== searchQuery.toLowerCase();
+                    
+                    return (
+                      <button
+                        key={`suggestion-${index}`}
+                        className={`w-full text-left px-3 py-2 rounded-md text-sm hover:bg-muted transition-colors flex items-center gap-2 ${
+                          highlightedIndex === index ? "bg-muted" : ""
+                        }`}
+                        onClick={() => handleSelectSuggestion(suggestion)}
+                      >
+                        <Search className="h-3 w-3 text-muted-foreground" />
+                        <span>
+                          {suggestion}
+                          {isFuzzy && <span className="ml-2 text-xs text-primary-foreground/70 bg-primary/30 px-1.5 py-0.5 rounded-sm">fuzzy</span>}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               )}
 
@@ -205,6 +229,23 @@ export default function OptimizedSearch({
               </Badge>
             ))}
           </div>
+        </div>
+      )}
+
+      {showFuzzyHint && (
+        <div className="mt-2 text-sm text-muted-foreground px-2">
+          Did you mean{" "}
+          {searchSuggestions.slice(0, 3).map((suggestion, index) => (
+            <span
+              key={index}
+              className="cursor-pointer underline hover:text-primary"
+              onClick={() => handleSelectSuggestion(suggestion)}
+            >
+              {suggestion}
+              {index < 2 && ", "}
+            </span>
+          ))}
+          ?
         </div>
       )}
     </div>

@@ -2,24 +2,24 @@
 
 import { useLanguage } from "@/components/language-provider-fixed"
 import OptimizedSearch from "@/components/optimized-search"
-import PerformanceMonitor from "@/components/performance-monitor"
 import TourCard from "@/components/tour-card"
-import TourFilters from "@/components/tour-filters"
+import TourFiltersSimplified from "@/components/tour-filters-simplified"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useOptimizedTourFilters, type TourUI } from "@/hooks/use-optimized-tour-filters"
+import { useOptimizedTourFilters } from "@/hooks/use-optimized-tour-filters"
+import { Tour } from "@/lib/search-engine"
 import { useAuth, useUser } from "@clerk/nextjs"
-import { Filter, Search, Zap } from "lucide-react"
+import { Filter, Loader2, Search } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
 export default function ToursPage() {
   const { t } = useLanguage()
   const [showMobileFilters, setShowMobileFilters] = useState(false)
-  const [showPerformanceMonitor, setShowPerformanceMonitor] = useState(false)
-  const [allTours, setAllTours] = useState<TourUI[]>([])
+  const [allTours, setAllTours] = useState<Tour[]>([])
+  const [allCategories, setAllCategories] = useState<Record<string, string>>({}) // Map of category IDs to names
   const [savedTourIds, setSavedTourIds] = useState<string[]>([])
   const { getToken } = useAuth()
   const { user } = useUser()
@@ -27,17 +27,51 @@ export default function ToursPage() {
   const TOURS_PER_PAGE = 6;
   const [tourImageIndexes, setTourImageIndexes] = useState<Record<string, number>>({});
 
+  // Fetch all categories
+  useEffect(() => {
+    fetch("http://localhost:5000/api/categories")
+      .then((res) => res.json())
+      .then((data) => {
+        const categoriesMap: Record<string, string> = {}
+        data.forEach((cat: any) => {
+          const id = typeof cat._id === 'object' ? cat._id.toString() : String(cat._id)
+          categoriesMap[id] = cat.name || ''
+        })
+        setAllCategories(categoriesMap)
+      })
+      .catch((err) => console.error("Failed to fetch categories:", err))
+  }, [])
+
+  // Fetch all tours
   useEffect(() => {
     fetch("http://localhost:5000/api/tours")
       .then((res) => res.json())
       .then((data) => {
         setAllTours(
-          data.map((tour: any) => ({
-            ...tour,
-            id: tour._id && typeof tour._id === 'object' && tour._id.toString
+          data.map((tour: any) => {
+            const id = tour._id && typeof tour._id === 'object' && tour._id.toString
               ? tour._id.toString()
               : String(tour._id || tour.id)
-          }))
+            
+            // Convert category IDs to readable names if available
+            let categories: string[] = []
+            if (Array.isArray(tour.category)) {
+              categories = tour.category.map((cat: any) => {
+                const catId = typeof cat === 'object' ? cat.toString() : String(cat)
+                return allCategories[catId] || catId
+              })
+            } else if (tour.category) {
+              const catId = typeof tour.category === 'object' ? tour.category.toString() : String(tour.category)
+              categories = [allCategories[catId] || catId]
+            }
+
+            return {
+              ...tour,
+              id,
+              name: tour.name || tour.title || '',
+              category: categories
+            }
+          })
         )
         const initialIndexes: Record<string, number> = {};
         data.forEach((tour: any) => {
@@ -47,7 +81,7 @@ export default function ToursPage() {
         setTourImageIndexes(initialIndexes);
       })
       .catch(() => setAllTours([]))
-  }, [])
+  }, [allCategories]) // Re-fetch tours when categories are loaded to translate IDs to names
 
   useEffect(() => {
     const fetchSavedTours = async () => {
@@ -97,32 +131,141 @@ export default function ToursPage() {
   });
   const totalPages = Math.ceil(sortedFilteredTours.length / TOURS_PER_PAGE);
   const paginatedTours = sortedFilteredTours.slice((currentPage - 1) * TOURS_PER_PAGE, currentPage * TOURS_PER_PAGE);
-
   // Lấy các tìm kiếm phổ biến và chuyển đổi định dạng để phù hợp với component
   const rawPopularSearches = getPopularSearches()
-  const popularSearches = rawPopularSearches.map(search => ({ name: search }))
+  const popularSearches = rawPopularSearches.map(search => {
+    return typeof search === 'string' ? { name: search } : search
+  })  // State cho tìm kiếm từ server
+  const [serverSearchResults, setServerSearchResults] = useState<any[]>([]);
+  const [isLoadingSearch, setIsLoadingSearch] = useState(false);
+  const [searchParams, setSearchParams] = useState({
+    query: '',
+    category: '',
+    destination: '',
+    minPrice: '',
+    maxPrice: '',
+    sortBy: 'newest'
+  });
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalCount: 0
+  });
 
   // Kiểm tra và đọc các tham số URL khi trang được load
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
-    const searchParam = queryParams.get('search');
+    const searchParam = queryParams.get('query') || queryParams.get('search'); // hỗ trợ cả hai tham số
+    const categoryParam = queryParams.get('category');
+    const destinationParam = queryParams.get('destination');
+    const minPriceParam = queryParams.get('minPrice');
+    const maxPriceParam = queryParams.get('maxPrice');
+    const sortByParam = queryParams.get('sortBy') || 'newest';
+    
+    const newSearchParams = {
+      query: searchParam || '',
+      category: categoryParam || '',
+      destination: destinationParam || '',
+      minPrice: minPriceParam || '',
+      maxPrice: maxPriceParam || '',
+      sortBy: sortByParam
+    };
+    
+    setSearchParams(newSearchParams);
     
     if (searchParam) {
-      updateFilter("searchQuery", searchParam);
       // Thêm vào lịch sử tìm kiếm
       addToSearchHistory(searchParam);
+      // Cũng cập nhật filter phía client để tương thích với cả hai cách tìm kiếm
+      updateFilter("searchQuery", searchParam);
     }
-  }, [updateFilter, addToSearchHistory]);
+    
+    // Gọi API tìm kiếm từ server
+    fetchSearchResults(newSearchParams);
+  }, [window.location.search, addToSearchHistory, updateFilter]);
 
+  // Hàm gọi API tìm kiếm
+  const fetchSearchResults = async (params: any) => {
+    setIsLoadingSearch(true);
+    try {
+      // Xây dựng URL với các tham số tìm kiếm
+      const searchUrl = new URLSearchParams();
+      if (params.query) searchUrl.append('query', params.query);
+      if (params.category) searchUrl.append('category', params.category);
+      if (params.destination) searchUrl.append('destination', params.destination);
+      if (params.minPrice) searchUrl.append('minPrice', params.minPrice);
+      if (params.maxPrice) searchUrl.append('maxPrice', params.maxPrice);
+      if (params.sortBy) searchUrl.append('sortBy', params.sortBy);
+      
+      // Thêm tham số phân trang
+      const pageParam = params.page || 1;
+      searchUrl.append('page', pageParam.toString());
+      searchUrl.append('limit', TOURS_PER_PAGE.toString());
+      
+      const response = await fetch(`http://localhost:5000/api/search?${searchUrl.toString()}`);
+      if (response.ok) {
+        const data = await response.json();
+        setServerSearchResults(data.tours || []);
+        setPagination(data.pagination || {
+          currentPage: 1,
+          totalPages: 1,
+          totalCount: 0
+        });
+      } else {
+        console.error("Lỗi khi tìm kiếm tours từ API");
+      }
+    } catch (error) {
+      console.error("Lỗi kết nối tới API:", error);
+    } finally {
+      setIsLoadingSearch(false);
+    }
+  };
+  
+  // Xác định danh sách tour hiển thị - ưu tiên kết quả từ server nếu có
+  const displayTours = searchParams.query || searchParams.category || searchParams.destination ? 
+    serverSearchResults : sortedFilteredTours;
+  
+  // Tính toán phân trang cho kết quả
+  const currentPageTours = searchParams.query || searchParams.category || searchParams.destination ?
+    displayTours : // Kết quả từ server đã được phân trang
+    displayTours.slice((currentPage - 1) * TOURS_PER_PAGE, currentPage * TOURS_PER_PAGE);
+  
+  // Cờ để biết có đang tìm kiếm không
+  const hasActiveSearch = (searchParams.query && searchParams.query.length > 0) || 
+                         filters.searchQuery.length > 0;
   const handleSearchChange = (query: string) => {
+    // Cập nhật filter local
     updateFilter("searchQuery", query)
+    
+    // Nếu xóa trắng truy vấn, hãy cập nhật URL và gọi API để lấy lại tất cả tour
+    if (!query.trim()) {
+      const queryParams = new URLSearchParams(window.location.search)
+      queryParams.delete("query")
+      
+      const newUrl = `${window.location.pathname}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`
+      window.history.pushState(null, '', newUrl)
+      
+      setSearchParams({...searchParams, query: ''})
+      fetchSearchResults({...searchParams, query: ''})
+    }
   }
-
   const handleSearchSelect = (query: string) => {
     updateFilter("searchQuery", query)
+    
+    // Cập nhật URL và search params
+    const queryParams = new URLSearchParams(window.location.search)
+    queryParams.set("query", query)
+    
+    // Cập nhật URL mà không refresh trang
+    const newUrl = `${window.location.pathname}?${queryParams.toString()}`
+    window.history.pushState(null, '', newUrl)
+    
+    // Cập nhật state và gọi API tìm kiếm
+    setSearchParams({...searchParams, query})
+    fetchSearchResults({...searchParams, query})
   }
 
-  const isSearching = filters.searchQuery.length > 0 && searchResults.length === 0
+  const noResultsFound = hasActiveSearch && currentPageTours.length === 0 && !isLoadingSearch
 
   const handleToggleSave = async (tourId: string) => {
     if (!user?.id) {
@@ -164,37 +307,34 @@ export default function ToursPage() {
   };
 
   return (
-    <div className="py-8">
-      <div className="flex items-center justify-between mb-6">
+    <div className="py-8">      <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">{t("nav.tours")}</h1>
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowPerformanceMonitor(!showPerformanceMonitor)}
-            className="hidden md:flex"
+          {/* Mobile Filter Button */}
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="lg:hidden flex items-center gap-1"
+            onClick={() => setShowMobileFilters(true)}
           >
-            <Zap className="h-4 w-4 mr-1" />
-            {t("common.performance")}
+            <Filter className="h-4 w-4" />
+            {t("filters.title")}
+            {activeFilterCount > 0 && (
+              <Badge variant="secondary" className="ml-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                {activeFilterCount}
+              </Badge>
+            )}
           </Button>
+          
+          {/* Desktop Badge */}
           {activeFilterCount > 0 && (
-            <Badge variant="secondary" className="flex items-center gap-1">
+            <Badge variant="secondary" className="hidden lg:flex items-center gap-1">
               <Filter className="h-3 w-3" />
               {activeFilterCount} {t("filters.active")}
             </Badge>
           )}
         </div>
       </div>
-
-      {showPerformanceMonitor && (
-        <div className="mb-6">
-          <PerformanceMonitor
-            metrics={performanceMetrics}
-            activeFilterCount={activeFilterCount}
-            searchQuery={filters.searchQuery}
-          />
-        </div>
-      )}
 
       <div className="mb-8">
         <OptimizedSearch
@@ -205,12 +345,12 @@ export default function ToursPage() {
           onSearchChange={handleSearchChange}
           onSearchSelect={handleSearchSelect}
           onAddToHistory={addToSearchHistory}
-          isSearching={isSearching}
+          isSearching={isLoadingSearch}
         />
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
-        <TourFilters
+        <TourFiltersSimplified
           filters={filters}
           filterCounts={filterCounts}
           activeFilterCount={activeFilterCount}
@@ -223,19 +363,20 @@ export default function ToursPage() {
 
         <div className="flex-1">
           <div className="flex justify-between items-center mb-6">
-            <div className="text-sm text-muted-foreground flex items-center gap-2">
-              <span>
-                {t("search.showing")} {filteredTours.length} {t("search.of")} {allTours.length} {t("search.tours")}
+            <div className="text-sm text-muted-foreground flex items-center gap-2">              <span>
+                {t("search.showing")} {currentPageTours.length} 
+                {searchParams.query ? 
+                  ` ${t("search.of")} ${pagination.totalCount} ${t("search.tours")}` :
+                  ` ${t("search.of")} ${allTours.length} ${t("search.tours")}`}
               </span>
               {activeFilterCount > 0 && (
                 <Badge variant="outline" className="text-xs">
                   {activeFilterCount} {t("filters.title")}
                 </Badge>
-              )}
-              {filters.searchQuery && (
+              )}              {hasActiveSearch && (
                 <Badge variant="outline" className="text-xs flex items-center gap-1">
                   <Search className="h-3 w-3" />
-                  {t("search.active")}
+                  {t("search.active")}: {searchParams.query || filters.searchQuery}
                 </Badge>
               )}
             </div>
@@ -257,9 +398,16 @@ export default function ToursPage() {
           </div>
 
           {filteredTours.length > 0 ? (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {paginatedTours.map((tour) => {
+            <>              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {isLoadingSearch && (
+                  <div className="col-span-3 py-20 flex flex-col items-center justify-center text-center">
+                    <Loader2 className="h-10 w-10 animate-spin mb-4 text-primary/70" />
+                    <h3 className="text-lg font-medium mb-1">{t("search.searching")}</h3>
+                    <p className="text-sm text-muted-foreground">{t("search.searchingMessage")}</p>
+                  </div>
+                )}
+                
+                {!isLoadingSearch && currentPageTours.map((tour) => {
                   const tItem = tour as any;
                   const id = String(tItem._id || tItem.id || "");
                   const images = Array.isArray(tItem.images) && tItem.images.length > 0
@@ -291,49 +439,83 @@ export default function ToursPage() {
                     />
                   );
                 })}
-              </div>
-              <Pagination className="mt-6">
+              </div>              <Pagination className="mt-6">
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious
                       href="#"
-                      onClick={e => { e.preventDefault(); setCurrentPage(p => Math.max(1, p - 1)) }}
-                      aria-disabled={currentPage === 1}
+                      onClick={e => { 
+                        e.preventDefault(); 
+                        if (hasActiveSearch) {
+                          // Sử dụng API search với trang trước
+                          const newPage = Math.max(1, pagination.currentPage - 1);
+                          const newParams = {...searchParams, page: newPage};
+                          fetchSearchResults(newParams);
+                        } else {
+                          // Phân trang client-side
+                          setCurrentPage(p => Math.max(1, p - 1));
+                        }
+                      }}
+                      aria-disabled={hasActiveSearch ? pagination.currentPage === 1 : currentPage === 1}
                     >
                       {t('common.paginationPrevious')}
                     </PaginationPrevious>
                   </PaginationItem>
-                  {Array.from({ length: totalPages }, (_, i) => (
+                  
+                  {/* Hiển thị số trang dựa trên nguồn dữ liệu */}
+                  {Array.from({ length: hasActiveSearch ? pagination.totalPages : totalPages }, (_, i) => (
                     <PaginationItem key={i}>
                       <PaginationLink
                         href="#"
-                        isActive={currentPage === i + 1}
-                        onClick={e => { e.preventDefault(); setCurrentPage(i + 1) }}
+                        isActive={hasActiveSearch ? pagination.currentPage === i + 1 : currentPage === i + 1}
+                        onClick={e => { 
+                          e.preventDefault(); 
+                          if (hasActiveSearch) {
+                            // Sử dụng API search cho trang được chọn
+                            const newPage = i + 1;
+                            const newParams = {...searchParams, page: newPage};
+                            fetchSearchResults(newParams);
+                          } else {
+                            // Phân trang client-side
+                            setCurrentPage(i + 1);
+                          }
+                        }}
                       >
                         {i + 1}
                       </PaginationLink>
                     </PaginationItem>
                   ))}
+                  
                   <PaginationItem>
                     <PaginationNext
                       href="#"
-                      onClick={e => { e.preventDefault(); setCurrentPage(p => Math.min(totalPages, p + 1)) }}
-                      aria-disabled={currentPage === totalPages}
+                      onClick={e => { 
+                        e.preventDefault(); 
+                        if (hasActiveSearch) {
+                          // Sử dụng API search với trang tiếp theo
+                          const newPage = Math.min(pagination.totalPages, pagination.currentPage + 1);
+                          const newParams = {...searchParams, page: newPage};
+                          fetchSearchResults(newParams);
+                        } else {
+                          // Phân trang client-side
+                          setCurrentPage(p => Math.min(totalPages, p + 1));
+                        }
+                      }}
+                      aria-disabled={hasActiveSearch ? pagination.currentPage === pagination.totalPages : currentPage === totalPages}
                     >
                       {t('common.paginationNext')}
                     </PaginationNext>
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>
-            </>
-          ) : (
+            </>          ) : (
               <div className="space-y-4">
                 <div className="text-muted-foreground">
                   <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <h3 className="text-lg font-medium">{t("search.noToursFound")}</h3>
                   <p className="text-sm">
-                    {filters.searchQuery
-                      ? t("search.noToursMatchSearch", { query: filters.searchQuery })
+                    {hasActiveSearch
+                      ? t("search.noToursMatchSearch", { query: searchParams.query || filters.searchQuery })
                       : t("search.noToursMatchFilters")}
                   </p>
                 </div>
@@ -343,10 +525,9 @@ export default function ToursPage() {
                   </Button>
                   {popularSearches.length > 0 && (
                     <div className="flex flex-wrap gap-2 justify-center">
-                      <span className="text-sm text-muted-foreground">{t("search.try")}:</span>
-                      {popularSearches.slice(0, 3).map((search, index) => (
-                        <Button key={index} variant="ghost" size="sm" onClick={() => handleSearchSelect(search.name)}>
-                          {search.name}
+                      <span className="text-sm text-muted-foreground">{t("search.try")}:</span>                      {popularSearches.slice(0, 3).map((search, index) => (
+                        <Button key={index} variant="ghost" size="sm" onClick={() => handleSearchSelect(typeof search === 'string' ? search : search.name)}>
+                          {typeof search === 'string' ? search : search.name}
                         </Button>
                       ))}
                     </div>

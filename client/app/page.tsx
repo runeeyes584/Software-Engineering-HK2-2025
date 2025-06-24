@@ -99,13 +99,12 @@ export default function HomePage() {
       rating: 4,
     },
   ]
-
   const handleSearch = (searchFilters: any) => {
     // Redirect to tours page with search parameters
     const params = new URLSearchParams()
 
     if (searchFilters.destination) {
-      params.set("search", searchFilters.destination)
+      params.set("query", searchFilters.destination)
     }
     
     // Chuyển hướng đến trang tours với tham số tìm kiếm

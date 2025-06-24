@@ -8,16 +8,8 @@ export interface FilterState {
   priceRange: [number, number]
   durationRange: [number, number]
   categories: string[]
-  countries: string[]
-  difficulties: string[]
-  activities: string[]
-  activityLevels: string[]
-  amenities: string[]
-  accommodationTypes: string[]
-  transportationTypes: string[]
-  ratingMin: number
   groupSizeMax: number
-  languages: string[]
+  ratingMin: number
 }
 
 interface FilterPerformanceMetrics {
@@ -32,16 +24,8 @@ const initialFilterState: FilterState = {
   priceRange: [0, 2000],
   durationRange: [1, 21],
   categories: [],
-  countries: [],
-  difficulties: [],
-  activities: [],
-  activityLevels: [],
-  amenities: [],
-  accommodationTypes: [],
-  transportationTypes: [],
   ratingMin: 0,
-  groupSizeMax: 50,
-  languages: [],
+  groupSizeMax: 50
 }
 
 export function useOptimizedTourFilters(tours: Tour[]) {
@@ -174,78 +158,38 @@ export function useOptimizedTourFilters(tours: Tour[]) {
         return false
       }
 
-      // Duration range
-      if (tour.duration < filters.durationRange[0] || tour.duration > filters.durationRange[1]) {
+      // Duration range - handle both direct duration property and calculated value from departureOptions
+      const duration = typeof tour.duration === 'number' ? 
+        tour.duration : 
+        (tour.departureOptions && tour.departureOptions.length > 0 ? 
+          Math.ceil((new Date(tour.departureOptions[0].returnDate).getTime() - 
+                    new Date(tour.departureOptions[0].departureDate).getTime()) / 
+                    (1000 * 60 * 60 * 24)) + 1 : 0)
+
+      if (duration < filters.durationRange[0] || duration > filters.durationRange[1]) {
         return false
       }
 
-      // Rating
-      if (tour.rating < filters.ratingMin) {
+      // Rating - may not be present in all tours
+      if (tour.rating && tour.rating < filters.ratingMin) {
         return false
       }
 
-      // Categories
-      if (filters.categories.length > 0 && !filters.categories.includes(tour.category)) {
+      // Categories - now an array of ObjectIds in the model
+      if (filters.categories.length > 0) {
+        // Handle both string categories and ObjectId categories
+        const tourCategories = Array.isArray(tour.category) ? 
+          tour.category.map(cat => typeof cat === 'string' ? cat : String(cat)) : 
+          (tour.category ? [String(tour.category)] : [])
+
+        if (!tourCategories.some(cat => filters.categories.includes(cat))) {
+          return false
+        }
+      }      // Destinations filter đã được loại bỏ
+      
+      // Group size - using maxGuests property from the model
+      if (filters.groupSizeMax < (tour.maxGuests || 50)) {
         return false
-      }
-
-      // Countries
-      if (filters.countries.length > 0 && !filters.countries.includes(tour.country)) {
-        return false
-      }
-
-      // Difficulties
-      if (filters.difficulties.length > 0 && tour.difficulty && !filters.difficulties.includes(tour.difficulty)) {
-        return false
-      }
-
-      // Activities
-      if (filters.activities.length > 0) {
-        const hasActivity = tour.activities?.some((activity) => filters.activities.includes(activity))
-        if (!hasActivity) return false
-      }
-
-      // Activity levels
-      if (
-        filters.activityLevels.length > 0 &&
-        tour.activityLevel &&
-        !filters.activityLevels.includes(tour.activityLevel)
-      ) {
-        return false
-      }
-
-      // Amenities
-      if (filters.amenities.length > 0) {
-        const hasAmenity = tour.amenities?.some((amenity) => filters.amenities.includes(amenity))
-        if (!hasAmenity) return false
-      }
-
-      // Accommodation types
-      if (
-        filters.accommodationTypes.length > 0 &&
-        tour.accommodation &&
-        !filters.accommodationTypes.includes(tour.accommodation)
-      ) {
-        return false
-      }
-
-      // Transportation types
-      if (filters.transportationTypes.length > 0) {
-        const hasTransportation = tour.transportation?.some((transport) =>
-          filters.transportationTypes.includes(transport),
-        )
-        if (!hasTransportation) return false
-      }
-
-      // Group size
-      if (tour.groupSize && tour.groupSize > filters.groupSizeMax) {
-        return false
-      }
-
-      // Languages
-      if (filters.languages.length > 0) {
-        const hasLanguage = tour.languages?.some((language) => filters.languages.includes(language))
-        if (!hasLanguage) return false
       }
 
       return true
@@ -260,16 +204,24 @@ export function useOptimizedTourFilters(tours: Tour[]) {
         result.sort((a, b) => b.price - a.price)
         break
       case "rating":
-        result.sort((a, b) => b.rating - a.rating)
+        result.sort((a, b) => (b.rating || 0) - (a.rating || 0))
         break
       case "duration-short":
-        result.sort((a, b) => a.duration - b.duration)
+        result.sort((a, b) => {
+          const durationA = typeof a.duration === 'number' ? a.duration : 0
+          const durationB = typeof b.duration === 'number' ? b.duration : 0
+          return durationA - durationB
+        })
         break
       case "duration-long":
-        result.sort((a, b) => b.duration - a.duration)
+        result.sort((a, b) => {
+          const durationA = typeof a.duration === 'number' ? a.duration : 0
+          const durationB = typeof b.duration === 'number' ? b.duration : 0
+          return durationB - durationA
+        })
         break
       case "alphabetical":
-        result.sort((a, b) => a.title.localeCompare(b.title))
+        result.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
         break
       case "relevance":
         if (filters.searchQuery && searchResults.length > 0) {
@@ -289,73 +241,38 @@ export function useOptimizedTourFilters(tours: Tour[]) {
 
     return result
   }, [tours, filters, sortBy, searchResults])
-
-  // Filter counts - simplified to avoid circular dependencies
+  // Filter counts - updated for category array support
   const filterCounts = useMemo(() => {
     const counts = {
-      categories: {} as Record<string, number>,
-      countries: {} as Record<string, number>,
-      difficulties: {} as Record<string, number>,
-      activities: {} as Record<string, number>,
-      activityLevels: {} as Record<string, number>,
-      amenities: {} as Record<string, number>,
-      accommodationTypes: {} as Record<string, number>,
-      transportationTypes: {} as Record<string, number>,
-      languages: {} as Record<string, number>,
+      categories: {} as Record<string, number>
     }
-
+    
     tours.forEach((tour) => {
-      counts.categories[tour.category] = (counts.categories[tour.category] || 0) + 1
-      counts.countries[tour.country] = (counts.countries[tour.country] || 0) + 1
-
-      if (tour.difficulty) {
-        counts.difficulties[tour.difficulty] = (counts.difficulties[tour.difficulty] || 0) + 1
+      // Categories - handle array of categories
+      if (Array.isArray(tour.category)) {
+        tour.category.forEach((cat) => {
+          const catId = typeof cat === 'string' ? cat : String(cat);
+          counts.categories[catId] = (counts.categories[catId] || 0) + 1;
+        });
+      } else if (tour.category) {
+        const catId = typeof tour.category === 'string' ? tour.category : String(tour.category);
+        counts.categories[catId] = (counts.categories[catId] || 0) + 1;
       }
-
-      tour.activities?.forEach((activity) => {
-        counts.activities[activity] = (counts.activities[activity] || 0) + 1
-      })
-
-      if (tour.activityLevel) {
-        counts.activityLevels[tour.activityLevel] = (counts.activityLevels[tour.activityLevel] || 0) + 1
-      }
-
-      tour.amenities?.forEach((amenity) => {
-        counts.amenities[amenity] = (counts.amenities[amenity] || 0) + 1
-      })
-
-      if (tour.accommodation) {
-        counts.accommodationTypes[tour.accommodation] = (counts.accommodationTypes[tour.accommodation] || 0) + 1
-      }
-
-      tour.transportation?.forEach((transport) => {
-        counts.transportationTypes[transport] = (counts.transportationTypes[transport] || 0) + 1
-      })
-
-      tour.languages?.forEach((language) => {
-        counts.languages[language] = (counts.languages[language] || 0) + 1
-      })
+      
+      // Destinations đã bị loại bỏ để hỗ trợ thêm địa điểm mới một cách linh hoạt
     })
 
     return counts
   }, [tours])
-
   const activeFilterCount = useMemo(() => {
     let count = 0
     if (filters.searchQuery) count++
     if (filters.priceRange[0] > 0 || filters.priceRange[1] < 2000) count++
     if (filters.durationRange[0] > 1 || filters.durationRange[1] < 21) count++
     if (filters.categories.length > 0) count++
-    if (filters.countries.length > 0) count++
-    if (filters.difficulties.length > 0) count++
-    if (filters.activities.length > 0) count++
-    if (filters.activityLevels.length > 0) count++
-    if (filters.amenities.length > 0) count++
-    if (filters.accommodationTypes.length > 0) count++
-    if (filters.transportationTypes.length > 0) count++
+    // if (filters.destinations.length > 0) count++ // Destinations đã bị loại bỏ
     if (filters.ratingMin > 0) count++
     if (filters.groupSizeMax < 50) count++
-    if (filters.languages.length > 0) count++
     return count
   }, [filters])
 
@@ -382,6 +299,7 @@ export function useOptimizedTourFilters(tours: Tour[]) {
   }
 }
 
+// Legacy interface for backward compatibility
 export interface TourUI {
   id?: string;
   _id?: string;
@@ -397,5 +315,7 @@ export interface TourUI {
   duration?: string | number;
   days?: number;
   price?: number;
-  // ... các trường khác nếu có
+  category?: string[] | string | any;
+  maxGuests?: number;
+  availableSlots?: number;
 }
