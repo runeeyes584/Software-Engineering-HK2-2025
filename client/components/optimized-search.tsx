@@ -2,19 +2,19 @@
 
 import type React from "react"
 
-import { useState, useRef, useEffect } from "react"
 import { useLanguage } from "@/components/language-provider-fixed"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Search, Clock, TrendingUp, X, Loader2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Clock, Loader2, Search, TrendingUp, X } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
 
 interface OptimizedSearchProps {
   searchQuery: string
   searchSuggestions: string[]
   searchHistory: string[]
-  popularSearches: string[]
+  popularSearches: { name: string }[]
   onSearchChange: (query: string) => void
   onSearchSelect: (query: string) => void
   onAddToHistory: (query: string) => void
@@ -41,7 +41,7 @@ export default function OptimizedSearch({
   const allSuggestions = [
     ...searchSuggestions.map((s) => ({ type: "suggestion", value: s })),
     ...searchHistory.slice(0, 3).map((s) => ({ type: "history", value: s })),
-    ...popularSearches.slice(0, 3).map((s) => ({ type: "popular", value: s })),
+    ...popularSearches.slice(0, 3).map((s) => ({ type: "popular", value: s.name })),
   ]
     .filter((item, index, self) => self.findIndex((i) => i.value === item.value) === index)
     .slice(0, 8)
@@ -177,10 +177,10 @@ export default function OptimizedSearch({
                           ? "bg-muted"
                           : ""
                       }`}
-                      onClick={() => handleSelectSuggestion(item)}
+                      onClick={() => handleSelectSuggestion(item.name)}
                     >
                       <TrendingUp className="h-3 w-3 text-muted-foreground" />
-                      <span>{item}</span>
+                      <span>{item.name}</span>
                     </button>
                   ))}
                 </div>
@@ -199,9 +199,9 @@ export default function OptimizedSearch({
                 key={index}
                 variant="secondary"
                 className="cursor-pointer hover:bg-secondary/80 transition-colors"
-                onClick={() => handleSelectSuggestion(search)}
+                onClick={() => handleSelectSuggestion(search.name)}
               >
-                {search}
+                {search.name}
               </Badge>
             ))}
           </div>
