@@ -17,7 +17,7 @@ A modern and user-friendly web application for booking travel tours and managing
 
 ## 🛠 Tech Stack
 
-- **Frontend:** React, Next.js, Tailwind CSS  
+- **Frontend:** React, Next.js, Fuse.js (fuzzy search), Tailwind CSS  
 - **Backend:** Node.js (with optional Express.js)  
 - **Database:** MongoDB
 
