@@ -67,8 +67,7 @@ export default function ToursPage() {
         setSavedTourIds([])
       }
     }
-    fetchSavedTours()
-  }, [user])
+    fetchSavedTours()  }, [user])
 
   const {
     filters,
@@ -99,7 +98,21 @@ export default function ToursPage() {
   const totalPages = Math.ceil(sortedFilteredTours.length / TOURS_PER_PAGE);
   const paginatedTours = sortedFilteredTours.slice((currentPage - 1) * TOURS_PER_PAGE, currentPage * TOURS_PER_PAGE);
 
-  const popularSearches = getPopularSearches()
+  // Lấy các tìm kiếm phổ biến và chuyển đổi định dạng để phù hợp với component
+  const rawPopularSearches = getPopularSearches()
+  const popularSearches = rawPopularSearches.map(search => ({ name: search }))
+
+  // Kiểm tra và đọc các tham số URL khi trang được load
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const searchParam = queryParams.get('search');
+    
+    if (searchParam) {
+      updateFilter("searchQuery", searchParam);
+      // Thêm vào lịch sử tìm kiếm
+      addToSearchHistory(searchParam);
+    }
+  }, [updateFilter, addToSearchHistory]);
 
   const handleSearchChange = (query: string) => {
     updateFilter("searchQuery", query)
@@ -332,8 +345,8 @@ export default function ToursPage() {
                     <div className="flex flex-wrap gap-2 justify-center">
                       <span className="text-sm text-muted-foreground">{t("search.try")}:</span>
                       {popularSearches.slice(0, 3).map((search, index) => (
-                        <Button key={index} variant="ghost" size="sm" onClick={() => handleSearchSelect(search)}>
-                          {search}
+                        <Button key={index} variant="ghost" size="sm" onClick={() => handleSearchSelect(search.name)}>
+                          {search.name}
                         </Button>
                       ))}
                     </div>
