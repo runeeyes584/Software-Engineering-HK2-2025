@@ -3,7 +3,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@clerk/nextjs";
-import { Baby, BadgeCheck, CalendarIcon, Clock, DollarSign, Mail, StickyNote, User, User2, Users } from "lucide-react";
+import { Baby, BadgeCheck, CalendarIcon, Clock, DollarSign, StickyNote, User, User2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -77,27 +77,20 @@ export default function BookingDetailModal({ booking, open, onOpenChange, t: tPr
           <DialogDescription className="text-xs text-muted-foreground mb-2">
             {t('bookingDetailModal.bookingId')}: {booking?.bookingCode || booking?._id}
           </DialogDescription>
-          {booking?.name && (
-            <div className="flex items-center gap-2 text-base">
-              <User className="w-5 h-5 text-primary" />
-              <span className=" text-black">{t('booking.customer')}:</span>
-              <span className="text-black">{booking.name}</span>
+          <div className="space-y-2 py-2">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="font-medium">{t('booking.customer')}:</span>
+              <span>{booking.name || '-'}</span>
             </div>
-          )}
-          {booking?.phone && (
-            <div className="flex items-center gap-2 text-base">
-              <User2 className="w-5 h-5 text-primary" />
-              <span className="text-black">{t('booking.phone')}:</span>
-              <span className="text-black">{booking.phone}</span>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="font-medium">{t('booking.phone')}:</span>
+              <span>{booking.phone || '-'}</span>
             </div>
-          )}
-          {booking?.email && (
-            <div className="flex items-center gap-2 text-base">
-              <Mail className="w-5 h-5 text-primary" />
-              <span className="text-black">Email:</span>
-              <span className="text-black">{booking.email}</span>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="font-medium">{t('booking.email')}:</span>
+              <span>{booking.email || '-'}</span>
             </div>
-          )}
+          </div>
         </DialogHeader>
         <div className="space-y-4 text-base">
           <div className="flex items-center gap-2">
@@ -160,20 +153,14 @@ export default function BookingDetailModal({ booking, open, onOpenChange, t: tPr
               <span>{booking.note}</span>
             </div>
           )}
-          {booking?.transportType && (
-            <div className="flex items-center gap-2">
-              <Users className="w-5 h-5 text-primary" />
-              <span className="font-medium">{t('bookingDetailModal.transportation')}:</span>
-              <span>{t('transport.' + booking.transportType)}</span>
-            </div>
-          )}
-          {booking?.ticketClass && (
-            <div className="flex items-center gap-2">
-              <BadgeCheck className="w-5 h-5 text-primary" />
-              <span className="font-medium">{t('bookingDetailModal.class')}:</span>
-              <span>{t('class.' + booking.ticketClass)}</span>
-            </div>
-          )}
+          <div className="flex items-center gap-2 mb-2">
+            <span className="font-medium">{t('booking.transportType')}:</span>
+            <span>{booking.transportType || '-'}</span>
+          </div>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="font-medium">{t('booking.ticketClass')}:</span>
+            <span>{booking.ticketClass || '-'}</span>
+          </div>
         </div>
         {isAdmin && (booking?.status === 'pending' || booking?.status === 'confirmed') && (
           <div className="flex gap-3 mt-6">

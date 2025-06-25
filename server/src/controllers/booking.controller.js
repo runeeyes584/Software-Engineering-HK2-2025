@@ -161,9 +161,14 @@ const updateBooking = async (req, res) => {
     const tourIdForNotification = bookingToUpdate.tour;
 
     // Cập nhật booking như bình thường
+    const updateFields = { ...req.body };
+    // Chỉ cho phép cập nhật transportType và ticketClass nếu có trong body
+    if (typeof req.body.transportType !== 'undefined') updateFields.transportType = req.body.transportType;
+    if (typeof req.body.ticketClass !== 'undefined') updateFields.ticketClass = req.body.ticketClass;
+
     const updatedBooking = await Booking.findByIdAndUpdate(
       id,
-      req.body,
+      updateFields,
       { new: true }
     ).populate('user', 'username email').populate('tour', 'name price');
 

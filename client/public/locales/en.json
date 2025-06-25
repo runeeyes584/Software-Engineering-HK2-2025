@@ -393,7 +393,7 @@
     "namePlaceholder": "Enter your full name",
     "phone": "Phone Number",
     "phonePlaceholder": "Enter your phone number",
-    "email": "Email (Optional)",
+    "email": "Email",
     "emailPlaceholder": "Enter your email",
     "note": "Note",
     "notePlaceholder": "Any special requests or notes...",
@@ -430,7 +430,9 @@
       "completeSuccess": "Booking completed successfully!",
       "completeError": "Failed to complete booking. Please try again.",
       "selectStartDate": "Please select a departure date before booking."
-    }
+    },
+    "transportType": "Transport",
+    "ticketClass": "Ticket class"
   },
   "bookingDetailModal": {
     "title": "Booking Details",
@@ -603,5 +605,18 @@
       "noSavedTours": "You have no saved tours."
     }
   },
-  "cancel_booking_success": "Booking cancelled successfully!"
+  "cancel_booking_success": "Booking cancelled successfully!",
+  "orderSuccess": {
+    "title": "Payment successful!",
+    "message": "Thank you for your payment. Your order has been confirmed and is being processed.",
+    "viewOrder": "View booking",
+    "goHome": "Go to home",
+    "support": "If you have any questions, please contact our support."
+  },
+  "orderFailed": {
+    "title": "Payment failed!",
+    "message": "An error occurred during payment. Please retry or contact our support for assistance.",
+    "goHome": "Go to home",
+    "support": "If you have been charged but your order is not confirmed, please contact support."
+  }
 } 

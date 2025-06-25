@@ -19,6 +19,8 @@ interface ModalBookingProps {
   adults: number
   children: number
   infants: number
+  transportType?: string
+  ticketClass?: string
 }
 
 export function ModalBooking({
@@ -28,7 +30,9 @@ export function ModalBooking({
   onSuccess,
   adults,
   children,
-  infants
+  infants,
+  transportType = "plane",
+  ticketClass = "economy"
 }: ModalBookingProps) {
   const { t } = useLanguage()
   const router = useRouter()
@@ -43,6 +47,8 @@ export function ModalBooking({
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
+  const [selectedTransport] = useState(transportType)
+  const [selectedClass] = useState(ticketClass)
 
   const isBookingReady = !!(user?.id && tour?._id && formData.name.trim() && formData.phone.trim())
 
@@ -79,6 +85,8 @@ export function ModalBooking({
           adults,
           children,
           infants,
+          transportType: selectedTransport,
+          ticketClass: selectedClass,
         }),
       })
       if (!res.ok) {

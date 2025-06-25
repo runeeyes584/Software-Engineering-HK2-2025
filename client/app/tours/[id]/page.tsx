@@ -8,13 +8,13 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -762,13 +762,15 @@ export default function TourDetailPage() {
           open={showBookingModal}
           onOpenChange={setShowBookingModal}
           tour={tourData}
+          onSuccess={(bookingDetails) => {
+            setShowBookingModal(false)
+            router.push(`/payment/${bookingDetails._id}`)
+          }}
           adults={adults}
           children={children}
           infants={infants}
-          onSuccess={(bookingDetails) => {
-            setShowBookingModal(false);
-            router.push(`/payment/${bookingDetails._id}`);
-          }}
+          transportType={transportType}
+          ticketClass={ticketClass}
         />
       </div>
 

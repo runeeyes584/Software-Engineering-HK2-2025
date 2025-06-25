@@ -74,8 +74,6 @@ const handleVNPayReturn = async (req, res) => {
     });
 
     if (status === 'success') {
-      booking.status = 'confirmed';
-      await booking.save();
       return res.redirect('http://localhost:3000/checkout/success');
     } else {
       return res.redirect('http://localhost:3000/checkout/failure');

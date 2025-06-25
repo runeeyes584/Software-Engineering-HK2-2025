@@ -374,7 +374,7 @@
     "namePlaceholder": "Nhập họ và tên của bạn",
     "phone": "Số điện thoại",
     "phonePlaceholder": "Nhập số điện thoại",
-    "email": "Email (Không bắt buộc)",
+    "email": "Email",
     "emailPlaceholder": "Nhập email của bạn",
     "note": "Ghi chú",
     "notePlaceholder": "Bất kỳ yêu cầu đặc biệt hoặc ghi chú nào...",
@@ -410,7 +410,9 @@
       "completeSuccess": "Hoàn thành đặt tour thành công!",
       "completeError": "Hoàn thành đặt tour thất bại. Vui lòng thử lại.",
       "selectStartDate": "Vui lòng chọn ngày khởi hành trước khi đặt chỗ."
-    }
+    },
+    "transportType": "Phương tiện",
+    "ticketClass": "Loại vé"
   },
   "admin": {
     "dashboard": "Bảng điều khiển",
@@ -504,6 +506,11 @@
       "title": "Tour đã lưu",
       "description": "Danh sách tour đã lưu của bạn sẽ hiển thị ở đây.",
       "noSavedTours": "Bạn chưa có tour nào đã lưu."
+    },
+    "sidebar": {
+      "profile": "Hồ sơ",
+      "bookings": "Đơn đặt tour",
+      "savedTours": "Tour đã lưu"
     }
   },
   "tour": {
@@ -588,5 +595,18 @@
     "inactiveTourMessage": "Tour này hiện không hoạt động. Quý khách vui lòng quay lại sau.",
     "understood": "Đã hiểu"
   },
-  "cancel_booking_success": "Hủy đặt tour thành công!"
+  "cancel_booking_success": "Hủy đặt tour thành công!",
+  "orderSuccess": {
+    "title": "Thanh toán thành công!",
+    "message": "Cảm ơn bạn đã thanh toán. Đơn hàng của bạn đã được xác nhận và đang được xử lý.",
+    "viewOrder": "Xem đơn đặt tour",
+    "goHome": "Về trang chủ",
+    "support": "Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ bộ phận hỗ trợ của chúng tôi."
+  },
+  "orderFailed": {
+    "title": "Thanh toán thất bại!",
+    "message": "Đã xảy ra lỗi trong quá trình thanh toán. Vui lòng thử lại hoặc liên hệ bộ phận hỗ trợ.",
+    "goHome": "Về trang chủ",
+    "support": "Nếu bạn đã bị trừ tiền nhưng đơn hàng chưa được xác nhận, vui lòng liên hệ bộ phận hỗ trợ."
+  }
 }

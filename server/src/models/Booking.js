@@ -16,6 +16,8 @@ const bookingSchema = new mongoose.Schema({
   name: { type: String },
   phone: { type: String },
   email: { type: String },
+  transportType: { type: String },
+  ticketClass: { type: String },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Booking', bookingSchema); 

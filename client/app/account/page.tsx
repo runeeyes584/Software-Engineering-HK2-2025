@@ -18,16 +18,17 @@ import { Tabs, TabsContent } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 import { provinces } from "@/lib/vietnam-administrative-divisions"
 import { useAuth, useUser } from "@clerk/nextjs"
-import { AlertCircle, ArrowRight, CalendarIcon, CheckCircle2, Clock, CreditCard, Heart, Plus, User, XCircle } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { AlertCircle, ArrowRight, CalendarIcon, CheckCircle2, Clock, Heart, User, XCircle } from "lucide-react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
 export default function AccountPage() {
   const { t } = useLanguage()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
-  const [activeTab, setActiveTab] = useState<'profile' | 'bookings' | 'payment' | 'saved-tours'>('profile')
+  const [activeTab, setActiveTab] = useState<'profile' | 'bookings' | 'saved-tours'>('profile')
   const { user } = useUser()
   const [savedTours, setSavedTours] = useState<any[]>([])
   const [loadingSaved, setLoadingSaved] = useState(false)
@@ -372,6 +373,13 @@ export default function AccountPage() {
     }
   }
 
+  useEffect(() => {
+    const tab = searchParams.get("tab")
+    if (tab === "bookings") setActiveTab("bookings")
+    else if (tab === "saved-tours") setActiveTab("saved-tours")
+    else if (tab === "profile") setActiveTab("profile")
+  }, [searchParams])
+
   return (
     <div className="container w-full px-10 py-10">
       <div className="flex flex-col md:flex-row gap-8">
@@ -404,7 +412,7 @@ export default function AccountPage() {
                   onClick={() => setActiveTab('profile')}
                 >
                   <User className="mr-3 h-5 w-5" />
-                  <span className="font-medium">Profile</span>
+                  <span className="font-medium">{t('account.sidebar.profile')}</span>
                 </Button>
                 <Button
                   variant={activeTab === 'bookings' ? 'secondary' : 'ghost'}
@@ -415,18 +423,7 @@ export default function AccountPage() {
                   onClick={() => setActiveTab('bookings')}
                 >
                   <CalendarIcon className="mr-3 h-5 w-5" />
-                  <span className="font-medium">Bookings</span>
-                </Button>
-                <Button
-                  variant={activeTab === 'payment' ? 'secondary' : 'ghost'}
-                  className={cn(
-                    "justify-start h-11 rounded-md transition-colors",
-                    activeTab === 'payment' && 'font-semibold shadow-sm'
-                  )}
-                  onClick={() => setActiveTab('payment')}
-                >
-                  <CreditCard className="mr-3 h-5 w-5" />
-                  <span className="font-medium">Payment Methods</span>
+                  <span className="font-medium">{t('account.sidebar.bookings')}</span>
                 </Button>
                 <Button
                   variant={activeTab === 'saved-tours' ? 'secondary' : 'ghost'}
@@ -437,7 +434,7 @@ export default function AccountPage() {
                   onClick={() => setActiveTab('saved-tours')}
                 >
                   <Heart className="mr-3 h-5 w-5" />
-                  <span className="font-medium">Saved Tours</span>
+                  <span className="font-medium">{t('account.sidebar.savedTours')}</span>
                 </Button>
                 <Separator className="my-2" />
               </nav>
@@ -772,50 +769,6 @@ export default function AccountPage() {
                       </Pagination>
                     </div>
                   )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="payment">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-2xl">Payment Methods</CardTitle>
-                  <CardDescription>Manage your payment methods and billing information</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <Card className="border shadow-sm">
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center gap-4">
-                            <div className="bg-muted rounded-lg p-3">
-                              <CreditCard className="h-6 w-6" />
-                            </div>
-                            <div>
-                              <div className="font-semibold">Visa ending in 4242</div>
-                              <div className="text-sm text-muted-foreground">Expires 12/25</div>
-                            </div>
-                          </div>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            className="h-9"
-                            onClick={() => {
-                              if (window.confirm("Are you sure you want to remove this payment method?")) {
-                                // Handle removal
-                              }
-                            }}
-                          >
-                            Remove
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    <Button className="w-full h-11 font-medium">
-                      <Plus className="mr-2 h-5 w-5" />
-                      Add Payment Method
-                    </Button>
-                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
