@@ -50,30 +50,12 @@ export default function ToursPage() {
       .then((res) => res.json())
       .then((data) => {
         setAllTours(
-          data.map((tour: any) => {
-            const id = tour._id && typeof tour._id === 'object' && tour._id.toString
-              ? tour._id.toString()
-              : String(tour._id || tour.id)
-            
-            // Convert category IDs to readable names if available
-            let categories: string[] = []
-            if (Array.isArray(tour.category)) {
-              categories = tour.category.map((cat: any) => {
-                const catId = typeof cat === 'object' ? cat.toString() : String(cat)
-                return allCategories[catId] || catId
-              })
-            } else if (tour.category) {
-              const catId = typeof tour.category === 'object' ? tour.category.toString() : String(tour.category)
-              categories = [allCategories[catId] || catId]
-            }
-
-            return {
-              ...tour,
-              id,
-              name: tour.name || tour.title || '',
-              category: categories
-            }
-          })
+          data.map((tour: any) => ({
+            ...tour,
+            id: tour._id?.toString() || tour.id,
+            name: tour.name || tour.title || '',
+            // Giữ nguyên category là object như API trả về
+          }))
         )
         const initialIndexes: Record<string, number> = {};
         data.forEach((tour: any) => {
@@ -414,6 +396,12 @@ export default function ToursPage() {
                     : (typeof tItem.duration === "number"
                       ? `${tItem.duration} ngày`
                       : (typeof tItem.days === "number" ? `${tItem.days} ngày` : ""));
+                  // Map category sang tên khi render
+                  const categoryNames = Array.isArray(tItem.category)
+                    ? tItem.category.map((cat: any) => cat && cat.name ? cat.name : '').filter(Boolean)
+                    : [];
+                  // Log debug
+                  console.log('DEBUG tour:', tItem.name || tItem.title, 'category raw:', tItem.category, 'categoryNames:', categoryNames);
                   return (
                     <TourCard
                       key={id}
@@ -432,6 +420,7 @@ export default function ToursPage() {
                       onPrev={() => handlePrevImage(id, images.length)}
                       onNext={() => handleNextImage(id, images.length)}
                       onViewDetail={() => window.location.href = `/tours/${id}`}
+                      category={categoryNames}
                     />
                   );
                 })}

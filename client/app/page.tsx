@@ -204,7 +204,11 @@ export default function HomePage() {
               sortedTours.map((tour) => {
                 const images = Array.isArray(tour.images) && tour.images.length > 0 ? tour.images : ["/placeholder.svg"];
                 const currentIndex = imageIndexes[tour._id || tour.id] || 0;
-                const durationStr = typeof tour.duration === "string" ? tour.duration : `${tour.duration} ngày`
+                const durationStr = typeof tour.duration === "string" ? tour.duration : `${tour.duration} ngày`;
+                // Map category sang mảng tên danh mục
+                const categoryNames = Array.isArray(tour.category)
+                  ? tour.category.map((cat: any) => typeof cat === 'object' && cat !== null ? cat.name : String(cat))
+                  : (tour.category ? [typeof tour.category === 'object' && tour.category !== null ? tour.category.name : String(tour.category)] : []);
                 return (
                   <TourCard
                     key={tour._id || tour.id}
@@ -221,6 +225,7 @@ export default function HomePage() {
                     onPrev={() => handlePrev(tour._id || tour.id, images)}
                     onNext={() => handleNext(tour._id || tour.id, images)}
                     onViewDetail={() => window.location.href = `/tours/${tour._id || tour.id}`}
+                    category={categoryNames}
                   />
                 );
               })

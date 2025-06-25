@@ -797,6 +797,10 @@ export default function AccountPage() {
                             : (typeof tour.duration === "number"
                               ? `${tour.duration} ngày`
                               : (typeof tour.days === "number" ? `${tour.days} ngày` : ""));
+                          // Map category sang tên giống trang home/tours
+                          const categoryNames = Array.isArray(tour.category)
+                            ? tour.category.map((cat: any) => cat && cat.name ? cat.name : '').filter(Boolean)
+                            : (tour.category && tour.category.name ? [tour.category.name] : []);
                           return (
                             <TourCard
                               key={id}
@@ -816,6 +820,7 @@ export default function AccountPage() {
                               onNext={() => handleNext(id, images)}
                               onViewDetail={() => window.location.href = `/tours/${id}`}
                               onToggleSave={() => handleUnsave(id)}
+                              category={categoryNames}
                             />
                           );
                         })}

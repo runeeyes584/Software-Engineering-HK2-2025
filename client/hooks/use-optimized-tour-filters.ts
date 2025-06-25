@@ -177,15 +177,15 @@ export function useOptimizedTourFilters(tours: Tour[]) {
 
       // Categories - now an array of ObjectIds in the model
       if (filters.categories.length > 0) {
-        // Handle both string categories and ObjectId categories
-        const tourCategories = Array.isArray(tour.category) ? 
-          tour.category.map(cat => typeof cat === 'string' ? cat : String(cat)) : 
-          (tour.category ? [String(tour.category)] : [])
+        // So sánh theo tên danh mục
+        const tourCategories = Array.isArray(tour.category)
+          ? tour.category.map(cat => (cat && typeof cat === 'object' && cat.name ? cat.name : String(cat)))
+          : (tour.category ? [typeof tour.category === 'object' && tour.category.name ? tour.category.name : String(tour.category)] : []);
 
         if (!tourCategories.some(cat => filters.categories.includes(cat))) {
           return false
         }
-      }      // Destinations filter đã được loại bỏ
+      }
       
       // Group size - using maxGuests property from the model
       if (filters.groupSizeMax < (tour.maxGuests || 50)) {
@@ -251,14 +251,27 @@ export function useOptimizedTourFilters(tours: Tour[]) {
       // Categories - handle array of categories
       if (Array.isArray(tour.category)) {
         tour.category.forEach((cat) => {
-          const catId = typeof cat === 'string' ? cat : String(cat);
-          counts.categories[catId] = (counts.categories[catId] || 0) + 1;
+          let catLabel = '';
+          if (typeof cat === 'object' && cat !== null && cat.name) {
+            catLabel = cat.name;
+          } else if (typeof cat === 'string') {
+            catLabel = cat;
+          }
+          if (catLabel) {
+            counts.categories[catLabel] = (counts.categories[catLabel] || 0) + 1;
+          }
         });
       } else if (tour.category) {
-        const catId = typeof tour.category === 'string' ? tour.category : String(tour.category);
-        counts.categories[catId] = (counts.categories[catId] || 0) + 1;
+        let catLabel = '';
+        if (typeof tour.category === 'object' && tour.category !== null && tour.category.name) {
+          catLabel = tour.category.name;
+        } else if (typeof tour.category === 'string') {
+          catLabel = tour.category;
+        }
+        if (catLabel) {
+          counts.categories[catLabel] = (counts.categories[catLabel] || 0) + 1;
+        }
       }
-      
       // Destinations đã bị loại bỏ để hỗ trợ thêm địa điểm mới một cách linh hoạt
     })
 

@@ -51,6 +51,8 @@ app.use('/api/saved-tours', saveTourRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/chatbot', chatbotRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Route mặc định
 app.get('/', (req, res) => {

@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import type { FilterState } from "@/hooks/use-optimized-tour-filters"
-import { Filter, X } from "lucide-react"
+import { X } from "lucide-react"
 import { useMemo } from "react"
 
 interface TourFiltersProps {

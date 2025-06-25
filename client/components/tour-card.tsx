@@ -22,6 +22,7 @@ interface TourCardProps {
   onViewDetail: () => void;
   isSaved?: boolean;
   onToggleSave?: () => void;
+  category?: string[];
 }
 
 export default function TourCard({
@@ -39,6 +40,7 @@ export default function TourCard({
   onViewDetail,
   isSaved: isSavedProp = false,
   onToggleSave,
+  category = [],
 }: TourCardProps) {
   const { getToken } = useAuth();
   const { user, isSignedIn } = useUser();
@@ -195,6 +197,19 @@ export default function TourCard({
           <span className="font-semibold text-yellow-600">{(Number(averageRating) || 0).toFixed(1)}</span>
           <span className="text-muted-foreground">({reviewCount})</span>
         </div>
+        {/* Hiển thị badge danh mục giữa rating và giá tiền */}
+        {category && category.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-2 mb-1">
+            {category.map((cat, idx) => (
+              <span
+                key={cat + idx}
+                className="inline-block bg-gradient-to-r from-indigo-100 via-sky-100 to-emerald-100 text-indigo-700 font-semibold text-xs px-2 py-0.5 rounded-full border border-indigo-200 shadow-sm"
+              >
+                {cat}
+              </span>
+            ))}
+          </div>
+        )}
       </CardHeader>
       <CardContent className="flex items-center justify-between px-5 pb-5">
         <span className="text-lg font-bold text-primary">${price.toLocaleString()}</span>
