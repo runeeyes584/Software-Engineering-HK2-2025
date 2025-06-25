@@ -91,8 +91,7 @@ export default function HomePage() {
       location: "Canada",
       rating: 5,
     },
-    {
-      id: 3,
+    {      id: 3,
       name: "Maria Garcia",
       text: "The beach tour in Thailand was the perfect getaway. Everything was well organized and stress-free.",
       location: "Spain",
@@ -104,29 +103,15 @@ export default function HomePage() {
     // Redirect to tours page with search parameters
     const params = new URLSearchParams()
 
-    if (searchFilters.destination) {
-      params.set("search", searchFilters.destination)
+    if (searchFilters.searchQuery) {
+      params.set("query", searchFilters.searchQuery)
+    } else if (searchFilters.destination) {
+      params.set("query", searchFilters.destination)
     }
-    if (searchFilters.category) {
-      params.set("category", searchFilters.category)
-    }
-    if (searchFilters.priceRange) {
-      params.set("price", searchFilters.priceRange)
-    }
-    if (searchFilters.duration) {
-      params.set("duration", searchFilters.duration)
-    }
-    if (searchFilters.departureDate) {
-      params.set("departure", searchFilters.departureDate.toISOString())
-    }
-    if (searchFilters.returnDate) {
-      params.set("return", searchFilters.returnDate.toISOString())
-    }
-    if (searchFilters.travelers !== "2") {
-      params.set("travelers", searchFilters.travelers)
-    }
-
-    window.location.href = `/tours?${params.toString()}`
+    
+    // Chuyển hướng đến trang tours với tham số tìm kiếm
+    const searchUrl = `/tours${params.toString() ? `?${params.toString()}` : ''}`
+    window.location.href = searchUrl
   }
 
   const handlePrev = (tourId: string, images: string[]) => {

@@ -16,14 +16,6 @@ interface TourFiltersProps {
   filters: FilterState
   filterCounts: {
     categories: Record<string, number>
-    countries: Record<string, number>
-    difficulties: Record<string, number>
-    activities: Record<string, number>
-    activityLevels: Record<string, number>
-    amenities: Record<string, number>
-    accommodationTypes: Record<string, number>
-    transportationTypes: Record<string, number>
-    languages: Record<string, number>
   }
   activeFilterCount: number
   onUpdateFilter: <K extends keyof FilterState>(key: K, value: FilterState[K]) => void
@@ -48,10 +40,8 @@ export default function TourFilters({
     price: true,
     duration: true,
     categories: true,
-    countries: false,
-    difficulties: false,
-    activities: false,
-    amenities: false,
+    rating: true,
+    groupSize: true,
   })
 
   const toggleSection = (section: string) => {
@@ -110,20 +100,10 @@ export default function TourFilters({
         key: "groupSizeMax",
         value: "",
         label: `${t("filters.groupSize")}: ≤${filters.groupSizeMax} ${t("filters.people")}`,
-      })
-    }
-
-    // Array filters with translations
+      })    }
+      // Array filters with translations
     const arrayFilters: Array<{ key: keyof FilterState; labelKey: string }> = [
-      { key: "categories", labelKey: "filters.category" },
-      { key: "countries", labelKey: "filters.destinations" },
-      { key: "difficulties", labelKey: "filters.difficulty" },
-      { key: "activities", labelKey: "filters.activity" },
-      { key: "activityLevels", labelKey: "filters.activityLevel" },
-      { key: "amenities", labelKey: "filters.amenity" },
-      { key: "accommodationTypes", labelKey: "filters.accommodation" },
-      { key: "transportationTypes", labelKey: "filters.transportation" },
-      { key: "languages", labelKey: "filters.tourLanguages" },
+      { key: "categories", labelKey: "filters.category" }
     ]
 
     arrayFilters.forEach(({ key, labelKey }) => {
@@ -303,9 +283,7 @@ export default function TourFilters({
                   </div>
                 ))}
               </CollapsibleContent>
-            </Collapsible>
-
-            {/* Countries */}
+            </Collapsible>            {/* Countries - Commented out as not in current FilterState
             <Collapsible open={openSections.countries} onOpenChange={() => toggleSection("countries")}>
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" className="w-full justify-between p-0 h-auto">
@@ -314,12 +292,12 @@ export default function TourFilters({
                 </Button>
               </CollapsibleTrigger>
               <CollapsibleContent className="space-y-2">
-                {Object.entries(filterCounts.countries).map(([country, count]) => (
+                {Object.entries(filterCounts.countries || {}).map(([country, count]) => (
                   <div key={country} className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id={`country-${country}`}
-                        checked={filters.countries.includes(country)}
+                        checked={filters.countries?.includes(country) || false}
                         onCheckedChange={() => onToggleArrayFilter("countries", country)}
                       />
                       <Label htmlFor={`country-${country}`} className="text-sm font-normal">
@@ -331,8 +309,7 @@ export default function TourFilters({
                 ))}
               </CollapsibleContent>
             </Collapsible>
-
-            {/* Difficulties */}
+            */}            {/* Difficulties - Commented out as not in current FilterState
             <Collapsible open={openSections.difficulties} onOpenChange={() => toggleSection("difficulties")}>
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" className="w-full justify-between p-0 h-auto">
@@ -341,12 +318,12 @@ export default function TourFilters({
                 </Button>
               </CollapsibleTrigger>
               <CollapsibleContent className="space-y-2">
-                {Object.entries(filterCounts.difficulties).map(([difficulty, count]) => (
+                {Object.entries(filterCounts.difficulties || {}).map(([difficulty, count]) => (
                   <div key={difficulty} className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id={`difficulty-${difficulty}`}
-                        checked={filters.difficulties.includes(difficulty)}
+                        checked={filters.difficulties?.includes(difficulty) || false}
                         onCheckedChange={() => onToggleArrayFilter("difficulties", difficulty)}
                       />
                       <Label htmlFor={`difficulty-${difficulty}`} className="text-sm font-normal">
@@ -358,192 +335,8 @@ export default function TourFilters({
                 ))}
               </CollapsibleContent>
             </Collapsible>
-
-            {/* Activities */}
-            <Collapsible open={openSections.activities} onOpenChange={() => toggleSection("activities")}>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" className="w-full justify-between p-0 h-auto">
-                  <Label>{t("filters.activities")}</Label>
-                  {openSections.activities ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="space-y-2 max-h-48 overflow-y-auto">
-                {Object.entries(filterCounts.activities)
-                  .sort(([, a], [, b]) => b - a)
-                  .slice(0, 10)
-                  .map(([activity, count]) => (
-                    <div key={activity} className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`activity-${activity}`}
-                          checked={filters.activities.includes(activity)}
-                          onCheckedChange={() => onToggleArrayFilter("activities", activity)}
-                        />
-                        <Label htmlFor={`activity-${activity}`} className="text-sm font-normal">
-                          {getTranslatedFilterValue("activities", activity)}
-                        </Label>
-                      </div>
-                      <span className="text-xs text-muted-foreground">({count})</span>
-                    </div>
-                  ))}
-              </CollapsibleContent>
-            </Collapsible>
-
-            {/* Activity Levels */}
-            <Collapsible open={openSections.activityLevels} onOpenChange={() => toggleSection("activityLevels")}>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" className="w-full justify-between p-0 h-auto">
-                  <Label>{t("filters.activityLevels")}</Label>
-                  {openSections.activityLevels ? (
-                    <ChevronUp className="h-4 w-4" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4" />
-                  )}
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="space-y-2">
-                {Object.entries(filterCounts.activityLevels).map(([level, count]) => (
-                  <div key={level} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`activityLevel-${level}`}
-                        checked={filters.activityLevels.includes(level)}
-                        onCheckedChange={() => onToggleArrayFilter("activityLevels", level)}
-                      />
-                      <Label htmlFor={`activityLevel-${level}`} className="text-sm font-normal">
-                        {getTranslatedFilterValue("activityLevels", level)}
-                      </Label>
-                    </div>
-                    <span className="text-xs text-muted-foreground">({count})</span>
-                  </div>
-                ))}
-              </CollapsibleContent>
-            </Collapsible>
-
-            {/* Amenities */}
-            <Collapsible open={openSections.amenities} onOpenChange={() => toggleSection("amenities")}>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" className="w-full justify-between p-0 h-auto">
-                  <Label>{t("filters.amenities")}</Label>
-                  {openSections.amenities ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="space-y-2 max-h-48 overflow-y-auto">
-                {Object.entries(filterCounts.amenities)
-                  .sort(([, a], [, b]) => b - a)
-                  .slice(0, 10)
-                  .map(([amenity, count]) => (
-                    <div key={amenity} className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`amenity-${amenity}`}
-                          checked={filters.amenities.includes(amenity)}
-                          onCheckedChange={() => onToggleArrayFilter("amenities", amenity)}
-                        />
-                        <Label htmlFor={`amenity-${amenity}`} className="text-sm font-normal">
-                          {getTranslatedFilterValue("amenities", amenity)}
-                        </Label>
-                      </div>
-                      <span className="text-xs text-muted-foreground">({count})</span>
-                    </div>
-                  ))}
-              </CollapsibleContent>
-            </Collapsible>
-
-            {/* Accommodation Types */}
-            <Collapsible
-              open={openSections.accommodationTypes}
-              onOpenChange={() => toggleSection("accommodationTypes")}
-            >
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" className="w-full justify-between p-0 h-auto">
-                  <Label>{t("filters.accommodationTypes")}</Label>
-                  {openSections.accommodationTypes ? (
-                    <ChevronUp className="h-4 w-4" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4" />
-                  )}
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="space-y-2">
-                {Object.entries(filterCounts.accommodationTypes).map(([accommodation, count]) => (
-                  <div key={accommodation} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`accommodation-${accommodation}`}
-                        checked={filters.accommodationTypes.includes(accommodation)}
-                        onCheckedChange={() => onToggleArrayFilter("accommodationTypes", accommodation)}
-                      />
-                      <Label htmlFor={`accommodation-${accommodation}`} className="text-sm font-normal">
-                        {getTranslatedFilterValue("accommodationTypes", accommodation)}
-                      </Label>
-                    </div>
-                    <span className="text-xs text-muted-foreground">({count})</span>
-                  </div>
-                ))}
-              </CollapsibleContent>
-            </Collapsible>
-
-            {/* Transportation Types */}
-            <Collapsible
-              open={openSections.transportationTypes}
-              onOpenChange={() => toggleSection("transportationTypes")}
-            >
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" className="w-full justify-between p-0 h-auto">
-                  <Label>{t("filters.transportationTypes")}</Label>
-                  {openSections.transportationTypes ? (
-                    <ChevronUp className="h-4 w-4" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4" />
-                  )}
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="space-y-2">
-                {Object.entries(filterCounts.transportationTypes).map(([transport, count]) => (
-                  <div key={transport} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`transport-${transport}`}
-                        checked={filters.transportationTypes.includes(transport)}
-                        onCheckedChange={() => onToggleArrayFilter("transportationTypes", transport)}
-                      />
-                      <Label htmlFor={`transport-${transport}`} className="text-sm font-normal">
-                        {getTranslatedFilterValue("transportationTypes", transport)}
-                      </Label>
-                    </div>
-                    <span className="text-xs text-muted-foreground">({count})</span>
-                  </div>
-                ))}
-              </CollapsibleContent>
-            </Collapsible>
-
-            {/* Languages */}
-            <Collapsible open={openSections.languages} onOpenChange={() => toggleSection("languages")}>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" className="w-full justify-between p-0 h-auto">
-                  <Label>{t("filters.tourLanguages")}</Label>
-                  {openSections.languages ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="space-y-2">
-                {Object.entries(filterCounts.languages).map(([language, count]) => (
-                  <div key={language} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`language-${language}`}
-                        checked={filters.languages.includes(language)}
-                        onCheckedChange={() => onToggleArrayFilter("languages", language)}
-                      />
-                      <Label htmlFor={`language-${language}`} className="text-sm font-normal">
-                        {getTranslatedFilterValue("languages", language)}
-                      </Label>
-                    </div>
-                    <span className="text-xs text-muted-foreground">({count})</span>
-                  </div>
-                ))}
-              </CollapsibleContent>
-            </Collapsible>
+            */}            {/* Note: Advanced filter sections (Activities, Amenities, etc.) have been 
+                 commented out as they don't match the current FilterState interface */}
 
             {/* Rating */}
             <div className="space-y-2">

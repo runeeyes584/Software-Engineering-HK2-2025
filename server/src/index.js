@@ -17,6 +17,7 @@ const reviewRoutes = require('./routes/review.route.js');
 const chatbotRoutes = require('./routes/chatbot.routes.js');
 const categoryRoutes = require('./routes/category.route.js');
 const notificationRoutes = require('./routes/notification.route.js');
+const searchRoutes = require('./routes/search.route.js');
 
 // Import auth middleware
 const requireAuth = require('./middleware/clerk');
@@ -48,9 +49,8 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/cloudinary', cloudinaryRoutes);
 app.use('/api/saved-tours', saveTourRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/search', searchRoutes);
 app.use('/api/chatbot', chatbotRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/notifications', notificationRoutes);
 
 // Route mặc định
 app.get('/', (req, res) => {
