@@ -77,6 +77,15 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ open
         console.error("Failed to mark notification as read:", error);
       }
     }
+    // Điều hướng nếu là thông báo xác nhận booking
+    if (notification.link) {
+      window.location.href = notification.link;
+    } else if (
+      notification.title?.toLowerCase().includes('đặt tour đã được xác nhận') ||
+      notification.message?.toLowerCase().includes('đơn đặt tour')
+    ) {
+      window.location.href = '/account?tab=bookings';
+    }
     onClose();
   };
 

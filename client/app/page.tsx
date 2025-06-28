@@ -60,19 +60,19 @@ export default function HomePage() {
       id: 1,
       name: "Hoi An",
       country: "Vietnam",
-      image: "/placeholder.svg?height=300&width=400",
+      image: "https://vcdn1-dulich.vnecdn.net/2022/06/01/Hoi-An-VnExpress-5851-16488048-4863-2250-1654057244.jpg?w=0&h=0&q=100&dpr=1&fit=crop&s=Z2ea_f0O7kgGZllKmJF92g",
     },
     {
       id: 2,
       name: "Kyoto",
       country: "Japan",
-      image: "/placeholder.svg?height=300&width=400",
+      image: "https://media.vietravel.com/images/Content/kinh-nghiem-du-lich-kyoto-1.png",
     },
     {
       id: 3,
       name: "Phuket",
       country: "Thailand",
-      image: "/placeholder.svg?height=300&width=400",
+      image: "https://media-cdn.tripadvisor.com/media/photo-m/1280/1b/4b/5d/c8/caption.jpg",
     },
   ]
 

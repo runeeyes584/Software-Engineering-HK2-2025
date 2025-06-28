@@ -171,7 +171,7 @@ export function useOptimizedTourFilters(tours: Tour[]) {
       }
 
       // Rating - may not be present in all tours
-      if (tour.rating && tour.rating < filters.ratingMin) {
+      if ((tour.rating ?? 0) < filters.ratingMin) {
         return false
       }
 

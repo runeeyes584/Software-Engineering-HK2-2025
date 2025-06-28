@@ -1,6 +1,7 @@
 {
   "common": {
     "search": "Search",
+    "days": "days",
     "login": "Login",
     "signup": "Sign Up",
     "logout": "Logout",
@@ -15,6 +16,18 @@
     "oldest": "Oldest",
     "paginationPrevious": "Previous",
     "paginationNext": "Next"
+  },
+  "sort": {
+    "recommended": "Recommended",
+    "priceLowToHigh": "Price: Low to High",
+    "priceHighToLow": "Price: High to Low",
+    "durationShortToLong": "Duration: Short to Long",
+    "durationLongToShort": "Duration: Long to Short",
+    "ratingHighToLow": "Rating: High to Low",
+    "ratingLowToHigh": "Rating: Low to High",
+    "reviewsHighToLow": "Reviews: High to Low",
+    "highestRated": "Highest Rated",
+    "alphabetical": "Alphabetical"
   },
   "home": {
     "hero": {
@@ -475,10 +488,31 @@
     "button": "Search",
     "showing": "Showing",
     "of": "of",
-    "tours": "tours"
+    "tours": "tours",
+    "noToursFound": "No tours found",
+    "noToursMatchFilters": "No tours match your filters",
+    "suggestionReduceFilters": "Reduce filters to find more tours",
+    "try": "Try"
+  },
+  "chatbot": {
+    "title": "Travel Assistant",
+    "welcome": "Hello! How can I help you today?",
+    "placeholder": "Ask me about tours, destinations, discounts, or any travel-related questions.",
+    "suggestions": "Quick Suggestions",
+    "suggestion": {
+      "beaches": "Beautiful Beaches",
+      "booking": "Booking",
+      "cancellation": "Cancellation",
+      "discounts": "Discounts",
+      "bestTime": "Best Time to Visit"
+    }
   },
   "filters": {
     "title": "Filters",
+    "active": "Active",
+    "category": "Category",
+    "ratingMin": "Minimum Rating",
+    "groupSizeMax": "Maximum Group Size",
     "showFilters": "Show Filters",
     "hideFilters": "Hide Filters",
     "clearAll": "Clear All",

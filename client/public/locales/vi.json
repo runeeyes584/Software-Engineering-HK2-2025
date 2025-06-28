@@ -280,10 +280,18 @@
     "button": "Tìm kiếm",
     "showing": "Hiển thị",
     "of": "trong tổng số",
-    "tours": "tour"
+    "tours": "tour",
+    "noToursFound": "Không tìm thấy tour nào",
+    "noToursMatchFilters": "Không tìm thấy tour nào phù hợp với bộ lọc của bạn",
+    "suggestionReduceFilters": "Giảm bộ lọc để tìm thấy nhiều tour hơn",
+    "try": "Thử"
   },
   "filters": {
     "title": "Bộ lọc",
+    "active": "Đang hoạt động",
+    "category": "Danh mục",
+    "ratingMin": "Đánh giá tối thiểu",
+    "groupSizeMax": "Số người tối đa",
     "showFilters": "Hiện bộ lọc",
     "hideFilters": "Ẩn bộ lọc",
     "clearAll": "Xóa tất cả",

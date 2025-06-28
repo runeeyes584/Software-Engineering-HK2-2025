@@ -80,15 +80,15 @@ export default function BookingDetailModal({ booking, open, onOpenChange, t: tPr
           <div className="space-y-2 py-2">
             <div className="flex items-center gap-2 mb-2">
               <span className="font-medium">{t('booking.customer')}:</span>
-              <span>{booking.name || '-'}</span>
+              <span>{booking?.name || '-'}</span>
             </div>
             <div className="flex items-center gap-2 mb-2">
               <span className="font-medium">{t('booking.phone')}:</span>
-              <span>{booking.phone || '-'}</span>
+              <span>{booking?.phone || '-'}</span>
             </div>
             <div className="flex items-center gap-2 mb-2">
               <span className="font-medium">{t('booking.email')}:</span>
-              <span>{booking.email || '-'}</span>
+              <span>{booking?.email || '-'}</span>
             </div>
           </div>
         </DialogHeader>
@@ -155,11 +155,11 @@ export default function BookingDetailModal({ booking, open, onOpenChange, t: tPr
           )}
           <div className="flex items-center gap-2 mb-2">
             <span className="font-medium">{t('booking.transportType')}:</span>
-            <span>{booking.transportType || '-'}</span>
+            <span>{booking?.transportType || '-'}</span>
           </div>
           <div className="flex items-center gap-2 mb-2">
             <span className="font-medium">{t('booking.ticketClass')}:</span>
-            <span>{booking.ticketClass || '-'}</span>
+            <span>{booking?.ticketClass || '-'}</span>
           </div>
         </div>
         {isAdmin && (booking?.status === 'pending' || booking?.status === 'confirmed') && (

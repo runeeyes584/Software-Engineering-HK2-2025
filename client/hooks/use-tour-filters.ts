@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useMemo, useState } from "react"
 
 export interface Tour {
   id: number
@@ -166,7 +166,7 @@ export function useTourFilters(tours: Tour[]) {
       }
 
       // Rating filter
-      if (tour.rating < filters.ratingMin) {
+      if ((tour.rating ?? 0) < filters.ratingMin) {
         return false
       }
 

@@ -105,16 +105,8 @@ export default function ToursPage() {
     getPopularSearches,
   } = useOptimizedTourFilters(allTours as any)
 
-  // Sort filteredTours theo createdAt mới nhất lên đầu
-  const sortedFilteredTours = [...filteredTours].sort((a, b) => {
-    const aAny = a as any;
-    const bAny = b as any;
-    const dateA = aAny.createdAt ? new Date(aAny.createdAt).getTime() : (aAny._id ? new Date(parseInt(aAny._id.toString().substring(0,8), 16) * 1000).getTime() : 0);
-    const dateB = bAny.createdAt ? new Date(bAny.createdAt).getTime() : (bAny._id ? new Date(parseInt(bAny._id.toString().substring(0,8), 16) * 1000).getTime() : 0);
-    return dateB - dateA;
-  });
-  const totalPages = Math.ceil(sortedFilteredTours.length / TOURS_PER_PAGE);
-  const paginatedTours = sortedFilteredTours.slice((currentPage - 1) * TOURS_PER_PAGE, currentPage * TOURS_PER_PAGE);
+  const totalPages = Math.ceil(filteredTours.length / TOURS_PER_PAGE);
+  const paginatedTours = filteredTours.slice((currentPage - 1) * TOURS_PER_PAGE, currentPage * TOURS_PER_PAGE);
   // Lấy các tìm kiếm phổ biến và chuyển đổi định dạng để phù hợp với component
   const rawPopularSearches = getPopularSearches()
   const popularSearches = rawPopularSearches.map(search => {
@@ -202,7 +194,7 @@ export default function ToursPage() {
   };
     // Xác định danh sách tour hiển thị - ưu tiên kết quả từ server nếu có
   const displayTours = serverSearchParams.query || serverSearchParams.category || serverSearchParams.destination ? 
-    serverSearchResults : sortedFilteredTours;
+    serverSearchResults : filteredTours;
   
   // Tính toán phân trang cho kết quả
   const currentPageTours = serverSearchParams.query || serverSearchParams.category || serverSearchParams.destination ?
@@ -491,26 +483,31 @@ export default function ToursPage() {
                 </PaginationContent>
               </Pagination>
             </>          ) : (
-              <div className="space-y-4">
-                <div className="text-muted-foreground">
-                  <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <h3 className="text-lg font-medium">{t("search.noToursFound")}</h3>
-                  <p className="text-sm">                    {hasActiveSearch
-                      ? t("search.noToursMatchSearch", { query: serverSearchParams.query || filters.searchQuery })
-                      : t("search.noToursMatchFilters")}
-                  </p>
-                </div>
+              <div className="flex flex-col items-center justify-center min-h-[320px] py-12 text-center space-y-6">
+                <Search className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+                <h3 className="text-2xl font-semibold text-muted-foreground mb-2">{t("search.noToursFound")}</h3>
+                <p className="text-base text-muted-foreground mb-4">
+                  {hasActiveSearch
+                    ? t("search.noToursMatchSearch", { query: serverSearchParams.query || filters.searchQuery })
+                    : t("search.noToursMatchFilters")}
+                </p>
+                <p className="text-sm text-muted-foreground mb-4">{t("search.suggestionReduceFilters") || "Hãy thử giảm điều kiện lọc hoặc xóa tất cả bộ lọc để xem thêm tour."}</p>
                 <div className="flex flex-col sm:flex-row gap-2 justify-center">
                   <Button variant="outline" onClick={resetFilters}>
                     {t("filters.clearAll")}
                   </Button>
-                  {popularSearches.length > 0 && (
-                    <div className="flex flex-wrap gap-2 justify-center">
-                      <span className="text-sm text-muted-foreground">{t("search.try")}:</span>                      {popularSearches.slice(0, 3).map((search, index) => (
-                        <Button key={index} variant="ghost" size="sm" onClick={() => handleSearchSelect(typeof search === 'string' ? search : search.name)}>
-                          {typeof search === 'string' ? search : search.name}
-                        </Button>
-                      ))}
+                  {popularSearches.filter(s => typeof s === 'string' || (s && typeof s.name === 'string')).length > 0 && (
+                    <div className="flex flex-wrap gap-2 justify-center items-center">
+                      <span className="text-sm text-muted-foreground">{t("search.try")}:</span>
+                      {popularSearches.slice(0, 3).map((search, index) => {
+                        const label = typeof search === 'string' ? search : (search && typeof search.name === 'string' ? search.name : null);
+                        if (!label) return null;
+                        return (
+                          <Button key={index} variant="ghost" size="sm" onClick={() => handleSearchSelect(label)}>
+                            {label}
+                          </Button>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
