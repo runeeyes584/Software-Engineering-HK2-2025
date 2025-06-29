@@ -485,6 +485,7 @@
   },
   "search": {
     "placeholder": "Where do you want to go?",
+    "active": "Active",
     "button": "Search",
     "showing": "Showing",
     "of": "of",

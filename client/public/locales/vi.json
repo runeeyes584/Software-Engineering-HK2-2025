@@ -277,6 +277,7 @@
   },
   "search": {
     "placeholder": "Bạn muốn đi đâu?",
+    "active": "Đang hoạt động",
     "button": "Tìm kiếm",
     "showing": "Hiển thị",
     "of": "trong tổng số",

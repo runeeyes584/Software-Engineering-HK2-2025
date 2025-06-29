@@ -1,6 +1,7 @@
 const { ProductCode, VNPay, VnpLocale, dateFormat, ignoreLogger } = require('vnpay');
 const Booking = require('../models/Booking.js');
 const Payment = require('../models/Payment.js');
+const { createNotification } = require('./notification.controller.js');
 
 const vnpay = new VNPay({
   tmnCode: 'JEOP71C7',
@@ -63,7 +64,8 @@ const handleVNPayReturn = async (req, res) => {
       status = "pending";
     }
 
-    await Payment.create({
+    // Tạo payment record
+    const payment = await Payment.create({
       user: booking.user._id,
       booking: booking._id,
       amount: Number(req.query.vnp_Amount) / 100,
@@ -72,6 +74,40 @@ const handleVNPayReturn = async (req, res) => {
       transactionId: req.query.vnp_TransactionNo,
       paidAt: new Date()
     });
+
+    // Cập nhật booking với payment reference
+    await Booking.findByIdAndUpdate(bookingId, { payment: payment._id });
+
+    // Nếu payment failed, cập nhật booking status thành cancelled
+    if (status === 'failed') {
+      await Booking.findByIdAndUpdate(bookingId, { status: 'cancelled' });
+      
+      // Gửi thông báo cho user về việc payment failed và booking bị cancelled
+      try {
+        if (booking.user && booking.user.clerkId) {
+          const title = "Thanh toán thất bại";
+          const message = "Thanh toán của bạn đã thất bại. Đơn đặt tour đã được hủy tự động.";
+          const link = `/account?tab=bookings`;
+          await createNotification(booking.user.clerkId, title, message, link);
+        }
+      } catch (notificationError) {
+        console.error("Failed to send payment failure notification:", notificationError);
+      }
+    }
+
+    // Nếu payment success, gửi thông báo cho user
+    if (status === 'success') {
+      try {
+        if (booking.user && booking.user.clerkId) {
+          const title = "Thanh toán thành công";
+          const message = "Thanh toán của bạn đã thành công! Đơn đặt tour đang chờ xác nhận.";
+          const link = `/account?tab=bookings`;
+          await createNotification(booking.user.clerkId, title, message, link);
+        }
+      } catch (notificationError) {
+        console.error("Failed to send payment success notification:", notificationError);
+      }
+    }
 
     if (status === 'success') {
       return res.redirect('http://localhost:3000/checkout/success');

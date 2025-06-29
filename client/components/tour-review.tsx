@@ -1,17 +1,16 @@
-import { Star, ThumbsUp, MessageCircle, Calendar, Clock, MoreVertical, Pencil, Trash2, ChevronLeft, ChevronRight, X, PlayCircle, Circle, Play, Reply } from "lucide-react"
 import { useLanguage } from "@/components/language-provider-fixed"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
-import { useState, useEffect } from "react"
-import { useUser, useAuth } from "@clerk/nextjs"
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
-import { Dialog, DialogContent, DialogHeader, DialogFooter } from "@/components/ui/dialog"
-import { toast } from "sonner"
 import { ReviewForm } from "@/components/review-form"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Label } from "@/components/ui/label"
+import { Progress } from "@/components/ui/progress"
 import { Textarea } from "@/components/ui/textarea"
+import { cn } from "@/lib/utils"
+import { useAuth, useUser } from "@clerk/nextjs"
+import { Calendar, ChevronLeft, ChevronRight, Clock, MessageCircle, MoreVertical, Pencil, PlayCircle, Reply, Star, ThumbsUp, Trash2 } from "lucide-react"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
 
 interface Review {
   id: string
@@ -297,7 +296,7 @@ export function TourReview({ reviews, averageRating, totalReviews, onRefreshRevi
                   </div>
                 ) : (
                   <>
-                    <p className="text-sm text-muted-foreground leading-relaxed mb-4">{review.comment}</p>
+                    <p className="text-base font-bold text-foreground leading-relaxed mb-4">{review.comment}</p>
                     {/* Gallery ảnh/video nếu có */}
                     {((Array.isArray(review.images) && review.images.length > 0) || (Array.isArray(review.videos) && review.videos.length > 0)) && (
                       <div className="flex flex-wrap gap-2 mb-2 items-center">
@@ -509,7 +508,9 @@ export function TourReview({ reviews, averageRating, totalReviews, onRefreshRevi
                 {/* Dialog xác nhận xóa */}
                 <Dialog open={deletingReviewId === review.id} onOpenChange={open => { if (!open) setDeletingReviewId(null) }}>
                   <DialogContent>
-                    <DialogHeader>{t("review.deleteConfirm")}</DialogHeader>
+                    <DialogHeader>
+                      <DialogTitle>{t("review.deleteConfirm")}</DialogTitle>
+                    </DialogHeader>
                     <DialogFooter>
                       <Button variant="outline" onClick={() => setDeletingReviewId(null)}>{t("common.cancel")}</Button>
                       <Button variant="destructive" onClick={async () => {
@@ -554,7 +555,9 @@ export function TourReview({ reviews, averageRating, totalReviews, onRefreshRevi
       {mediaModal && (
         <Dialog open={!!mediaModal} onOpenChange={() => setMediaModal(null)}>
           <DialogContent className="max-w-4xl p-0 overflow-hidden bg-transparent border-none shadow-none z-[9999]">
-            <DialogHeader className="sr-only">Review Media</DialogHeader>
+            <DialogHeader className="sr-only">
+              <DialogTitle>Review Media</DialogTitle>
+            </DialogHeader>
             <div className="relative w-full aspect-video bg-black flex items-center justify-center">
               {mediaModal.type === 'image' ? (
                 <img src={mediaModal.url} alt="Review Media" className="w-full h-full object-contain" />
