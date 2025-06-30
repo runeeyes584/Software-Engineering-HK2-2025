@@ -285,7 +285,9 @@
     "noToursFound": "Không tìm thấy tour nào",
     "noToursMatchFilters": "Không tìm thấy tour nào phù hợp với bộ lọc của bạn",
     "suggestionReduceFilters": "Giảm bộ lọc để tìm thấy nhiều tour hơn",
-    "try": "Thử"
+    "try": "Thử",
+    "noResults": "Không có kết quả",
+    "noToursMatchSeach": "Không có tour nào phù hợp với tiêu chí tìm kiếm của bạn"
   },
   "filters": {
     "title": "Bộ lọc",
@@ -319,7 +321,8 @@
     "person": "người",
     "people": "người",
     "maximum": "Tối đa",
-    "activityLevel": "Cấp độ hoạt động"
+    "activityLevel": "Cấp độ hoạt động",
+    "search": "Tìm kiếm"
   },
   "tours": {
     "title": "Tour của chúng tôi",
@@ -392,6 +395,7 @@
     "bookings_of": "Các tour đã đặt của bạn",
     "manage": "Quản lý các tour đã đặt của bạn",
     "sort_by": "Sắp xếp theo",
+    "noBookings": "Bạn chưa có tour nào đã đặt.",
     "newest": "Mới nhất",
     "oldest": "Cũ nhất",
     "status": {

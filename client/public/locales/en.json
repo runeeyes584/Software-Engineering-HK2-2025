@@ -417,6 +417,8 @@
     "sort_by": "Sort By",
     "newest": "Newest",
     "oldest": "Oldest",
+    "noBookings": "You have no bookings yet.",
+    "noBookingsDescription": "Once you book a tour, it will appear here.",
     "status": {
       "pending": "Pending",
       "confirmed": "Confirmed",
@@ -493,7 +495,9 @@
     "noToursFound": "No tours found",
     "noToursMatchFilters": "No tours match your filters",
     "suggestionReduceFilters": "Reduce filters to find more tours",
-    "try": "Try"
+    "try": "Try",
+    "noResults": "No results found",
+    "noToursMatchSeach": "No tours match your search criteria"
   },
   "chatbot": {
     "title": "Travel Assistant",
@@ -540,7 +544,8 @@
     "person": "person",
     "people": "people",
     "maximum": "Maximum",
-    "activityLevel": "Activity Level"
+    "activityLevel": "Activity Level",
+    "search":"Search"
   },
   "tours": {
     "title": "Our Tours",
@@ -616,6 +621,8 @@
       "title": "My Bookings",
       "description": "Manage your booked tours.",
       "noBookings": "You have no bookings yet.",
+      "noBookingsDescription": "Once you book a tour, it will appear here.",
+
       "total": "Total",
       "sortBy": "Sort By",
       "newest": "Newest",
