@@ -1,15 +1,5 @@
 "use client"
 
-import { ColumnDef } from "@tanstack/react-table"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,11 +11,21 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { MoreHorizontal, Edit, Trash2 } from "lucide-react"
-import Link from "next/link"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { useAuth } from "@clerk/nextjs"
-import { toast } from "sonner"
+import { ColumnDef } from "@tanstack/react-table"
+import { Edit, MoreHorizontal, Trash2 } from "lucide-react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export type Category = {
   _id: string
@@ -99,7 +99,7 @@ export const getCategoryColumns = (onDeleteCategory?: (id: string) => void): Col
     accessorKey: "name",
     header: () => <div className="text-center">Tên danh mục</div>,
     cell: ({ row }) => (
-      <div className="text-center font-semibold text-gray-900">{row.getValue("name")}</div>
+      <div className="text-center font-semibold text-foreground">{row.getValue("name")}</div>
     ),
   },
   {
@@ -108,7 +108,7 @@ export const getCategoryColumns = (onDeleteCategory?: (id: string) => void): Col
     cell: ({ row }) => {
       const desc = row.getValue("description") as string
       return (
-        <div className="text-center text-sm text-gray-600 max-w-xs mx-auto truncate" title={desc} style={{ cursor: 'pointer' }}>
+        <div className="text-center text-sm text-muted-foreground max-w-xs mx-auto truncate" title={desc} style={{ cursor: 'pointer' }}>
           {desc}
         </div>
       )
