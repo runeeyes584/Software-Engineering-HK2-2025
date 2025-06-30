@@ -15,6 +15,7 @@ import { Mail, MapPin, Phone } from "lucide-react"
 export default function ContactPage() {
   const { t } = useLanguage()
   const [isLoading, setIsLoading] = useState(false)
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle")
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -34,30 +35,38 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setStatus("idle")
 
     try {
-      // This would connect to your .NET Core backend
-      // const response = await fetch('/api/contact', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // });
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Reset form
-      setFormData({
-        name: "",
-        email: "",
-        subject: "",
-        message: "",
+      const response = await fetch('https://formspree.io/f/xvgrlalr', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+        })
       })
 
-      alert("Your message has been sent successfully!")
+      if (response.ok) {
+        setStatus("success")
+        // Reset form
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
+        })
+      } else {
+        setStatus("error")
+      }
     } catch (error) {
       console.error("Failed to send message:", error)
-      alert("Failed to send message. Please try again later.")
+      setStatus("error")
     } finally {
       setIsLoading(false)
     }
@@ -72,6 +81,21 @@ export default function ContactPage() {
           <Card>
             <CardContent className="p-6">
               <h2 className="text-2xl font-bold mb-6">{t("contact.getInTouch")}</h2>
+              
+              {/* Success Message */}
+              {status === "success" && (
+                <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-md">
+                  <p className="text-green-800 font-medium">{t("contact.form.success")}</p>
+                </div>
+              )}
+
+              {/* Error Message */}
+              {status === "error" && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
+                  <p className="text-red-800 font-medium">{t("contact.form.error")}</p>
+                </div>
+              )}
+
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -136,8 +160,8 @@ export default function ContactPage() {
                   <Mail className="h-5 w-5 mr-3 mt-0.5 text-primary" />
                   <div>
                     <h3 className="font-medium">{t("contact.email")}</h3>
-                    <p className="text-sm text-muted-foreground">info@travelvista.com</p>
-                    <p className="text-sm text-muted-foreground">support@travelvista.com</p>
+                    <p className="text-sm text-muted-foreground">anhtienle428@gmail.com</p>
+                    <p className="text-sm text-muted-foreground">anhtienle428@gmail.com</p>
                   </div>
                 </div>
 
@@ -145,8 +169,8 @@ export default function ContactPage() {
                   <Phone className="h-5 w-5 mr-3 mt-0.5 text-primary" />
                   <div>
                     <h3 className="font-medium">{t("contact.phone")}</h3>
-                    <p className="text-sm text-muted-foreground">+84 (0) 123 456 789</p>
-                    <p className="text-sm text-muted-foreground">+1 (555) 123-4567</p>
+                    <p className="text-sm text-muted-foreground">+84 (0) 971825026</p>
+                    <p className="text-sm text-muted-foreground">+1 (555) 453-14584</p>
                   </div>
                 </div>
 
@@ -155,11 +179,11 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-medium">{t("contact.headquarters")}</h3>
                     <p className="text-sm text-muted-foreground">
-                      123 Tran Hung Dao Street
+                      123 Mac Dinh Chi Street
                       <br />
-                      Hoan Kiem District
+                      Linh Trung Ward
                       <br />
-                      Hanoi, Vietnam
+                      Thu Duc city, Vietnam
                     </p>
                   </div>
                 </div>
@@ -173,7 +197,7 @@ export default function ContactPage() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span>{t("contact.weekdays")}</span>
-                  <span>9:00 AM - 6:00 PM</span>
+                  <span>8:00 AM - 6:00 PM</span>
                 </div>
                 <div className="flex justify-between">
                   <span>{t("contact.saturday")}</span>

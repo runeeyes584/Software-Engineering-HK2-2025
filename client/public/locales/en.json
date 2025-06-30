@@ -163,8 +163,8 @@
       "subject": "Subject",
       "message": "Message",
       "submit": "Send Message",
-      "success": "Message sent successfully!",
-      "error": "Error sending message. Please try again.",
+      "success": "Message sent successfully! We will get back to you soon.",
+      "error": "Failed to send message. Please try again later.",
       "required": "Required fields",
       "privacy": "By submitting this form, you agree to our privacy policy."
     },

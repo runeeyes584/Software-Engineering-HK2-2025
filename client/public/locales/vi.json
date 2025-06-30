@@ -156,8 +156,8 @@
       "subject": "Tiêu đề",
       "message": "Nội dung",
       "submit": "Gửi tin nhắn",
-      "success": "Gửi tin nhắn thành công!",
-      "error": "Lỗi khi gửi tin nhắn. Vui lòng thử lại.",
+      "success": "Gửi tin nhắn thành công! Chúng tôi sẽ phản hồi lại bạn sớm nhất có thể.",
+      "error": "Không thể gửi tin nhắn. Vui lòng thử lại sau.",
       "required": "Các trường bắt buộc",
       "privacy": "Bằng việc gửi form này, bạn đồng ý với chính sách bảo mật của chúng tôi."
     },
