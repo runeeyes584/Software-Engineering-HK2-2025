@@ -39,10 +39,10 @@ app.use(cors({
 }));
 
 // Middleware quan trọng để parse JSON bodies
+app.use('/api/users', userRoutes);
 app.use(express.json());
 
 // Routes
-app.use('/api/users', userRoutes);
 app.use('/api/tours', tourRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/payments', paymentRoutes);

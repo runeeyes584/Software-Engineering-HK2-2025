@@ -37,7 +37,9 @@ const handleClerkWebhook = async (req, res) => {
     const eventType = evt.type;
 
     if (eventType === "user.deleted") {
-      return res.status(200).json({ success: true, message: "User deleted event ignored" });
+      // Xóa user trong database theo clerkId
+      await User.deleteOne({ clerkId: id });
+      return res.status(200).json({ success: true, message: "User deleted from database" });
     }
 
     const {
