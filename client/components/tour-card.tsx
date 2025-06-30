@@ -102,7 +102,7 @@ export default function TourCard({
     : duration;
 
   return (
-    <Card className="overflow-hidden border border-border rounded-2xl shadow-md transition-transform duration-200 bg-white group relative">
+    <Card className="overflow-hidden border border-border rounded-2xl shadow-md transition-transform duration-200 bg-card group relative">
       {/* Nút trái tim lưu tour ở góc trên bên phải card */}
       {isSignedIn ? (
         <button
@@ -159,9 +159,9 @@ export default function TourCard({
           fill
           className="object-cover rounded-t-2xl transition-transform duration-300"
         />
-        <div className="absolute top-3 left-3 bg-white/80 rounded-full px-3 py-1 flex items-center gap-1 shadow text-xs font-medium">
-          <MapPin className="h-4 w-4 text-primary" />
-          <span className="text-primary font-semibold">{destination}</span>
+        <div className="absolute top-3 left-3 bg-card/90 rounded-full px-3 py-1 flex items-center gap-1 shadow text-xs font-medium">
+          <MapPin className="h-4 w-4 text-card-foreground" />
+          <span className="text-card-foreground font-semibold">{destination}</span>
         </div>
         {/* Nút chuyển ảnh trái/phải, chỉ hiện khi hover */}
         {images.length > 1 && (
